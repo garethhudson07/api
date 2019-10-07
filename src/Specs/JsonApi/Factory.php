@@ -25,11 +25,15 @@ class Factory
         return (new Service())->accepts(
             'relationsKey',
             'filtersKey',
-            'sortKey'
+            'sortKey',
+            'offsetKey',
+            'limitKey'
         )
             ->relationsKey('include')
             ->filtersKey('filter')
-            ->sortKey('sort');
+            ->sortKey('sort')
+            ->offsetKey('offset')
+            ->limitKey('limit');
     }
 
     /**

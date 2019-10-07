@@ -53,26 +53,20 @@ class Factory
     }
 
     /**
-     * @return \Psr\Http\Message\ServerRequestInterface
-     * @throws \Oilstone\RsqlParser\Exceptions\InvalidQueryStringException
+     * @return ServerRequestInterface
      */
     public function query()
     {
         $request = $this->base();
-        $queryParams = $request->getQueryParams();
 
-        return $request->withAttribute(
-            'segments',
-            Parser::segments($request->getUri()->getPath())
-        )->withAttribute(
-            'relations',
-            Parser::relations($queryParams[$this->config->get('relationsKey')] ?? '')
-        )->withAttribute(
-            'filters',
-            Parser::filters($queryParams[$this->config->get('filtersKey')] ?? '')
-        )->withAttribute(
-            'sort',
-            Parser::sort($queryParams[$this->config->get('sortKey')] ?? '')
+        $bag = Bag::parse(
+            Raw::extract($request, $this->config)
         );
+
+        return $request->withAttribute('segments', $bag->segments())
+            ->withAttribute('relations', $bag->relations())
+            ->withAttribute('filters', $bag->filters())
+            ->withAttribute('sort', $bag->sort())
+            ->withAttribute('limit', $bag->limit());
     }
 }

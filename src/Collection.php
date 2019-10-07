@@ -144,4 +144,12 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
     {
         return count($this->items);
     }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->items;
+    }
 }

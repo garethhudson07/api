@@ -6,6 +6,7 @@ use Api\Guards\OAuth2\Sentinel;
 use Api\Pipeline\Pipe;
 use Api\Repositories\Contracts\Repository as RepositoryContract;
 use Api\Resources\Resource;
+use Api\Http\Requests\Relations as RequestRelations;
 use Exception;
 use Oilstone\RsqlParser\Condition;
 use Oilstone\RsqlParser\Expression;
@@ -66,7 +67,8 @@ class Repository implements RepositoryContract
 
         $this->includeRelations($query, $relations)
             ->applyRsqlExpression($query, $request->getAttribute('filters'))
-            ->applySorting($query, $request->getAttribute('sort'));
+            ->applySorting($query, $request->getAttribute('sort'))
+            ->applyLimit($query, $request->getAttribute('limit'), $relations);
 
         return $query->get()->toArray();
     }
@@ -87,7 +89,8 @@ class Repository implements RepositoryContract
 
         $this->includeRelations($query, $relations)
             ->applyRsqlExpression($query, $request->getAttribute('filters'))
-            ->applySorting($query, $request->getAttribute('sort'));
+            ->applySorting($query, $request->getAttribute('sort'))
+            ->applyLimit($query, $request->getAttribute('limit'), $relations);
 
         return $query->first()->toArray();
     }
@@ -146,10 +149,10 @@ class Repository implements RepositoryContract
 
     /**
      * @param Resource $resource
-     * @param array $relations
+     * @param RequestRelations $relations
      * @return $this
      */
-    public function addRelations(Resource $resource, array $relations)
+    public function addRelations(Resource $resource, RequestRelations $relations)
     {
         foreach ($relations as $requestRelation) {
             $name = $requestRelation->getName();
@@ -169,10 +172,10 @@ class Repository implements RepositoryContract
 
     /**
      * @param Query $query
-     * @param array $relations
+     * @param RequestRelations $relations
      * @return $this
      */
-    public function includeRelations(Query $query, array $relations)
+    public function includeRelations(Query $query, RequestRelations $relations)
     {
         foreach ($relations as $relation) {
             $query->with($relation->path());
@@ -205,7 +208,7 @@ class Repository implements RepositoryContract
     protected function applyRsqlExpression($query, Expression $expression)
     {
         foreach ($expression as $item) {
-            $method = $item['operator'] == 'OR' ? 'orWhere' : 'where';
+            $method = $item['operator'] === 'OR' ? 'orWhere' : 'where';
             $constraint = $item['constraint'];
 
             if ($constraint instanceof Expression) {
@@ -215,10 +218,28 @@ class Repository implements RepositoryContract
                 });
             } else {
                 /** @var Condition $constraint */
-
-
-
                 $query->{$method}($constraint->getColumn(), $constraint->getOperator()->toSql(), $constraint->getValue());
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Query $query
+     * @param $limit
+     * @param RequestRelations $relations
+     * @return $this
+     */
+    function applyLimit(Query $query, $limit, RequestRelations $relations)
+    {
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        foreach ($relations->collapse() as $relation) {
+            if ($limit = $relation->getLimit()) {
+                $query->limit($relation->path(), $limit);
             }
         }
 

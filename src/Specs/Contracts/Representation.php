@@ -2,7 +2,6 @@
 
 namespace Api\Specs\Contracts;
 
-use Api\Pipeline\Pipe;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**

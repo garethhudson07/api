@@ -26,7 +26,9 @@ class Relation
     /**
      * @var array
      */
-    protected $relations = [];
+    protected $relations;
+
+    protected $limit;
 
     /**
      * Relation constructor.
@@ -35,6 +37,7 @@ class Relation
     public function __construct(string $name)
     {
         $this->name = $name;
+        $this->relations = new Relations();
     }
 
     /**
@@ -100,6 +103,15 @@ class Relation
     }
 
     /**
+     * @param string $name
+     * @return null
+     */
+    public function pullRelation(string $name)
+    {
+        return $this->relations->pull($name);
+    }
+
+    /**
      * @return string
      */
     public function getName(): string
@@ -147,6 +159,25 @@ class Relation
      */
     public function hasRelations()
     {
-        return count($this->relations) > 0;
+        return $this->relations->count() > 0;
+    }
+
+    /**
+     * @param int $limit
+     * @return $this
+     */
+    public function setLimit(int $limit)
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLimit()
+    {
+        return $this->limit;
     }
 }

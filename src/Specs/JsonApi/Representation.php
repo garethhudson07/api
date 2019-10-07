@@ -2,9 +2,9 @@
 
 namespace Api\specs\JsonApi;
 
-use Api\Pipeline\Pipe;
 use Api\Specs\Contracts\Representation as RepresentationContract;
-use Api\Requests\Relation;
+use Api\Http\Requests\Relation as RequestRelation;
+use Api\Http\Requests\Relations as RequestRelations;
 use Api\Support\Str;
 use Neomerx\JsonApi\Encoder\Encoder;
 use Neomerx\JsonApi\Schema\Arr as ArrSchema;
@@ -50,16 +50,16 @@ class Representation implements RepresentationContract
     }
 
     /**
-     * @param array $relations
+     * @param RequestRelations $relations
      * @return array
      */
-    public function collapseRelations(array $relations): array
+    public function collapseRelations(RequestRelations $relations): array
     {
         $collapsed = [];
 
         foreach ($relations as $relation) {
-            /** @var Relation $relation */
-            if ($relation->getRelations()) {
+            /** @var RequestRelation $relation */
+            if ($relation->getRelations()->count()) {
                 $collapsed = array_merge($collapsed, array_map(function ($subRelation) use ($relation) {
                     return Str::camel($relation->getName()) . '.' . $subRelation;
                 }, $this->collapseRelations($relation->getRelations())));

@@ -5,6 +5,7 @@ namespace Api\Guards\OAuth2;
 use Api\Exceptions\ApiException;
 use Api\Pipeline\Pipeline;
 use Api\Resources\Resource;
+use Api\Http\Requests\Relations as RequestRelations;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Sentinel
@@ -68,11 +69,11 @@ class Sentinel
 
     /**
      * @param Resource $resource
-     * @param array $requestRelations
+     * @param RequestRelations $requestRelations
      * @return $this
      * @throws \Exception
      */
-    protected function checkRelations(Resource $resource, array $requestRelations)
+    protected function checkRelations(Resource $resource, RequestRelations $requestRelations)
     {
         foreach ($requestRelations as $requestRelation) {
             $relation = $resource->getRelation($requestRelation->getName());
