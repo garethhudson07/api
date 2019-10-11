@@ -24,12 +24,14 @@ class Factory
     {
         return (new Service())->accepts(
             'relationsKey',
+            'fieldsKey',
             'filtersKey',
             'sortKey',
             'offsetKey',
             'limitKey'
         )
             ->relationsKey('include')
+            ->fieldsKey('fields')
             ->filtersKey('filter')
             ->sortKey('sort')
             ->offsetKey('offset')

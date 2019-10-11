@@ -18,6 +18,8 @@ class Relation
 
     protected $ancestry;
 
+    protected $fields = [];
+
     /**
      * @var
      */
@@ -134,6 +136,25 @@ class Relation
     public function setFilters(Expression $filters)
     {
         $this->filters = $filters;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFields(): array
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param array $fields
+     * @return $this
+     */
+    public function setFields(array $fields)
+    {
+        $this->fields = $fields;
 
         return $this;
     }

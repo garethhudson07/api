@@ -11,6 +11,8 @@ class Raw
 
     protected $relations;
 
+    protected $fields;
+
     protected $filters;
 
     protected $sort;
@@ -25,6 +27,7 @@ class Raw
 
         return (new static)->setSegments($request->getUri()->getPath())
             ->setRelations($params[$config->get('relationsKey')] ?? null)
+            ->setFields($params[$config->get('fieldsKey')] ?? null)
             ->setFilters($params[$config->get('filtersKey')] ?? null)
             ->setSort($params[$config->get('sortKey')] ?? null)
             ->setLimit($params[$config->get('limitKey')] ?? null)
@@ -86,6 +89,25 @@ class Raw
     public function filters()
     {
         return $this->filters;
+    }
+
+    /**
+     * @param $fields
+     * @return $this
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function fields()
+    {
+        return $this->fields;
     }
 
     /**

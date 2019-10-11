@@ -66,6 +66,7 @@ class Repository implements RepositoryContract
         $query = $this->scopedQuery($pipe);
 
         $this->includeRelations($query, $relations)
+            ->applyFields($query, $request->getAttribute('fields'), $relations)
             ->applyRsqlExpression($query, $request->getAttribute('filters'))
             ->applySorting($query, $request->getAttribute('sort'))
             ->applyLimit($query, $request->getAttribute('limit'), $relations);
@@ -88,6 +89,7 @@ class Repository implements RepositoryContract
         $query =  $this->keyedQuery($pipe);
 
         $this->includeRelations($query, $relations)
+            ->applyFields($query, $request->getAttribute('fields'), $relations)
             ->applyRsqlExpression($query, $request->getAttribute('filters'))
             ->applySorting($query, $request->getAttribute('sort'))
             ->applyLimit($query, $request->getAttribute('limit'), $relations);
@@ -219,6 +221,32 @@ class Repository implements RepositoryContract
             } else {
                 /** @var Condition $constraint */
                 $query->{$method}($constraint->getColumn(), $constraint->getOperator()->toSql(), $constraint->getValue());
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Query $query
+     * @param array $fields
+     * @param RequestRelations $relations
+     * @return $this
+     */
+    function applyFields(Query $query, array $fields, RequestRelations $relations)
+    {
+        if ($fields) {
+            $query->select(...$fields);
+        }
+
+        foreach ($relations->collapse() as $relation) {
+            if ($fields = $relation->getFields()) {
+                $path = $relation->path();
+
+                $query->limit(...array_map(function ($field) use ($path)
+                {
+                    return "$field.$path";
+                }, $fields));
             }
         }
 

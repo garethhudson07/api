@@ -65,6 +65,7 @@ class Factory
 
         return $request->withAttribute('segments', $bag->segments())
             ->withAttribute('relations', $bag->relations())
+            ->withAttribute('fields', $bag->fields())
             ->withAttribute('filters', $bag->filters())
             ->withAttribute('sort', $bag->sort())
             ->withAttribute('limit', $bag->limit());

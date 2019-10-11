@@ -3,13 +3,14 @@
 namespace Api\Http\Requests;
 
 use Closure;
-use Oilstone\RsqlParser\Parser as RsqlParser;
 
 class Bag
 {
     protected $segments;
 
     protected $relations;
+
+    protected $fields = [];
 
     protected $filters;
 
@@ -19,18 +20,49 @@ class Bag
 
     protected $offset;
 
+    /**
+     * Bag constructor.
+     */
     public function __construct()
     {
         $this->relations = new Relations();
     }
 
+    /**
+     * @param Raw $raw
+     * @return Bag
+     */
     public static function parse(Raw $raw)
     {
         return (new static)->parseSegments($raw->segments())
             ->parseRelations($raw->relations() ?: '')
+            ->parseFields($raw->fields() ?: '')
             ->parseFilters($raw->filters() ?: '')
             ->parseSort($raw->sort() ?: '')
             ->parseLimit($raw->limit() ?: '');
+    }
+
+    /**
+     * @param array $items
+     * @param Closure $callback
+     * @return $this
+     */
+    protected function apply(array $items, Closure $callback)
+    {
+        $resource = $this->resource();
+
+        foreach ($items as $name => $value) {
+            if ($name === $resource) {
+                $callback($this, $value);
+                continue;
+            }
+
+            if ($relation = $this->relations->pull($name)) {
+                $callback($relation, $value);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -39,7 +71,7 @@ class Bag
      */
     public function parseSegments(string $input)
     {
-        $this->segments = array_values(array_filter(explode('/', $input)));
+        $this->segments = Parser::segments($input);
 
         return $this;
     }
@@ -47,30 +79,38 @@ class Bag
     /**
      * @param $input
      * @return $this
+     */
+    public function parseFields($input)
+    {
+        if (is_array($input)) {
+            $this->apply($input, function ($instance, $value)
+            {
+                $instance->setFields(Parser::list($value));
+            });
+
+            return $this;
+        }
+
+        return $this->setFields(Parser::list($input));
+    }
+
+    /**
+     * @param $input
+     * @return $this|Bag
      * @throws \Oilstone\RsqlParser\Exceptions\InvalidQueryStringException
      */
     public function parseFilters($input)
     {
         if (is_array($input)) {
-            $resource = $this->resource();
-
-            foreach ($input as $name => $filters) {
-                if ($name === $resource) {
-                    $this->filters = RsqlParser::parse($filters);
-                    continue;
-                }
-
-                if ($relation = $this->relations->pull($name)) {
-                    $relation->setFilters(RsqlParser::parse($filters));
-                }
-            }
+            $this->apply($input, function ($instance, $value)
+            {
+                $instance->setFilters(Parser::filters($value));
+            });
 
             return $this;
         }
 
-        $this->filters = RsqlParser::parse($input);
-
-        return $this;
+        return $this->setFilters(Parser::filters($input));
     }
 
     /**
@@ -79,9 +119,7 @@ class Bag
      */
     public function parseRelations(string $input)
     {
-        foreach (array_filter(explode(',', $input)) as $item) {
-            $this->relations[] = Relation::parse($item);
-        }
+        $this->relations = Parser::relations($input);
 
         return $this;
     }
@@ -92,9 +130,7 @@ class Bag
      */
     public function parseSort(string $input)
     {
-        foreach (array_filter(explode(',', $input)) as $item) {
-            $this->sort = Order::parse($item);
-        }
+        $this->sort = Parser::sort($input);
 
         return $this;
     }
@@ -106,25 +142,15 @@ class Bag
     public function parseLimit($input)
     {
         if (is_array($input)) {
-            $resource = $this->resource();
-
-            foreach ($input as $name => $limit) {
-                if ($name === $resource) {
-                    $this->limit = $limit;
-                    continue;
-                }
-
-                if ($relation = $this->relations->pull($name)) {
-                    $relation->setLimit($limit);
-                }
-            }
+            $this->apply($input, function ($instance, $value)
+            {
+                $instance->setLimit(Parser::integer($value));
+            });
 
             return $this;
         }
 
-        $this->limit = $input;
-
-        return $this;
+        return $this->setLimit(Parser::integer($input));
     }
 
     /**
@@ -175,6 +201,25 @@ class Bag
     public function relations()
     {
         return $this->relations;
+    }
+
+    /**
+     * @param array $fields
+     * @return $this
+     */
+    public function setFields(array $fields)
+    {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function fields(): array
+    {
+        return $this->fields;
     }
 
     /**
