@@ -17,7 +17,6 @@
         "php": "^7.1.3",
         "oilstone/php-rsql-parser": "^1.0",
         "oilstone/json-api": "^1.0",
-        "oilstone/stitch": "^1.0.0",
         "league/oauth2-server": "^7.4",
         "psr/http-message": "^1.0",
         "nyholm/psr7": "^1.1",
