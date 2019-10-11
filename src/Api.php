@@ -21,6 +21,8 @@ class Api
      */
     protected $resources;
 
+    protected $prefix = '';
+
     public function __construct(Factory $factory)
     {
         $this->factory = $factory;
@@ -46,6 +48,17 @@ class Api
     public function register(string $name, Closure $callback)
     {
         $this->resources->bind($name, $callback);
+    }
+
+    /**
+     * @param string $prefix
+     * @return $this
+     */
+    public function prefix(string $prefix)
+    {
+        $this->prefix = $prefix;
+
+        return $this;
     }
 
     /**
@@ -128,7 +141,7 @@ class Api
         return $this->try(function ()
         {
             $request = $this->factory->request()->query();
-            $pipeline = (new Pipeline($request, $this->resources))->assemble();
+            $pipeline = (new Pipeline($request, $this->resources, $this->prefix))->assemble();
             $this->factory->guard()->sentinel($request, $pipeline)->protect();
 
             return $this->factory->response()->json(

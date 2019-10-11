@@ -2,6 +2,7 @@
 
 namespace Api\Pipeline;
 
+use Api\Http\Requests\Parser;
 use Api\Resources\Registry;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -20,15 +21,29 @@ class Pipeline
      */
     protected $pipes = [];
 
+    protected $segments = [];
+
     /**
      * Pipeline constructor.
      * @param ServerRequestInterface $request
      * @param Registry $resources
+     * @param string $prefix
      */
-    public function __construct(ServerRequestInterface $request, Registry $resources)
+    public function __construct(ServerRequestInterface $request, Registry $resources, string $prefix)
     {
         $this->request = $request;
         $this->resources = $resources;
+    }
+
+    /**
+     * @param string $prefix
+     */
+    protected function resolveSegments(string $prefix)
+    {
+        $this->segments = array_slice(
+            $this->request->getAttribute('segments'),
+            count(Parser::segments($prefix))
+        );
     }
 
     /**
@@ -59,7 +74,7 @@ class Pipeline
         /** @var Pipe $pipe */
         $pipe = null;
 
-        foreach ($this->request->getAttribute('segments') as $segment) {
+        foreach ($this->segments as $segment) {
             if ($pipe && !$pipe->hasKey()) {
                 if ($pipe->isCollectable()) {
                     $pipe->setKey(urldecode($segment));
