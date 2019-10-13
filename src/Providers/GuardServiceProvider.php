@@ -48,7 +48,7 @@ class GuardServiceProvider extends AbstractServiceProvider
     protected function bindOAuth2(): void
     {
         $this->getContainer()
-            ->add(Sentinel::class, function ()
+            ->share(Sentinel::class, function ()
             {
                 return (new OAuth2Factory(
                     $this->getContainer(),
