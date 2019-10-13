@@ -13,6 +13,8 @@ class Service
     protected $parent;
 
     /**
+     *
+     *
      * @param array ...$arguments
      * @return $this
      */
@@ -24,6 +26,8 @@ class Service
     }
 
     /**
+     *
+     *
      * @param string $key
      * @return bool
      */
@@ -33,6 +37,8 @@ class Service
     }
 
     /**
+     * Inherit from another Service
+     *
      * @param Service $config
      * @return $this
      */
@@ -46,12 +52,14 @@ class Service
     /**
      * @return Service
      */
-    public function child()
+    public function extend()
     {
         return (new static())->inherit($this);
     }
 
     /**
+     * Set a configuration value
+     *
      * @param string $key
      * @param $value
      * @return $this
@@ -66,6 +74,8 @@ class Service
     }
 
     /**
+     * Get a configuration value
+     *
      * @param string $key
      * @return mixed|null
      */
@@ -84,6 +94,19 @@ class Service
     }
 
     /**
+     * Get a configuration value via property access
+     *
+     * @param string $key
+     * @return mixed|null
+     */
+    public function __get(string $key)
+    {
+        return $this->get($key);
+    }
+
+    /**
+     * Set a configuration value via method access
+     *
      * @param $name
      * @param $arguments
      * @return Service

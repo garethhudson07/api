@@ -5,6 +5,8 @@ namespace Api;
 use Closure;
 use League\Container\Container;
 use Api\Config\Store as Configs;
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use Psr\Container\ContainerInterface;
 
 class Kernel
 {
@@ -15,29 +17,13 @@ class Kernel
     /**
      * Kernel constructor.
      */
-    public function __construct()
+    public function __construct(Container $container, Configs $configs)
     {
-        $this->container = new Container;
-        $this->configs = new Configs;
+        $this->container = $container;
+        $this->configs = $configs;
     }
 
-    /**
-     * @return Container
-     */
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
-    /**
-     * @return Configs
-     */
-    public function getConfigs()
-    {
-        return $this->configs;
-    }
-
-    public function addConfig()
+    public function addConfig(string $name)
     {
 
     }
@@ -51,20 +37,51 @@ class Kernel
         return $this->configs->configure($name, $callback);
     }
 
-    /**
-     * @param Kernel $kernel
-     * @return Kernel
-     */
-    public function delegate(Kernel $kernel)
+    public function bind($id, $value)
     {
-        $this->container->delegate($kernel->getContainer());
-        $this->configs->delegate($kernel->getConfigs());
+
+    }
+
+    /**
+     * @param $id
+     * @return array|mixed|object
+     */
+    public function resolve($id)
+    {
+        return $this->container->get($id);
+    }
+
+    /**
+     * @param AbstractServiceProvider $provider
+     * @return $this
+     */
+    public function addServiceProvider(AbstractServiceProvider $provider)
+    {
+        $this->container->addServiceProvider($provider);
 
         return $this;
     }
 
-    public function bind()
+    /**
+     * @param ContainerInterface $container
+     * @return $this
+     */
+    public function addDelegateContainer(ContainerInterface $container)
     {
+        $this->container->delegate($container);
 
+        return $this;
+    }
+
+    /**
+     * @param Kernel $kernel
+     * @return Kernel
+     */
+    public function extend()
+    {
+        return new static(
+            (new Container)->delegate($this->container),
+            $this->configs->extend()
+        );
     }
 }

@@ -26,7 +26,7 @@ class Factory
      */
     public static function config()
     {
-        return (new Manager())->service('jsonApi', JsonApiFactory::config())->use('jsonApi');
+        return (new Manager())->add('jsonApi', JsonApiFactory::config())->use('jsonApi');
     }
 
     /**
@@ -35,7 +35,7 @@ class Factory
     public function jsonApi()
     {
         if (!$this->jsonApi) {
-            $this->jsonApi = new JsonApiFactory($this->config->getService('jsonApi'));
+            $this->jsonApi = new JsonApiFactory($this->config->service('jsonApi'));
         }
 
         return $this->jsonApi;
@@ -46,6 +46,6 @@ class Factory
      */
     public function representation()
     {
-        return $this->{$this->config->getEnabled()}()->representation();
+        return $this->{$this->config->enabled()}()->representation();
     }
 }

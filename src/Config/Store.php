@@ -11,13 +11,12 @@ class Store extends Collection
      * @param Store $collection
      * @return $this
      */
-    public function delegate(Store $collection)
+    public function inherit(Store $collection)
     {
         foreach ($collection as $name => $config) {
             $this->put(
                 $name,
-
-                $config->child()
+                $config->extend()
             );
         }
 
@@ -27,7 +26,7 @@ class Store extends Collection
     /**
      * @return Store
      */
-    public function child()
+    public function extend()
     {
         return (new static())->inherit($this);
     }

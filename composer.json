@@ -9,8 +9,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Online Solutions",
-            "email": "support@onlinesolutionsltd.com"
+            "name": "Gareth",
+            "email": "garethhudson07@gmail.com"
         }
     ],
     "require": {
@@ -23,7 +23,8 @@
         "nyholm/psr7-server": "^0.3.0",
         "zendframework/zend-httphandlerrunner": "^1.1",
         "ext-json": "*",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "league/container": "^3.3"
     },
     "autoload": {
         "psr-4": {

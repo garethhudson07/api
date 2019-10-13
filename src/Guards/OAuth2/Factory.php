@@ -4,15 +4,19 @@ namespace Api\Guards\OAuth2;
 
 use Api\Guards\OAuth2\League\Factory as LeagueFactory;
 use Api\Config\Service;
+use League\Container\Container;
 
 class Factory
 {
+    protected $container;
+
     protected $config;
 
     protected $leagueFactory;
 
-    public function __construct(Service $config)
+    public function __construct(Container $container, Service $config)
     {
+        $this->container = $container;
         $this->config = $config;
         $this->leagueFactory = new LeagueFactory($config);
     }
@@ -30,35 +34,34 @@ class Factory
      * @param $pipeline
      * @return Sentinel
      */
-    public function sentinel($request, $pipeline)
+    public function sentinel()
     {
         return new Sentinel(
-            $request,
-            $pipeline,
-            $this->key($request)
+            $this->container->get('Psr\Http\Message\ServerRequestInterface'),
+            $this->key()
         );
     }
 
-    public function key($request)
+    /**
+     * @return Key
+     */
+    public function key()
     {
         return new Key(
             $this->leagueFactory->resourceServer(),
-            $request,
+            $this->container->get('Psr\Http\Message\ServerRequestInterface'),
             $this->config->get('userRepository')
         );
     }
 
     /**
-     * @param $request
      * @return Authoriser
-     * @throws \Defuse\Crypto\Exception\BadFormatException
-     * @throws \Defuse\Crypto\Exception\EnvironmentIsBrokenException
      */
-    public function authoriser($request)
+    public function authoriser()
     {
         return new Authoriser(
             $this->leagueFactory->authorisationServer(),
-            $request
+            $this->container->get('Psr\Http\Message\ServerRequestInterface')
         );
     }
 }

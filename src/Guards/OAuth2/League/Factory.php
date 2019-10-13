@@ -2,12 +2,12 @@
 
 namespace Api\Guards\OAuth2\League;
 
+use Api\Config\Service;
 use Api\Guards\OAuth2\League\Repositories\Client as ClientRepository;
 use Api\Guards\OAuth2\League\Repositories\AccessToken as AccessTokenRepository;
 use Api\Guards\OAuth2\League\Repositories\RefreshToken as RefreshTokenRepository;
 use Api\Guards\OAuth2\League\Repositories\Scope as ScopeRepository;
 use Api\Guards\OAuth2\League\Repositories\User as UserRepository;
-use Api\Config\Service;
 use League\OAuth2\Server\Grant\ClientCredentialsGrant;
 use League\OAuth2\Server\Grant\PasswordGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;

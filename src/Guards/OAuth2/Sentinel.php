@@ -2,13 +2,14 @@
 
 namespace Api\Guards\OAuth2;
 
+use Api\Guards\Contracts\Sentinel as SentinelContract;
 use Api\Exceptions\ApiException;
 use Api\Pipeline\Pipeline;
 use Api\Resources\Resource;
 use Api\Http\Requests\Relations as RequestRelations;
 use Psr\Http\Message\ServerRequestInterface;
 
-class Sentinel
+class Sentinel implements SentinelContract
 {
     protected $request;
 
@@ -22,24 +23,23 @@ class Sentinel
      * @param Pipeline $pipeline
      * @param Key $key
      */
-    public function __construct(ServerRequestInterface $request, Pipeline $pipeline, Key $key)
+    public function __construct(ServerRequestInterface $request, Key $key)
     {
         $this->request = $request;
-        $this->pipeline = $pipeline;
         $this->key = $key;
     }
 
     /**
+     * @param Pipeline $pipeline
      * @return $this
-     * @throws \Exception
      */
-    public function protect()
+    public function protect(Pipeline $pipeline)
     {
         $this->key->handle();
 
-        $this->checkPipeline()
+        $this->checkPipeline($pipeline)
             ->checkRelations(
-                $this->pipeline->last()->getResource(),
+                $pipeline->last()->getResource(),
                 $this->request->getAttribute('relations')
             );
 
@@ -55,12 +55,12 @@ class Sentinel
     }
 
     /**
+     * @param Pipeline $pipeline
      * @return $this
-     * @throws \Exception
      */
-    protected function checkPipeline()
+    protected function checkPipeline(Pipeline $pipeline)
     {
-        foreach ($this->pipeline->all() as $pipe) {
+        foreach ($pipeline->all() as $pipe) {
             $this->verify($pipe->getOperation(), $pipe->getResource()->getName());
         }
 

@@ -4,7 +4,8 @@ namespace Api;
 
 use Api\Pipeline\Pipeline;
 use Api\Pipeline\Scope;
-use Api\Requests\Request;
+use Psr\Http\Message\ServerRequestInterface;
+use Api\Guards\Contracts\Sentinel as SentinelInterface;
 
 /**
  * Class CustomResourceRepository
@@ -12,6 +13,16 @@ use Api\Requests\Request;
  */
 class CustomResourceRepository
 {
+    protected $request;
+
+    protected $sentinel;
+
+    public function __construct(ServerRequestInterface $request, SentinelInterface $sentinel)
+    {
+        $this->request = $request;
+        $this->sentinel = $sentinel;
+    }
+
     /**
      * @param Request $request
      * @param Pipeline $pipeline
