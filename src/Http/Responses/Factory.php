@@ -13,7 +13,7 @@ class Factory
      * @param string $content
      * @return mixed
      */
-    public function base(string $content = '')
+    public function make(string $content = '')
     {
         $response = $this->psr7Response()->withBody($this->psr7Stream());
 
@@ -30,7 +30,7 @@ class Factory
      */
     public function json(string $content = '')
     {
-        return $this->base($content)->withHeader('Content-Type', 'application/json');
+        return $this->make($content)->withHeader('Content-Type', 'application/json');
     }
 
     /**

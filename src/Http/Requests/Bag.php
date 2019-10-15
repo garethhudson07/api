@@ -119,7 +119,7 @@ class Bag
      */
     public function parseRelations(string $input)
     {
-        $this->relations = Parser::relations($input);
+        $this->relations->fill(Parser::relations($input));
 
         return $this;
     }

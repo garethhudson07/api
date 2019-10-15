@@ -32,10 +32,13 @@ abstract class Registry
     /**
      * @param string $name
      * @param Closure $callback
+     * @return $this
      */
     public function bind(string $name, Closure $callback)
     {
         $this->items[$name] = $callback;
+
+        return $this;
     }
 
     /**

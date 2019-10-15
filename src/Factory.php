@@ -19,26 +19,26 @@ use Closure;
  */
 class Factory
 {
-    protected $config;
+//    protected $config;
+//
+//    protected $spec;
+//
+//    protected $request;
+//
+//    protected $response;
+//
+//    protected $guard;
 
-    protected $spec;
+//    protected $resource;
 
-    protected $request;
-
-    protected $response;
-
-    protected $guard;
-
-    protected $resource;
-
-    /**
-     * Factory constructor.
-     * @param Config|null $config
-     */
-    public function __construct(?Config $config = null)
-    {
-        $this->config = $config;
-    }
+//    /**
+//     * Factory constructor.
+//     * @param Config|null $config
+//     */
+//    public function __construct(?Config $config = null)
+//    {
+//        $this->config = $config;
+//    }
 
     /**
      * @param string $name

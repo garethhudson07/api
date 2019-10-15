@@ -2,10 +2,15 @@
 
 namespace Api;
 
-use Api\Config\Store as Config;
-use Api\Specs\Factory as SpecFactory;
-use Api\Guards\Factory as GuardFactory;
+use Api\Config\Manager as ConfigManager;
 use Psr\Http\Message\ServerRequestInterface;
+use Api\Guards\OAuth2\Factory as OAuth2Factory;
+use Api\Specs\JsonApi\Factory as JsonApiFactory;
+use Api\Http\Requests\Factory as RequestFactory;
+use Api\Providers\RequestServiceProvider;
+use Api\Providers\ResponseServiceProvider;
+use Api\Providers\GuardServiceProvider;
+use Api\Providers\SpecServiceProvider;
 use Stitch\Stitch;
 use Closure;
 
@@ -15,7 +20,20 @@ use Closure;
  */
 class Package
 {
-    protected static $config;
+    protected $kernel;
+
+    protected $request;
+
+    /**
+     * Package constructor.
+     * @throws \Exception
+     */
+    public function __construct()
+    {
+        $this->kernel = Kernel::make();
+
+        $this->init();
+    }
 
     /**
      * @param Closure $callback
@@ -26,40 +44,91 @@ class Package
     }
 
     /**
-     * @return mixed
+     * @throws \Exception
      */
-    protected static function config()
+    protected function init()
     {
-        if (!static::$config) {
-            static::$config = (new Config())->put('specification', SpecFactory::config())
-                ->put('guard', GuardFactory::config());
-        }
+        $this->buildConfig()
+            ->registerServiceProviders();
+    }
 
-        return static::$config;
+    /**
+     * @return $this
+     * @throws \Exception
+     */
+    protected function buildConfig()
+    {
+        $this->kernel->addConfig(
+            'guard',
+            (new ConfigManager())->add('OAuth2', OAuth2Factory::config())
+        )->addConfig(
+            'specification',
+            (new ConfigManager())->add('jsonApi', JsonApiFactory::config())->use('jsonApi')
+        )->addConfig(
+            'request',
+            RequestFactory::config()
+        );
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function registerServiceProviders()
+    {
+        $this->kernel->addServiceProvider(
+            new RequestServiceProvider($this->kernel->getConfig('request'), $this->kernel->getConfig('specification'))
+        )->addServiceProvider(
+            new ResponseServiceProvider()
+        )->addServiceProvider(
+            new GuardServiceProvider($this->kernel->getConfig('guard'))
+        )->addServiceProvider(
+            new SpecServiceProvider($this->kernel->getConfig('specification'))
+        );
+
+        return $this;
     }
 
     /**
      * @param string $name
      * @param Closure $callback
+     * @return $this
      */
-    public static function configure(string $name, Closure $callback)
+    public function configure(string $name, Closure $callback)
     {
-        static::config()->configure($name, $callback);
+        $this->kernel->configure($name, $callback);
+
+        return $this;
     }
 
     /**
-     * @param null|ServerRequestInterface $request
-     * @return Api
-     * @throws \Exception
+     * @param mixed ...$arguments
+     * @return $this
      */
-    public static function make(?ServerRequestInterface $request = null)
+    public function bind(...$arguments)
     {
-        $factory = new Factory(static::config()->child());
+        $this->kernel->bind(...$arguments);
 
-        if ($request) {
-            $factory->request()->setBaseRequest($request);
-        }
+        return $this;
+    }
 
-        return new Api($factory);
+    /**
+     * @param ServerRequestInterface $request
+     * @return $this
+     */
+    public function setRequest(ServerRequestInterface $request)
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * @return Api
+     */
+    public function api()
+    {
+        return new Api($this->kernel->extend());
     }
 }

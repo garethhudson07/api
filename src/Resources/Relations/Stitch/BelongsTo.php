@@ -2,7 +2,6 @@
 
 namespace Api\Resources\Relations\Stitch;
 
-use Stitch\Model;
 use Stitch\Relations\BelongsTo as StitchRelation;
 
 /**

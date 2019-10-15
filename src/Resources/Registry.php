@@ -3,13 +3,16 @@
 namespace Api\Resources;
 
 use Api\Registry as AbstractRegistry;
-use Api\Factory;
 use Closure;
 
 class Registry extends AbstractRegistry
 {
     protected $factory;
 
+    /**
+     * Registry constructor.
+     * @param Factory $factory
+     */
     public function __construct(Factory $factory)
     {
         $this->factory = $factory;

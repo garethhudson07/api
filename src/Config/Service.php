@@ -37,6 +37,24 @@ class Service
     }
 
     /**
+     * @param string $key
+     * @return bool
+     */
+    public function has(string $key)
+    {
+        return array_key_exists($key, $this->values);
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function pulls(string $key)
+    {
+        return (!$this->has($key) && ($this->parent && ($this->parent->has($key) || $this->parent->pulls($key))));
+    }
+
+    /**
      * Inherit from another Service
      *
      * @param Service $config
@@ -81,7 +99,7 @@ class Service
      */
     public function get(string $key)
     {
-        $value = array_key_exists($key, $this->values)
+        $value = $this->has($key)
             ? $this->values[$key]
             : ($this->parent ? $this->parent->get($key) : null);
 

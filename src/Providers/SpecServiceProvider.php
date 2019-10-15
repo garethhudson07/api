@@ -3,15 +3,14 @@
 namespace Api\Providers;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
-use Api\Config\Service as ConfigService;
-use Api\Config\Manager as ConfigManager;
-use Api\Http\Requests\Factory;
+use Api\Config\Manager as Config;
+use Api\Specs\Contracts\Representation as RepresentationInterface;
+use Api\specs\JsonApi\Representation as JsonApiRepresentation;
 
-class RequestServiceProvider extends AbstractServiceProvider
+
+class SpecServiceProvider extends AbstractServiceProvider
 {
-    protected $requestConfig;
-
-    protected $specConfig;
+    protected $config;
 
     /**
      * The provided array is a way to let the container
@@ -23,18 +22,16 @@ class RequestServiceProvider extends AbstractServiceProvider
      * @var array
      */
     protected $provides = [
-        Factory::class,
+        RepresentationInterface::class,
     ];
 
     /**
-     * RequestServiceProvider constructor.
-     * @param ConfigService $requestConfig
-     * @param ConfigManager $specConfig
+     * GuardServiceProvider constructor.
+     * @param Config $config
      */
-    public function __construct(ConfigService $requestConfig, ConfigManager $specConfig)
+    public function __construct(Config $config)
     {
-        $this->requestConfig = $requestConfig;
-        $this->specConfig = $specConfig;
+        $this->config = $config;
     }
 
     /**
@@ -45,9 +42,18 @@ class RequestServiceProvider extends AbstractServiceProvider
      */
     public function register()
     {
-        $this->getContainer()->share(Factory::class, function ()
-        {
-            return new Factory($this->requestConfig, $this->specConfig);
-        });
+        switch ($this->config->using()) {
+            case 'jsonApi':
+                $this->bindJsonApi();
+                break;
+        }
+    }
+
+    /**
+     *
+     */
+    protected function bindJsonApi()
+    {
+        $this->getContainer()->share(RepresentationInterface::class, JsonApiRepresentation::class);
     }
 }

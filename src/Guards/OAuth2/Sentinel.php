@@ -20,7 +20,6 @@ class Sentinel implements SentinelContract
     /**
      * Sentinel constructor.
      * @param ServerRequestInterface $request
-     * @param Pipeline $pipeline
      * @param Key $key
      */
     public function __construct(ServerRequestInterface $request, Key $key)
@@ -32,6 +31,7 @@ class Sentinel implements SentinelContract
     /**
      * @param Pipeline $pipeline
      * @return $this
+     * @throws \Exception
      */
     public function protect(Pipeline $pipeline)
     {
@@ -57,6 +57,7 @@ class Sentinel implements SentinelContract
     /**
      * @param Pipeline $pipeline
      * @return $this
+     * @throws \Exception
      */
     protected function checkPipeline(Pipeline $pipeline)
     {

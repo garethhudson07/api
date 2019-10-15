@@ -3,16 +3,10 @@
 namespace Api\Providers;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
-use Api\Config\Service as ConfigService;
-use Api\Config\Manager as ConfigManager;
-use Api\Http\Requests\Factory;
+use Api\Http\Responses\Factory;
 
-class RequestServiceProvider extends AbstractServiceProvider
+class ResponseServiceProvider extends AbstractServiceProvider
 {
-    protected $requestConfig;
-
-    protected $specConfig;
-
     /**
      * The provided array is a way to let the container
      * know that a service is provided by this service
@@ -27,17 +21,6 @@ class RequestServiceProvider extends AbstractServiceProvider
     ];
 
     /**
-     * RequestServiceProvider constructor.
-     * @param ConfigService $requestConfig
-     * @param ConfigManager $specConfig
-     */
-    public function __construct(ConfigService $requestConfig, ConfigManager $specConfig)
-    {
-        $this->requestConfig = $requestConfig;
-        $this->specConfig = $specConfig;
-    }
-
-    /**
      * This is where the magic happens, within the method you can
      * access the container and register or retrieve anything
      * that you need to, but remember, every alias registered
@@ -47,7 +30,7 @@ class RequestServiceProvider extends AbstractServiceProvider
     {
         $this->getContainer()->share(Factory::class, function ()
         {
-            return new Factory($this->requestConfig, $this->specConfig);
+            return new Factory;
         });
     }
 }

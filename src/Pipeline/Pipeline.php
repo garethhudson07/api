@@ -14,36 +14,48 @@ class Pipeline
 {
     protected $request;
 
-    protected $resources;
-
     /**
      * @var array
      */
     protected $pipes = [];
 
-    protected $segments = [];
+    protected $prefix;
 
     /**
      * Pipeline constructor.
      * @param ServerRequestInterface $request
-     * @param Registry $resources
-     * @param string $prefix
      */
-    public function __construct(ServerRequestInterface $request, Registry $resources, string $prefix)
+    public function __construct(ServerRequestInterface $request)
     {
         $this->request = $request;
-        $this->resources = $resources;
     }
 
     /**
      * @param string $prefix
+     * @return $this
      */
-    protected function resolveSegments(string $prefix)
+    public function prefix(string $prefix)
     {
-        $this->segments = array_slice(
-            $this->request->getAttribute('segments'),
-            count(Parser::segments($prefix))
-        );
+        $this->prefix = $prefix;
+
+        return $this;
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function segments()
+    {
+        $segments = $this->request->getAttribute('segments');
+
+        if ($this->prefix) {
+            $segments = array_slice(
+                $segments,
+                count(Parser::segments($this->prefix))
+            );
+        }
+
+        return $segments;
     }
 
     /**
@@ -67,14 +79,15 @@ class Pipeline
     }
 
     /**
-     * @return $this
+     * @param Registry $resources
+     * @return Pipeline
      */
-    public function assemble()
+    public function assemble(Registry $resources)
     {
         /** @var Pipe $pipe */
         $pipe = null;
 
-        foreach ($this->segments as $segment) {
+        foreach ($this->segments() as $segment) {
             if ($pipe && !$pipe->hasKey()) {
                 if ($pipe->isCollectable()) {
                     $pipe->setKey(urldecode($segment));
@@ -88,7 +101,7 @@ class Pipeline
             if ($penultimate = $this->penultimate()) {
                 $pipe->setEntity($penultimate->getResource()->getRelation($segment))->scope($penultimate);
             } else {
-                $pipe->setEntity($this->resources->get($segment));
+                $pipe->setEntity($resources->get($segment));
             }
         }
 

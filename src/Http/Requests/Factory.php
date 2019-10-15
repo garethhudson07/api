@@ -2,54 +2,60 @@
 
 namespace Api\Http\Requests;
 
-use Api\Config\Manager;
+use Api\Config\Manager as ConfigManager;
+use Api\Config\Service as ConfigService;
 use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 
 class Factory
 {
-    protected $config;
+    protected $requestConfig;
 
-    protected $baseRequest;
+    protected $specConfig;
+
+    protected $instance;
 
     /**
      * Factory constructor.
-     * @param Manager $config
+     * @param ConfigService $requestConfig
+     * @param ConfigManager $specConfig
      */
-    public function __construct(Manager $config)
+    public function __construct(ConfigService $requestConfig, ConfigManager $specConfig)
     {
-        $this->config = $config;
+        $this->requestConfig = $requestConfig;
+        $this->specConfig = $specConfig;
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @return $this
+     * @return ConfigService
      */
-    public function setBaseRequest(ServerRequestInterface $request)
+    public static function config()
     {
-        $this->baseRequest = $request;
-
-        return $this;
+        return (new ConfigService())->accepts('base', 'prefix');
     }
 
     /**
      * @return \Psr\Http\Message\ServerRequestInterface
      */
-    public function base()
+    public function instance()
     {
-        if (!$this->baseRequest) {
-            $psr17Factory = new Psr17Factory();
+        if (!$this->instance) {
+            if ($this->requestConfig->has('instance')) {
+                $this->instance = $this->requestConfig->instance;
+            } else {
+                $psr17Factory = new Psr17Factory();
 
-            $this->baseRequest = (new ServerRequestCreator(
-                $psr17Factory,
-                $psr17Factory,
-                $psr17Factory,
-                $psr17Factory
-            ))->fromGlobals();
+                $this->instance = (new ServerRequestCreator(
+                    $psr17Factory,
+                    $psr17Factory,
+                    $psr17Factory,
+                    $psr17Factory
+                ))->fromGlobals();
+            }
         }
 
-        return $this->baseRequest;
+        return $this->instance;
     }
 
     /**
@@ -57,10 +63,10 @@ class Factory
      */
     public function query()
     {
-        $request = $this->base();
+        $request = $this->instance();
 
         $bag = Bag::parse(
-            Raw::extract($request, $this->config)
+            Raw::extract($request, $this->specConfig)
         );
 
         return $request->withAttribute('segments', $bag->segments())

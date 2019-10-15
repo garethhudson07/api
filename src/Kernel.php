@@ -16,6 +16,8 @@ class Kernel
 
     /**
      * Kernel constructor.
+     * @param Container $container
+     * @param Configs $configs
      */
     public function __construct(Container $container, Configs $configs)
     {
@@ -23,9 +25,63 @@ class Kernel
         $this->configs = $configs;
     }
 
-    public function addConfig(string $name)
+    /**
+     * @return Kernel
+     */
+    public static function make()
     {
+        return new static(
+            new Container(),
+            new Configs()
+        );
+    }
 
+    /**
+     * @return Kernel
+     */
+    public function extend()
+    {
+        return new static(
+            (new Container)->delegate($this->container),
+            $this->configs->extend()
+        );
+    }
+
+    /**
+     * @return Container
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
+     * @return Configs
+     */
+    public function getConfigs()
+    {
+        return $this->configs;
+    }
+
+    /**
+     * @param string $name
+     * @param $config
+     * @return $this
+     */
+    public function addConfig(string $name, $config)
+    {
+        $this->configs->put($name, $config);
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return mixed|null
+     */
+    public function getConfig(string $name)
+    {
+        return $this->configs->get($name);
     }
 
     /**
@@ -37,9 +93,15 @@ class Kernel
         return $this->configs->configure($name, $callback);
     }
 
-    public function bind($id, $value)
+    /**
+     * @param mixed ...$arguments
+     * @return $this
+     */
+    public function bind(...$arguments)
     {
+        $this->container->add(...$arguments);
 
+        return $this;
     }
 
     /**
@@ -49,6 +111,18 @@ class Kernel
     public function resolve($id)
     {
         return $this->container->get($id);
+    }
+
+    /**
+     * @param mixed ...$ids
+     * @return array
+     */
+    public function resolveMany(...$ids)
+    {
+        return array_map(function ($id)
+        {
+            return $this->resolve($id);
+        }, $ids);
     }
 
     /**
@@ -71,17 +145,5 @@ class Kernel
         $this->container->delegate($container);
 
         return $this;
-    }
-
-    /**
-     * @param Kernel $kernel
-     * @return Kernel
-     */
-    public function extend()
-    {
-        return new static(
-            (new Container)->delegate($this->container),
-            $this->configs->extend()
-        );
     }
 }

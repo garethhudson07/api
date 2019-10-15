@@ -2,20 +2,26 @@
 
 namespace Api\Resources;
 
-use Api\Factory as MasterFactory;
-use Api\Resources\Relations\Collection as Relations;
+use League\Container\Container;
+use Api\Resources\Relations\Factory as RelationsFactory;
 use Api\Repositories\Stitch\Repository as StitchRepository;
+use Api\Specs\Contracts\Representation;
+use Closure;
 use Stitch\Model;
+use Stitch\Stitch;
 
 class Factory
 {
-    protected $masterFactory;
+    protected $container;
+
+    protected $relationsFactory;
 
     protected $registry;
 
-    public function __construct(MasterFactory $masterFactory)
+    public function __construct(Container $container)
     {
-        $this->masterFactory = $masterFactory;
+        $this->container = $container;
+        $this->relationsFactory = new RelationsFactory($this->registry());
     }
 
     /**
@@ -24,7 +30,7 @@ class Factory
     public function registry()
     {
         if (!$this->registry) {
-            $this->registry = new Registry($this->masterFactory);
+            $this->registry = new Registry($this);
         }
 
         return $this->registry;
@@ -36,11 +42,11 @@ class Factory
      */
     public function collectable($value)
     {
-        if ($value instanceof Model) {
-            return new Collectable($this->masterFactory, new StitchRepository($value));
-        }
-
-        return new Collectable($this->masterFactory, $value);
+        return new Collectable(
+            $value instanceof Model ? new StitchRepository($value) : $value,
+            $this->relationsFactory->registry(),
+            $this->container->get(Representation::class)
+        );
     }
 
     /**
@@ -48,14 +54,14 @@ class Factory
      */
     public function singleton($value)
     {
-        echo 'make singleton';
     }
 
     /**
-     * @return Relations
+     * @param Closure $callback
+     * @return Model
      */
-    public function relations()
+    public function model(Closure $callback)
     {
-        return new Relations();
+        return Stitch::make($callback);
     }
 }

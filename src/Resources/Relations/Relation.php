@@ -2,8 +2,7 @@
 
 namespace Api\Resources\Relations;
 
-use Api\Factory;
-use Api\Registry;
+use Api\Resources\Registry as ResourceRegistry;
 use Api\Resources\Resource;
 use Exception;
 
@@ -11,19 +10,22 @@ use Exception;
  * Class Relation
  * @package Api\Resources\Relations
  */
-class Relation
+abstract class Relation
 {
-    protected $factory;
-
     /**
      * @var Resource
      */
     protected $localResource;
 
     /**
-     * @var
+     * @var Resource
      */
     protected $foreignResource;
+
+    /**
+     * @var ResourceRegistry
+     */
+    protected $resourceRegistry;
 
     /**
      * @var
@@ -31,9 +33,9 @@ class Relation
     protected $name;
 
     /**
-     * @var
+     * @var string|null
      */
-    protected $binding;
+    protected $localKey;
 
     /**
      * @var string|null
@@ -41,19 +43,19 @@ class Relation
     protected $foreignKey;
 
     /**
-     * @var string|null
+     * @var
      */
-    protected $localKey;
+    protected $binding;
 
     /**
      * Relation constructor.
-     * @param Factory $factory
      * @param Resource $localResource
+     * @param ResourceRegistry $resourceRegistry
      */
-    public function __construct(Factory $factory, Resource $localResource)
+    public function __construct(Resource $localResource, ResourceRegistry $resourceRegistry)
     {
-        $this->factory = $factory;
         $this->localResource = $localResource;
+        $this->resourceRegistry = $resourceRegistry;
     }
 
     /**
@@ -85,7 +87,7 @@ class Relation
         }
 
         if ($this->binding) {
-            $this->foreignResource = $this->factory->resource()->registry()->get($this->binding);
+            $this->foreignResource = $this->resourceRegistry->get($this->binding);
 
             return $this->foreignResource;
         }
@@ -178,17 +180,18 @@ class Relation
     }
 
     /**
+     * @return mixed
+     */
+    abstract public function pullKeys();
+
+    /**
      * @return $this
      * @throws Exception
      */
     public function boot()
     {
         if (!$this->hasKeys()) {
-            if (method_exists($this, 'pullKeys')) {
-                $this->pullKeys();
-
-                return $this;
-            }
+            $this->pullKeys();
         }
 
         return $this;

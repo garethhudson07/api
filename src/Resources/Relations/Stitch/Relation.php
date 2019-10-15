@@ -9,7 +9,7 @@ use Stitch\Model;
  * Class HasMany
  * @package Api\Resources\Relations
  */
-class Relation extends BaseRelation
+abstract class Relation extends BaseRelation
 {
     /**
      * @return Model
@@ -26,4 +26,9 @@ class Relation extends BaseRelation
     {
         return $this->getForeignResource()->getRepository()->getmodel();
     }
+
+    /**
+     * @return mixed
+     */
+    abstract public function pullKeys();
 }

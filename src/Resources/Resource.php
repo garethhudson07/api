@@ -2,16 +2,12 @@
 
 namespace Api\Resources;
 
-use Api\Factory;
-use Api\Guards\OAuth2\Sentinel;
 use Api\Pipeline\Pipe;
 use Api\Repositories\Contracts\Repository;
-use Api\Resources\Relations\Stitch\BelongsTo;
-use Api\Resources\Relations\Stitch\Has;
+use Api\Specs\Contracts\Representation;
 use Psr\Http\Message\ServerRequestInterface;
 use Api\Resources\Relations\Relation;
-use Api\Resources\Relations\Collection as Relations;
-use Closure;
+use Api\Resources\Relations\Registry as Relations;
 use Exception;
 
 /**
@@ -20,27 +16,25 @@ use Exception;
  */
 class Resource
 {
-    protected $factory;
-
-    /**
-     * @var array
-     */
-    protected const ENDPOINTS = [];
-
     /**
      * @var Repository
      */
     protected $repository;
 
     /**
-     * @var
-     */
-    protected $name;
-
-    /**
      * @var Relations
      */
     protected $relations;
+
+    /**
+     * @var Representation
+     */
+    protected $representation;
+
+    /**
+     * @var
+     */
+    protected $name;
 
     /**
      * @var array
@@ -53,15 +47,21 @@ class Resource
     ];
 
     /**
-     * Resource constructor.
-     * @param Factory $factory
-     * @param $repository
+     * @var array
      */
-    public function __construct(Factory $factory, Repository $repository)
+    protected const ENDPOINTS = [];
+
+    /**
+     * Resource constructor.
+     * @param Repository $repository
+     * @param Relations $relations
+     * @param Representation $representation
+     */
+    public function __construct(Repository $repository, Relations $relations, Representation $representation)
     {
-        $this->factory = $factory;
         $this->repository = $repository;
-        $this->relations = $factory->resource()->relations();
+        $this->relations = $relations;
+        $this->representation = $representation;
     }
 
     /**
@@ -119,7 +119,7 @@ class Resource
      */
     public function hasMany(...$arguments)
     {
-        $this->addRelation(array_merge([Has::class], $arguments));
+        $this->relations->has(...array_merge([$this], $arguments));
 
         return $this;
     }
@@ -130,38 +130,7 @@ class Resource
      */
     public function belongsTo(...$arguments)
     {
-        $this->addRelation(array_merge([BelongsTo::class], $arguments));
-
-        return $this;
-    }
-
-    /**
-     * @param $arguments
-     * @return $this
-     */
-    protected function addRelation($arguments)
-    {
-        $class = array_shift($arguments);
-        $name = array_shift($arguments);
-
-        $this->relations->bind(
-            $name,
-            function () use ($class, $name, $arguments) {
-                /** @var Relation $relation */
-                /** @noinspection PhpUndefinedMethodInspection */
-                $relation = (new $class($this->factory, $this))->name($name);
-
-                if (count($arguments) && $arguments[0] instanceof Closure) {
-                    $arguments[0]($relation);
-                }
-
-                if (!$relation->getBinding()) {
-                    $relation->bind($name);
-                }
-
-                return $relation->boot();
-            }
-        );
+        $this->relations->belongsTo(...array_merge([$this], $arguments));
 
         return $this;
     }
@@ -172,7 +141,7 @@ class Resource
      */
     public function nest(...$arguments)
     {
-        $this->addRelation(array_merge([Relation::class], $arguments));
+        $this->relations->nest(...array_merge([$this], $arguments));
 
         return $this;
     }
@@ -207,9 +176,11 @@ class Resource
             throw new Exception("The index endpoint is not available on the $this->name resource");
         }
 
-        return $this->factory->spec()
-            ->representation()
-            ->forCollection($pipe->getEntity()->getName(), $request, $this->repository->getCollection($pipe, $request, $this->factory->guard()->sentinel()));
+        return $this->representation->forCollection(
+            $pipe->getEntity()->getName(),
+            $request,
+            $this->repository->getCollection($pipe, $request)
+        );
     }
 
     /**
@@ -245,9 +216,11 @@ class Resource
             throw new Exception("The show endpoint is not available on the $this->name resource");
         }
 
-        return $this->factory->spec()
-            ->representation()
-            ->forSingleton($pipe->getEntity()->getName(), $request, $this->repository->getRecord($pipe, $request, $this->factory->guard()->sentinel()));
+        return $this->representation->forSingleton(
+            $pipe->getEntity()->getName(),
+            $request,
+            $this->repository->getRecord($pipe, $request)
+        );
     }
 
     /**
@@ -262,9 +235,11 @@ class Resource
             throw new Exception("The create endpoint is not available on the $this->name resource");
         }
 
-        return $this->factory->spec()
-            ->representation()
-            ->forSingleton($pipe->getEntity()->getName(), $request, $this->repository->create($pipe, $request, $this->factory->guard()->sentinel()));
+        return $this->representation->forSingleton(
+            $pipe->getEntity()->getName(),
+            $request,
+            $this->repository->create($pipe, $request)
+        );
     }
 
     /**
@@ -279,8 +254,10 @@ class Resource
             throw new Exception("The update endpoint is not available on the $this->name resource");
         }
 
-        return $this->factory->spec()
-            ->representation()
-            ->forSingleton($pipe->getEntity()->getName(), $request, $this->repository->update($pipe, $request, $this->factory->guard()->sentinel()));
+        return $this->representation->forSingleton(
+            $pipe->getEntity()->getName(),
+            $request,
+            $this->repository->update($pipe, $request)
+        );
     }
 }

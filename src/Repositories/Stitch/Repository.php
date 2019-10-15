@@ -2,7 +2,6 @@
 
 namespace Api\Repositories\Stitch;
 
-use Api\Guards\OAuth2\Sentinel;
 use Api\Pipeline\Pipe;
 use Api\Repositories\Contracts\Repository as RepositoryContract;
 use Api\Resources\Resource;
@@ -54,10 +53,9 @@ class Repository implements RepositoryContract
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @param Sentinel $sentinel
      * @return array
      */
-    public function getCollection(Pipe $pipe, ServerRequestInterface $request, Sentinel $sentinel): array
+    public function getCollection(Pipe $pipe, ServerRequestInterface $request): array
     {
         $relations = $request->getAttribute('relations');
 
@@ -77,10 +75,9 @@ class Repository implements RepositoryContract
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @param Sentinel $sentinel
      * @return array
      */
-    public function getRecord(Pipe $pipe, ServerRequestInterface $request, Sentinel $sentinel): array
+    public function getRecord(Pipe $pipe, ServerRequestInterface $request): array
     {
         $relations = $request->getAttribute('relations');
 
@@ -277,11 +274,10 @@ class Repository implements RepositoryContract
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @param Sentinel $sentinel
      * @return array
      * @throws Exception
      */
-    public function create(Pipe $pipe, ServerRequestInterface $request, Sentinel $sentinel): array
+    public function create(Pipe $pipe, ServerRequestInterface $request): array
     {
         throw new Exception('Method not yet implemented');
     }
@@ -289,11 +285,10 @@ class Repository implements RepositoryContract
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @param Sentinel $sentinel
      * @return array
      * @throws Exception
      */
-    public function update(Pipe $pipe, ServerRequestInterface $request, Sentinel $sentinel): array
+    public function update(Pipe $pipe, ServerRequestInterface $request): array
     {
         throw new Exception('Method not yet implemented');
     }

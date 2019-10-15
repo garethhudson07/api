@@ -2,7 +2,6 @@
 
 namespace Api\Repositories\Contracts;
 
-use Api\Guards\OAuth2\Sentinel;
 use Api\Pipeline\Pipe;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -21,32 +20,28 @@ interface Repository
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @param Sentinel $sentinel
      * @return array
      */
-    public function getCollection(Pipe $pipe, ServerRequestInterface $request, Sentinel $sentinel): array;
+    public function getCollection(Pipe $pipe, ServerRequestInterface $request): array;
 
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @param Sentinel $sentinel
      * @return array
      */
-    public function getRecord(Pipe $pipe, ServerRequestInterface $request, Sentinel $sentinel): array;
+    public function getRecord(Pipe $pipe, ServerRequestInterface $request): array;
 
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @param Sentinel $sentinel
      * @return array
      */
-    public function create(Pipe $pipe, ServerRequestInterface $request, Sentinel $sentinel): array;
+    public function create(Pipe $pipe, ServerRequestInterface $request): array;
 
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @param Sentinel $sentinel
      * @return array
      */
-    public function update(Pipe $pipe, ServerRequestInterface $request, Sentinel $sentinel): array;
+    public function update(Pipe $pipe, ServerRequestInterface $request): array;
 }
