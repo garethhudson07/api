@@ -32,24 +32,14 @@ class Resource
     protected $representation;
 
     /**
+     * @var array
+     */
+    protected $endpoints;
+
+    /**
      * @var
      */
     protected $name;
-
-    /**
-     * @var array
-     */
-    protected $config = [
-        'endpoints' => [
-            'except' => [],
-            'only' => []
-        ]
-    ];
-
-    /**
-     * @var array
-     */
-    protected const ENDPOINTS = [];
 
     /**
      * Resource constructor.
@@ -62,6 +52,7 @@ class Resource
         $this->repository = $repository;
         $this->relations = $relations;
         $this->representation = $representation;
+        $this->endpoints = new Endpoints();
     }
 
     /**
@@ -97,7 +88,7 @@ class Resource
      */
     public function except(...$arguments)
     {
-        $this->config['endpoints']['except'] = array_merge($this->config['endpoints']['except'], $arguments);
+        $this->endpoints->except(...$arguments);
 
         return $this;
     }
@@ -108,7 +99,7 @@ class Resource
      */
     public function only(...$arguments)
     {
-        $this->config['endpoints']['only'] = array_merge($this->config['endpoints']['only'], $arguments);
+        $this->endpoints->only(...$arguments);
 
         return $this;
     }
@@ -154,7 +145,7 @@ class Resource
     {
         return $this->relations->get($name);
     }
-
+    
     /**
      * @param Pipe $pipe
      * @return mixed
@@ -172,36 +163,13 @@ class Resource
      */
     public function getCollection(Pipe $pipe, ServerRequestInterface $request)
     {
-        if (!$this->endpointEnabled('index')) {
-            throw new Exception("The index endpoint is not available on the $this->name resource");
-        }
+        $this->endpoints->verify('index');
 
         return $this->representation->forCollection(
             $pipe->getEntity()->getName(),
             $request,
             $this->repository->getCollection($pipe, $request)
         );
-    }
-
-    /**
-     * @param string $name
-     * @return bool
-     */
-    public function endpointEnabled(string $name)
-    {
-        if (!in_array($name, static::ENDPOINTS)) {
-            return false;
-        }
-
-        if (count($this->config['endpoints']['only']) && !in_array($name, $this->config['endpoints']['only'])) {
-            return false;
-        }
-
-        if (in_array($name, $this->config['endpoints']['except'])) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -212,9 +180,7 @@ class Resource
      */
     public function getRecord(Pipe $pipe, ServerRequestInterface $request)
     {
-        if (!$this->endpointEnabled('show')) {
-            throw new Exception("The show endpoint is not available on the $this->name resource");
-        }
+        $this->endpoints->verify('show');
 
         return $this->representation->forSingleton(
             $pipe->getEntity()->getName(),
@@ -231,9 +197,7 @@ class Resource
      */
     public function create(Pipe $pipe, ServerRequestInterface $request)
     {
-        if (!$this->endpointEnabled('create')) {
-            throw new Exception("The create endpoint is not available on the $this->name resource");
-        }
+        $this->endpoints->verify('create');
 
         return $this->representation->forSingleton(
             $pipe->getEntity()->getName(),
@@ -250,9 +214,7 @@ class Resource
      */
     public function update(Pipe $pipe, ServerRequestInterface $request)
     {
-        if (!$this->endpointEnabled('update')) {
-            throw new Exception("The update endpoint is not available on the $this->name resource");
-        }
+        $this->endpoints->verify('update');
 
         return $this->representation->forSingleton(
             $pipe->getEntity()->getName(),

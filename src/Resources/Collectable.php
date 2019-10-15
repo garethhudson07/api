@@ -1,7 +1,9 @@
 <?php
 
 namespace Api\Resources;
-
+use Api\Repositories\Contracts\Repository;
+use Api\Resources\Relations\Registry as Relations;
+use Api\Specs\Contracts\Representation;
 
 /**
  * Class Collection
@@ -9,14 +11,16 @@ namespace Api\Resources;
  */
 class Collectable extends Resource
 {
-    /**
-     * @var array
-     */
-    protected const ENDPOINTS = [
-        'index',
-        'show',
-        'create',
-        'update',
-        'destroy'
-    ];
+    public function __construct(Repository $repository, Relations $relations, Representation $representation)
+    {
+        parent::__construct($repository, $relations, $representation);
+
+        $this->endpoints->add(
+            'index',
+            'show',
+            'create',
+            'update',
+            'destroy'
+        );
+    }
 }
