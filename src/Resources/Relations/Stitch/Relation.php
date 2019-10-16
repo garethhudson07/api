@@ -18,7 +18,9 @@ abstract class Relation extends BaseRelation
      */
     public function boot()
     {
-        $this->stitchRelation = $this->makeStitchRelation()->foreignModel($this->getForeignModel());
+        $this->stitchRelation = $this->makeStitchRelation()->foreignModel(
+            $this->getForeignResource()->getRepository()->getmodel()
+        );
 
         if ($this->localKey) {
             $this->stitchRelation->localKey($this->localKey);
@@ -55,22 +57,6 @@ abstract class Relation extends BaseRelation
     public function getForeignKey()
     {
         return $this->stitchRelation->getForeignKey()->getName();
-    }
-
-    /**
-     * @return Model
-     */
-    protected function getLocalModel(): Model
-    {
-        return $this->getLocalResource()->getRepository()->getModel();
-    }
-
-    /**
-     * @return Model
-     */
-    protected function getForeignModel(): Model
-    {
-        return $this->getForeignResource()->getRepository()->getmodel();
     }
 
     /**
