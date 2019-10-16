@@ -13,27 +13,11 @@ class Has extends Relation
     /**
      * @return mixed
      */
-    public function make()
+    protected function makeStitchRelation()
     {
         return (new StitchRelation(
             $this->name,
-            $this->getLocalModel())
-        )->foreignModel($this->getForeignmodel())
-            ->boot();
-    }
-
-    /**
-     * @return $this
-     */
-    public function pullKeys()
-    {
-        $key = $this->getForeignModel()->getTable()->getForeignKeyFor(
-            $this->getLocalModel()->getTable()->getPrimaryKey()
-        );
-
-        $this->foreignKey = $key->getLocalColumn()->getName();
-        $this->localKey = $key->getReferenceColumnName();
-
-        return $this;
+            $this->getLocalModel()
+        ));
     }
 }

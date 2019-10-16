@@ -4,7 +4,6 @@ namespace Api\Resources\Relations;
 
 use Api\Resources\Registry as ResourceRegistry;
 use Api\Resources\Resource;
-use Exception;
 
 /**
  * Class Relation
@@ -176,24 +175,11 @@ abstract class Relation
      */
     public function hasKeys()
     {
-        return ($this->foreignKey && $this->foreignKey);
+        return ($this->localKey && $this->foreignKey);
     }
 
     /**
      * @return mixed
      */
-    abstract public function pullKeys();
-
-    /**
-     * @return $this
-     * @throws Exception
-     */
-    public function boot()
-    {
-        if (!$this->hasKeys()) {
-            $this->pullKeys();
-        }
-
-        return $this;
-    }
+    abstract public function boot();
 }

@@ -11,6 +11,52 @@ use Stitch\Model;
  */
 abstract class Relation extends BaseRelation
 {
+    protected $stitchRelation;
+
+    /**
+     * @return $this|mixed
+     */
+    public function boot()
+    {
+        $this->stitchRelation = $this->makeStitchRelation()->foreignModel($this->getForeignModel());
+
+        if ($this->localKey) {
+            $this->stitchRelation->localKey($this->localKey);
+        }
+
+        if ($this->foreignKey) {
+            $this->stitchRelation->foreignKey($this->foreignKey);
+        }
+
+        $this->stitchRelation->boot();
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStitchRelation()
+    {
+        return $this->stitchRelation;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLocalKey()
+    {
+        return $this->stitchRelation->getLocalKey()->getName();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getForeignKey()
+    {
+        return $this->stitchRelation->getForeignKey()->getName();
+    }
+
     /**
      * @return Model
      */
@@ -30,5 +76,5 @@ abstract class Relation extends BaseRelation
     /**
      * @return mixed
      */
-    abstract public function pullKeys();
+    abstract protected function makeStitchRelation();
 }

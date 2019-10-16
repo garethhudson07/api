@@ -158,7 +158,7 @@ class Repository implements RepositoryContract
             $relation = $resource->getRelation($name);
             $foreignResource = $relation->getForeignResource();
 
-            $this->model->addRelation($relation->make());
+            $this->model->addRelation($relation->getStitchRelation());
 
             $foreignResource->getRepository()->addRelations(
                 $foreignResource,
