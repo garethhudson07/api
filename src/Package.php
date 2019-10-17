@@ -21,9 +21,7 @@ use Closure;
 class Package
 {
     protected $kernel;
-
-    protected $request;
-
+    
     /**
      * Package constructor.
      * @throws \Exception
@@ -109,17 +107,6 @@ class Package
     public function bind(...$arguments)
     {
         $this->kernel->bind(...$arguments);
-
-        return $this;
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @return $this
-     */
-    public function setRequest(ServerRequestInterface $request)
-    {
-        $this->request = $request;
 
         return $this;
     }
