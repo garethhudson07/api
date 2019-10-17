@@ -2,18 +2,18 @@
 
 namespace Api\Resources\Relations;
 
-use Api\Resources\Registry as ResourceRegistry;
+use Api\Resources\Factory as ResourceFactory;
 use Api\Resources\Relations\Stitch\BelongsTo;
 use Api\Resources\Relations\Stitch\Has;
 use Api\Resources\Resource;
 
 class Factory
 {
-    protected $resourceRegistry;
+    protected $resourceFactory;
 
-    public function __construct(ResourceRegistry $resourceRegistry)
+    public function __construct(ResourceFactory $resourceFactory)
     {
-        $this->resourceRegistry = $resourceRegistry;
+        $this->resourceFactory = $resourceFactory;
     }
 
     /**
@@ -49,6 +49,6 @@ class Factory
      */
     protected function make(string $class, Resource $resource)
     {
-        return (new $class($resource, $this->resourceRegistry));
+        return (new $class($resource, $this->resourceFactory->registry()));
     }
 }

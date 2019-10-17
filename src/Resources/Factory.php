@@ -21,7 +21,7 @@ class Factory
     public function __construct(Container $container)
     {
         $this->container = $container;
-        $this->relationsFactory = new RelationsFactory($this->registry());
+        $this->relationsFactory = new RelationsFactory($this);
     }
 
     /**
