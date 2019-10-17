@@ -30,8 +30,6 @@ class Factory
     }
 
     /**
-     * @param $request
-     * @param $pipeline
      * @return Sentinel
      */
     public function sentinel()
@@ -56,6 +54,8 @@ class Factory
 
     /**
      * @return Authoriser
+     * @throws \Defuse\Crypto\Exception\BadFormatException
+     * @throws \Defuse\Crypto\Exception\EnvironmentIsBrokenException
      */
     public function authoriser()
     {
