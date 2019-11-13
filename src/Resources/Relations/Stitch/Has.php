@@ -15,9 +15,9 @@ class Has extends Relation
      */
     protected function makeStitchRelation()
     {
-        return (new StitchRelation(
+        return new StitchRelation(
             $this->name,
             $this->localResource->getRepository()->getModel()
-        ));
+        );
     }
 }

@@ -13,27 +13,11 @@ class BelongsTo extends Relation
     /**
      * @return mixed
      */
-    public function make()
+    public function makeStitchRelation()
     {
-        return (new StitchRelation(
+        return new StitchRelation(
             $this->name,
-            $this->getLocalModel())
-        )->foreignModel($this->getForeignmodel())
-            ->boot();
-    }
-
-    /**
-     * @return $this
-     */
-    public function pullKeys()
-    {
-        $key = $this->getLocalModel()->getTable()->getForeignKeyFor(
-            $this->getForeignModel()->getTable()->getPrimaryKey()
+            $this->localResource->getRepository()->getModel()
         );
-
-        $this->foreignKey = $key->getReferenceColumnName();
-        $this->localKey = $key->getLocalColumn()->getName();
-
-        return $this;
     }
 }

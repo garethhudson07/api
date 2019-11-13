@@ -21,7 +21,7 @@ use Closure;
 class Package
 {
     protected $kernel;
-    
+
     /**
      * Package constructor.
      * @throws \Exception
