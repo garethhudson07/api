@@ -216,8 +216,22 @@ class Repository implements RepositoryContract
                     $this->applyRsqlExpression($query, $constraint);
                 });
             } else {
+                $operatorMap = ['IS NULL' => '=', 'IS NOT NULL' => '!='];
+                $valueMap = ['IS NULL' => null, 'IS NOT NULL' => null];
+                $column = $constraint->getColumn();
+                $operator = $constraint->getOperator()->toSql();
+                $value = $constraint->getValue();
+
+                if (array_key_exists($operator, $valueMap)) {
+                    $value = $valueMap[$operator];
+                }
+
+                if (array_key_exists($operator, $operatorMap)) {
+                    $operator = $operatorMap[$operator];
+                }
+
                 /** @var Condition $constraint */
-                $query->{$method}($constraint->getColumn(), $constraint->getOperator()->toSql(), $constraint->getValue());
+                $query->{$method}($column, $operator, $value);
             }
         }
 
