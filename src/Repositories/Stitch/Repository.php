@@ -153,10 +153,16 @@ class Repository implements RepositoryContract
      */
     public function addRelations(Resource $resource, RequestRelations $relations)
     {
+//        var_dump($relations);
+
         foreach ($relations as $requestRelation) {
             $name = $requestRelation->getName();
             $relation = $resource->getRelation($name);
             $foreignResource = $relation->getForeignResource();
+
+            echo 'adding relation ' . $relation->getStitchRelation()->getName() . ' to ' . $this->model->getTable()->getName();
+            echo '<br>';
+            var_dump($relation->getStitchRelation()->getName());
 
             $this->model->addRelation($relation->getStitchRelation());
 
@@ -178,6 +184,9 @@ class Repository implements RepositoryContract
     {
         foreach ($relations as $relation) {
             $query->with($relation->path());
+
+            echo 'including ' . $relation->path();
+            echo '<br>';
 
             $this->includeRelations($query, $relation->getRelations());
         }

@@ -16,7 +16,9 @@ class Relation
      */
     protected $name;
 
-    protected $ancestry;
+    protected $parent;
+
+    protected $path;
 
     protected $fields = [];
 
@@ -48,27 +50,25 @@ class Relation
      */
     public static function parse(string $path)
     {
-        $hierarchy = explode('.', $path);
-        $name = array_pop($hierarchy);
-        $ancestry = implode('.', $hierarchy);
+        $pieces = explode('.', $path, 2);
+        $name = array_shift($pieces);
         $instance = (new static($name));
 
-        if ($ancestry) {
-            $instance->setAncestry($ancestry);
-
-            return static::parse($ancestry)->addRelation($instance);
+        if ($pieces) {
+            $instance->addRelation(
+                static::parse($pieces[0])->setParent($instance)
+            );
         }
 
         return $instance;
     }
 
     /**
-     * @param string $path
-     * @return $this
+     * @param Relation $parent
      */
-    public function setAncestry(string $path)
+    public function setParent(Relation $parent)
     {
-        $this->ancestry = $path;
+        $this->parent = $parent;
 
         return $this;
     }
@@ -76,18 +76,10 @@ class Relation
     /**
      * @return mixed
      */
-    public function getAncestry()
-    {
-        return $this->ancestry;
-    }
-
-    /**
-     * @return mixed
-     */
     public function path()
     {
-        if ($this->ancestry) {
-            return "{$this->ancestry}.{$this->name}";
+        if ($this->path) {
+            $this->path = ($this->parent ? $this->parent->path() : '') . '.' . $this->name;
         }
 
         return $this->name;
