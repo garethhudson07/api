@@ -3,7 +3,6 @@
 namespace Api\Http\Requests;
 
 use Oilstone\RsqlParser\Expression;
-use Oilstone\RsqlParser\Parser as RsqlParser;
 
 /**
  * Class Relation
@@ -65,6 +64,7 @@ class Relation
 
     /**
      * @param Relation $parent
+     * @return $this
      */
     public function setParent(Relation $parent)
     {

@@ -150,6 +150,9 @@ class Api
             $pipeline->assemble($this->resources);
 
             if ($sentinel = $this->kernel->resolve(Sentinel::class)) {
+                var_dump($sentinel);
+                exit;
+
                 $sentinel->protect($pipeline);
             }
 
