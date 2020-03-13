@@ -124,14 +124,6 @@ class Api
     }
 
     /**
-     * @param ResponseInterface $response
-     */
-    protected function emitResponse(ResponseInterface $response)
-    {
-        $this->kernel->resolve(ResponseFactory::class)->emitter()->emit($response);
-    }
-
-    /**
      * @return mixed|ResponseInterface
      * @throws Exception
      */
@@ -140,7 +132,8 @@ class Api
         return $this->try(function ()
         {
             $pipeline = (new Pipeline(
-                $this->kernel->resolve(RequestFactory::class)->prepare()
+                $this->kernel->resolve(RequestFactory::class)->prepare(),
+                $this->kernel->resolve(ResponseFactory::class)->json()
             ));
 
             if($prefix = $this->kernel->getConfig('request')->prefix) {
@@ -153,10 +146,16 @@ class Api
                 $sentinel->protect($pipeline);
             }
 
-            return $this->kernel->resolve(ResponseFactory::class)->json(
-                $pipeline->call()->last()->getData()
-            );
+            return $pipeline->prepareResponse();
         });
+    }
+
+    /**
+     * @param ResponseInterface $response
+     */
+    protected function emitResponse(ResponseInterface $response)
+    {
+        $this->kernel->resolve(ResponseFactory::class)->emitter()->emit($response);
     }
 
     /**

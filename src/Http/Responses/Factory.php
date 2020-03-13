@@ -3,6 +3,7 @@
 namespace Api\Http\Responses;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
+use Psr\Http\Message\ResponseInterface;
 use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
 class Factory
@@ -11,9 +12,9 @@ class Factory
 
     /**
      * @param string $content
-     * @return mixed
+     * @return ResponseInterface
      */
-    public function make(string $content = '')
+    public function make(string $content = ''): ResponseInterface
     {
         $response = $this->psr7Response()->withBody($this->psr7Stream());
 
@@ -25,18 +26,17 @@ class Factory
     }
 
     /**
-     * @param string $content
-     * @return mixed
+     * @return ResponseInterface
      */
-    public function json(string $content = '')
+    public function json(): ResponseInterface
     {
-        return $this->make($content)->withHeader('Content-Type', 'application/json');
+        return $this->make()->withHeader('Content-Type', 'application/json');
     }
 
     /**
-     * @return mixed
+     * @return Psr17Factory
      */
-    public function psr17Factory()
+    public function psr17Factory(): Psr17Factory
     {
         if (!$this->psr17Factory) {
             $this->psr17Factory = new Psr17Factory();
@@ -46,9 +46,9 @@ class Factory
     }
 
     /**
-     * @return mixed
+     * @return ResponseInterface
      */
-    public function psr7Response()
+    public function psr7Response(): ResponseInterface
     {
         return $this->psr17Factory()->createResponse();
     }

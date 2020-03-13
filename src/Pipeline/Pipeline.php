@@ -5,6 +5,7 @@ namespace Api\Pipeline;
 use Api\Http\Requests\Parser;
 use Api\Resources\Registry;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class Pipeline
@@ -13,6 +14,8 @@ use Psr\Http\Message\ServerRequestInterface;
 class Pipeline
 {
     protected $request;
+
+    protected $response;
 
     /**
      * @var array
@@ -24,10 +27,12 @@ class Pipeline
     /**
      * Pipeline constructor.
      * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
      */
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(ServerRequestInterface $request, ResponseInterface $response)
     {
         $this->request = $request;
+        $this->response = $response;
     }
 
     /**
@@ -172,5 +177,26 @@ class Pipeline
         }
 
         return $this;
+    }
+
+    /**
+     * @return ResponseInterface
+     */
+    public function prepareResponse()
+    {
+        $pipe = $this->call()->last();
+
+        $this->response->getBody()->write($pipe->getData());
+
+        switch ($pipe->getOperation()) {
+            case 'create':
+                $status = '201';
+                break;
+
+            default:
+                $status = '200';
+        }
+
+        return $this->response->withStatus($status);
     }
 }
