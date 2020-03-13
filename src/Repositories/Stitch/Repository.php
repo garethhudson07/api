@@ -39,7 +39,7 @@ class Repository implements RepositoryContract
         RelationshipResolver::associate(
             $this->model,
             $pipe->getResource(),
-            $request->getAttribute('relations')
+            $request->getAttribute('query')->relations()
         );
     }
 
@@ -101,7 +101,9 @@ class Repository implements RepositoryContract
      */
     public function create(Pipe $pipe, ServerRequestInterface $request): array
     {
-        throw new Exception('Method not yet implemented');
+        return $this->model->record(
+            $request->getParsedBody()
+        )->save()->toArray();
     }
 
     /**

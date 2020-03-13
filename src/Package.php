@@ -3,7 +3,6 @@
 namespace Api;
 
 use Api\Config\Manager as ConfigManager;
-use Psr\Http\Message\ServerRequestInterface;
 use Api\Guards\OAuth2\Factory as OAuth2Factory;
 use Api\Specs\JsonApi\Factory as JsonApiFactory;
 use Api\Http\Requests\Factory as RequestFactory;

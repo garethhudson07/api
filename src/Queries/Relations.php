@@ -1,9 +1,8 @@
 <?php
 
-namespace Api\Http\Requests;
+namespace Api\Queries;
 
 use Api\Collection;
-use Closure;
 
 class Relations extends Collection
 {

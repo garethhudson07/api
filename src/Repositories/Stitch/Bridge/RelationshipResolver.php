@@ -4,7 +4,7 @@ namespace Api\Repositories\Stitch\Bridge;
 
 use Stitch\Model;
 use Api\Resources\Resource;
-use Api\Http\Requests\Relations as RequestRelations;
+use Api\Queries\Relations as RequestRelations;
 
 class RelationshipResolver
 {

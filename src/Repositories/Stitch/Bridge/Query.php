@@ -3,9 +3,8 @@
 namespace Api\Repositories\Stitch\Bridge;
 
 use Oilstone\RsqlParser\Expression;
-use Psr\Http\Message\ServerRequestInterface;
 use Stitch\Queries\Query as BaseQuery;
-use Api\Http\Requests\Relations as RequestRelations;
+use Api\Queries\Relations as RequestRelations;
 
 class Query
 {
@@ -21,23 +20,13 @@ class Query
         'IS NOT NULL' => null
     ];
 
+    /**
+     * Query constructor.
+     * @param BaseQuery $baseQuery
+     */
     public function __construct(BaseQuery $baseQuery)
     {
         $this->baseQuery = $baseQuery;
-    }
-
-    /**
-     * @param BaseQuery $baseQuery
-     * @param ServerRequestInterface $request
-     * @return Query
-     */
-    public static function resolve(BaseQuery $baseQuery, ServerRequestInterface $request)
-    {
-        return (new static($baseQuery))->with($request->getAttribute('relations'))
-            ->select($request->getAttribute('fields'))
-            ->where($request->getAttribute('filters'))
-            ->orderBy($request->getAttribute('sort'))
-            ->limit($request->getAttribute('limit'));
     }
 
     public function get()
@@ -45,6 +34,9 @@ class Query
         return $this->baseQuery->get();
     }
 
+    /**
+     * @return null|\Stitch\Records\Record
+     */
     public function first()
     {
         return $this->baseQuery->first();
@@ -54,7 +46,7 @@ class Query
      * @param RequestRelations $relations
      * @return $this
      */
-    protected function with(RequestRelations $relations)
+    public function with(RequestRelations $relations)
     {
         foreach ($relations as $relation) {
             $this->baseQuery->with($relation->path());
@@ -65,7 +57,11 @@ class Query
         return $this;
     }
 
-    protected function select(array $fields)
+    /**
+     * @param array $fields
+     * @return $this
+     */
+    public function select(array $fields)
     {
         if ($fields) {
             $this->baseQuery->select(...$fields);
@@ -89,7 +85,7 @@ class Query
      * @param Expression $expression
      * @return Query
      */
-    protected function where(Expression $expression)
+    public function where(Expression $expression)
     {
         return $this->applyRsqlExpression($this->baseQuery, $expression);
     }
@@ -111,7 +107,7 @@ class Query
      * @param $limit
      * @return $this
      */
-    protected function limit($limit)
+    public function limit($limit)
     {
         if ($limit) {
             $this->baseQuery->limit($limit);

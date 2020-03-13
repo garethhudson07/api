@@ -140,7 +140,7 @@ class Api
         return $this->try(function ()
         {
             $pipeline = (new Pipeline(
-                $this->kernel->resolve(RequestFactory::class)->query()
+                $this->kernel->resolve(RequestFactory::class)->prepare()
             ));
 
             if($prefix = $this->kernel->getConfig('request')->prefix) {
@@ -150,9 +150,6 @@ class Api
             $pipeline->assemble($this->resources);
 
             if ($sentinel = $this->kernel->resolve(Sentinel::class)) {
-                var_dump($sentinel);
-                exit;
-
                 $sentinel->protect($pipeline);
             }
 

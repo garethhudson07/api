@@ -209,15 +209,14 @@ class Pipe
         $httpMethod = $this->request->getMethod();
         $this->arguments = [$this];
 
-        if ($this->isLast()) {
-            $this->arguments[] = $this->request;
-        } else {
+        if (!$this->isLast()) {
             $this->operation = 'read';
             $this->method = 'getByKey';
 
             return $this;
         }
 
+        $this->arguments[] = $this->request;
         $this->operation = $this::OPERATION_MAP[$httpMethod];
 
         $this->method = $httpMethod === 'GET'

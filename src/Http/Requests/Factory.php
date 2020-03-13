@@ -4,6 +4,7 @@ namespace Api\Http\Requests;
 
 use Api\Config\Manager as ConfigManager;
 use Api\Config\Service as ConfigService;
+use Api\Queries\Query;
 use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
@@ -61,19 +62,50 @@ class Factory
     /**
      * @return ServerRequestInterface
      */
-    public function query()
+    public function prepare()
     {
         $request = $this->instance();
 
-        $bag = Bag::parse(
-            Raw::extract($request, $this->specConfig)
+        $request = $request->withAttribute(
+            'segments',
+            Parser::segments($request->getUri()->getPath())
         );
 
-        return $request->withAttribute('segments', $bag->segments())
-            ->withAttribute('relations', $bag->relations())
-            ->withAttribute('fields', $bag->fields())
-            ->withAttribute('filters', $bag->filters())
-            ->withAttribute('sort', $bag->sort())
-            ->withAttribute('limit', $bag->limit());
+        switch ($this->instance()->getMethod()) {
+            case 'DELETE':
+                return $request;
+
+            case 'GET':
+                return $this->query($request);
+
+            default:
+                return $this->persist($request);
+        }
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return ServerRequestInterface
+     */
+    protected function query(ServerRequestInterface $request)
+    {
+        return $request->withAttribute(
+            'query',
+            Query::extract($request, $this->specConfig)
+        );
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return ServerRequestInterface
+     */
+    protected function persist(ServerRequestInterface $request)
+    {
+        return $request->withParsedBody(
+            json_decode(
+                file_get_contents("php://input"),
+                true
+            )
+        );
     }
 }

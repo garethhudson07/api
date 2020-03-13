@@ -3,8 +3,8 @@
 namespace Api\specs\JsonApi;
 
 use Api\Specs\Contracts\Representation as RepresentationContract;
-use Api\Http\Requests\Relation as RequestRelation;
-use Api\Http\Requests\Relations as RequestRelations;
+use Api\Queries\Relation as RequestRelation;
+use Api\Queries\Relations as RequestRelations;
 use Api\Support\Str;
 use Neomerx\JsonApi\Encoder\Encoder;
 use Neomerx\JsonApi\Schema\Arr as ArrSchema;
@@ -41,7 +41,11 @@ class Representation implements RepresentationContract
      */
     public function forCollection(string $name, ServerRequestInterface $request, array $collection)
     {
-        $this->encoder->withIncludedPaths($this->collapseRelations($request->getAttribute('relations') ?? []));
+        if($query = $request->getAttribute('query')) {
+            $this->encoder->withIncludedPaths(
+                $this->collapseRelations($query->relations())
+            );
+        }
 
         return $this->encoder->encodeCollectionArray(
             $name,
@@ -136,7 +140,11 @@ class Representation implements RepresentationContract
      */
     public function forSingleton(string $name, ServerRequestInterface $request, array $item)
     {
-        $this->encoder->withIncludedPaths($this->collapseRelations($request->getAttribute('relations') ?? []));
+        if($query = $request->getAttribute('query')) {
+            $this->encoder->withIncludedPaths(
+                $this->collapseRelations($query->relations())
+            );
+        }
 
         return $this->encoder->encodeSingletonArray(
             $name,

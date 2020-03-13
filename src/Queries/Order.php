@@ -1,6 +1,6 @@
 <?php
 
-namespace Api\Http\Requests;
+namespace Api\Queries;
 
 /**
  * Class Order

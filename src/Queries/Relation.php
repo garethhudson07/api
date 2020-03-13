@@ -1,6 +1,6 @@
 <?php
 
-namespace Api\Http\Requests;
+namespace Api\Queries;
 
 use Oilstone\RsqlParser\Expression;
 

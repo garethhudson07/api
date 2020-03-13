@@ -1,12 +1,14 @@
 <?php
 
-namespace Api\Http\Requests;
+namespace Api\Queries;
 
+use Api\Config\Manager;
 use Closure;
+use Psr\Http\Message\ServerRequestInterface;
 
-class Bag
+class Query
 {
-    protected $segments;
+    protected $type;
 
     protected $relations;
 
@@ -21,25 +23,33 @@ class Bag
     protected $offset;
 
     /**
-     * Bag constructor.
+     * Query constructor.
+     * @param string $type
      */
-    public function __construct()
+    public function __construct(string $type)
     {
+        $this->type = $type;
         $this->relations = new Relations();
     }
 
     /**
-     * @param Raw $raw
-     * @return Bag
+     * @param ServerRequestInterface $request
+     * @param Manager $config
+     * @return Query
      */
-    public static function parse(Raw $raw)
+    public static function extract(ServerRequestInterface $request, Manager $config)
     {
-        return (new static)->parseSegments($raw->segments())
-            ->parseRelations($raw->relations() ?: '')
-            ->parseFields($raw->fields() ?: '')
-            ->parseFilters($raw->filters() ?: '')
-            ->parseSort($raw->sort() ?: '')
-            ->parseLimit($raw->limit() ?: '');
+        $segments = $request->getAttribute('segments');
+        $params = $request->getQueryParams();
+
+        return (new static(
+            $segments[count($segments) - 1]
+        ))->parseRelations($params[$config->get('relationsKey')] ?? '')
+            ->parseFields($params[$config->get('fieldsKey')] ?? '')
+            ->parseFilters($params[$config->get('filtersKey')] ?? '')
+            ->parseSort($params[$config->get('sortKey')] ?? '')
+            ->parseLimit($params[$config->get('limitKey')] ?? '')
+            ->parseOffset($params[$config->get('offsetKey')] ?? '');
     }
 
     /**
@@ -49,10 +59,8 @@ class Bag
      */
     protected function apply(array $items, Closure $callback)
     {
-        $resource = $this->resource();
-
         foreach ($items as $name => $value) {
-            if ($name === $resource) {
+            if ($name === $this->type) {
                 $callback($this, $value);
                 continue;
             }
@@ -61,17 +69,6 @@ class Bag
                 $callback($relation, $value);
             }
         }
-
-        return $this;
-    }
-
-    /**
-     * @param string $input
-     * @return $this
-     */
-    public function parseSegments(string $input)
-    {
-        $this->segments = Parser::segments($input);
 
         return $this;
     }
@@ -96,7 +93,7 @@ class Bag
 
     /**
      * @param $input
-     * @return $this|Bag
+     * @return $this|Query
      * @throws \Oilstone\RsqlParser\Exceptions\InvalidQueryStringException
      */
     public function parseFilters($input)
@@ -154,44 +151,11 @@ class Bag
     }
 
     /**
-     * @param array $segments
+     * @param $input
      * @return $this
      */
-    public function setSegments(array $segments)
+    public function parseOffset($input)
     {
-        $this->segments = $segments;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function segments()
-    {
-        return $this->segments;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function resource()
-    {
-        if (!$this->segments) {
-            return null;
-        }
-
-        return $this->segments[count($this->segments) - 1];
-    }
-
-    /**
-     * @param array $relations
-     * @return $this
-     */
-    public function setRelations(array $relations)
-    {
-        $this->relations = $relations;
-
         return $this;
     }
 
@@ -242,17 +206,6 @@ class Bag
     }
 
     /**
-     * @param string $sort
-     * @return $this
-     */
-    public function setSort(string $sort)
-    {
-        $this->sort = $sort;
-
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function sort()
@@ -277,17 +230,6 @@ class Bag
     public function limit()
     {
         return $this->limit;
-    }
-
-    /**
-     * @param $offset
-     * @return $this
-     */
-    public function setOffset($offset)
-    {
-        $this->offset = $offset;
-
-        return $this;
     }
 
     /**
