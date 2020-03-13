@@ -17,7 +17,7 @@ class RelationshipResolver
             $model->addRelation($relation->getStitchRelation());
 
             static::associate(
-                $model,
+                $foreignResource->getRepository()->getModel(),
                 $foreignResource,
                 $requestRelation->getRelations()
             );
