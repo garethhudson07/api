@@ -2,7 +2,7 @@
 
 namespace Api\Repositories\Contracts;
 
-use Api\Pipeline\Pipe;
+use Api\Pipeline\Pipes\Pipe;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -44,4 +44,10 @@ interface Repository
      * @return array
      */
     public function update(Pipe $pipe, ServerRequestInterface $request): array;
+
+    /**
+     * @param Pipe $pipe
+     * @return array
+     */
+    public function delete(Pipe $pipe): array;
 }

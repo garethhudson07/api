@@ -1,7 +1,9 @@
 <?php
 
-namespace Api\Pipeline;
+namespace Api\Pipeline\Pipes;
 
+use Api\Pipeline\Pipeline;
+use Api\Pipeline\Scope;
 use Psr\Http\Message\ServerRequestInterface;
 use Api\Resources\Singleton;
 use Api\Resources\Collectable;
@@ -34,13 +36,6 @@ class Pipe
         'PUT' => 'update',
         'PATCH' => 'update',
         'DELETE' => 'delete'
-    ];
-
-    protected const METHOD_MAP = [
-        'POST' => 'create',
-        'PUT' => 'update',
-        'PATCH' => 'update',
-        'DELETE' => 'destroy'
     ];
 
     /**
@@ -221,7 +216,7 @@ class Pipe
 
         $this->method = $httpMethod === 'GET'
             ? 'get' . ($this->hasKey() ? 'Record' : 'Collection')
-            : $this::METHOD_MAP[$httpMethod];
+            : $this::OPERATION_MAP[$httpMethod];
 
         return $this;
     }

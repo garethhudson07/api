@@ -1,9 +1,14 @@
 <?php
 
 namespace Api\Resources;
+
+use Api\Pipeline\Pipes\Pipe;
 use Api\Repositories\Contracts\Repository;
 use Api\Resources\Relations\Registry as Relations;
+use Api\Schema\Schema;
 use Api\Specs\Contracts\Representation;
+use Api\Events\Contracts\Emitter as EmitterInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class Collection
@@ -11,16 +16,74 @@ use Api\Specs\Contracts\Representation;
  */
 class Collectable extends Resource
 {
-    public function __construct(Repository $repository, Relations $relations, Representation $representation)
+    public function __construct(Schema $schema, Repository $repository, Relations $relations, Representation $representation, EmitterInterface $emitter)
     {
-        parent::__construct($repository, $relations, $representation);
+        parent::__construct($schema, $repository, $relations, $representation, $emitter);
 
         $this->endpoints->add(
             'index',
             'show',
             'create',
             'update',
-            'destroy'
+            'delete'
         );
+    }
+
+    /**
+     * @param Pipe $pipe
+     * @param ServerRequestInterface $request
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getCollection(Pipe $pipe, ServerRequestInterface $request)
+    {
+        $this->endpoints->verify('index');
+        $this->emitCrudEvent('readingMany', compact('pipe','request'));
+
+        return $this->representation->forCollection(
+            $pipe->getEntity()->getName(),
+            $request,
+            $this->repository->getCollection($pipe, $request)
+        );
+    }
+
+    /**
+     * @param Pipe $pipe
+     * @param ServerRequestInterface $request
+     * @return mixed
+     * @throws \Exception
+     */
+    public function create(Pipe $pipe, ServerRequestInterface $request)
+    {
+        $this->endpoints->verify('create');
+        $this->emitCrudEvent('creating', compact('pipe','request'));
+        $this->schema->validate($request->getParsedBody());
+
+        $record = $this->repository->create($pipe, $request);
+
+        $this->emitCrudEvent('created', compact('record'));
+
+        return $this->representation->forSingleton(
+            $pipe->getEntity()->getName(),
+            $request,
+            $record
+        );
+    }
+
+    /**
+     * @param Pipe $pipe
+     * @return mixed
+     * @throws \Exception
+     */
+    public function delete(Pipe $pipe)
+    {
+        $this->endpoints->verify('delete');
+        $this->emitCrudEvent('deleting', compact('pipe'));
+
+        $record = $this->repository->delete($pipe);
+
+        $this->emitCrudEvent('deleted', compact('record'));
+
+        return [];
     }
 }

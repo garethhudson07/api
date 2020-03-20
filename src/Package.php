@@ -10,6 +10,7 @@ use Api\Providers\RequestServiceProvider;
 use Api\Providers\ResponseServiceProvider;
 use Api\Providers\GuardServiceProvider;
 use Api\Providers\SpecServiceProvider;
+use Api\Providers\PipelineServiceProvider;
 use Stitch\Stitch;
 use Closure;
 
@@ -82,6 +83,8 @@ class Package
             new GuardServiceProvider($this->kernel->getConfig('guard'))
         )->addServiceProvider(
             new SpecServiceProvider($this->kernel->getConfig('specification'))
+        )->addServiceProvider(
+            new PipelineServiceProvider()
         );
 
         return $this;
@@ -106,6 +109,17 @@ class Package
     public function bind(...$arguments)
     {
         $this->kernel->bind(...$arguments);
+
+        return $this;
+    }
+
+    /**
+     * @param mixed ...$arguments
+     * @return $this
+     */
+    public function listen(...$arguments)
+    {
+        $this->kernel->listen(...$arguments);
 
         return $this;
     }

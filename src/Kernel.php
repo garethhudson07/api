@@ -7,6 +7,13 @@ use League\Container\Container;
 use Api\Config\Store as Configs;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Psr\Container\ContainerInterface;
+use Api\Events\Contracts\Emitter as EmitterInterface;
+use Api\Events\Factory as Events;
+use Api\Http\Requests\Factory as RequestFactory;
+use Api\Http\Responses\Factory as ResponseFactory;
+use Api\Pipeline\Pipeline;
+use Api\Guards\Contracts\Sentinel;
+use Api\Events\Contracts\Emitter;
 
 class Kernel
 {
@@ -14,15 +21,27 @@ class Kernel
 
     protected $configs;
 
+    protected $emitter;
+
+    protected const SERVICE_ALIASES = [
+        'request' => RequestFactory::class,
+        'response' => ResponseFactory::class,
+        'pipeline' => Pipeline::class,
+        'sentinel' => Sentinel::class,
+        'emitter' => Emitter::class
+    ];
+
     /**
      * Kernel constructor.
      * @param Container $container
      * @param Configs $configs
+     * @param EmitterInterface $emitter
      */
-    public function __construct(Container $container, Configs $configs)
+    public function __construct(Container $container, Configs $configs, EmitterInterface $emitter)
     {
         $this->container = $container;
         $this->configs = $configs;
+        $this->emitter = $emitter;
     }
 
     /**
@@ -32,7 +51,8 @@ class Kernel
     {
         return new static(
             new Container(),
-            new Configs()
+            new Configs(),
+            Events::emitter()
         );
     }
 
@@ -43,7 +63,8 @@ class Kernel
     {
         return new static(
             (new Container)->delegate($this->container),
-            $this->configs->extend()
+            $this->configs->extend(),
+            $this->emitter->extend()
         );
     }
 
@@ -61,6 +82,14 @@ class Kernel
     public function getConfigs()
     {
         return $this->configs;
+    }
+
+    /**
+     * @return EmitterInterface
+     */
+    public function getEmitter()
+    {
+        return $this->emitter;
     }
 
     /**
@@ -110,6 +139,10 @@ class Kernel
      */
     public function resolve($id)
     {
+        if (array_key_exists($id, $this::SERVICE_ALIASES)) {
+            $id = $this::SERVICE_ALIASES[$id];
+        }
+
         return $this->container->get($id);
     }
 
@@ -143,6 +176,17 @@ class Kernel
     public function addDelegateContainer(ContainerInterface $container)
     {
         $this->container->delegate($container);
+
+        return $this;
+    }
+
+    /**
+     * @param mixed ...$arguments
+     * @return $this
+     */
+    public function listen(...$arguments)
+    {
+        $this->emitter->listen(...$arguments);
 
         return $this;
     }

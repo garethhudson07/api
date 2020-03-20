@@ -11,5 +11,5 @@ interface ApiException
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function formatResponse(ResponseInterface $response): ResponseInterface;
+    public function prepareResponse(ResponseInterface $response): ResponseInterface;
 }

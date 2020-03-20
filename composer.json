@@ -24,7 +24,9 @@
         "zendframework/zend-httphandlerrunner": "^1.1",
         "ext-json": "*",
         "ext-mbstring": "*",
-        "league/container": "^3.3"
+        "league/container": "^3.3",
+        "respect/validation": "^1.1",
+        "league/event": "^2.2"
     },
     "autoload": {
         "psr-4": {

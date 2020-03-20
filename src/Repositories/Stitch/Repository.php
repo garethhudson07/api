@@ -2,7 +2,7 @@
 
 namespace Api\Repositories\Stitch;
 
-use Api\Pipeline\Pipe;
+use Api\Pipeline\Pipes\Pipe;
 use Api\Repositories\Contracts\Repository as RepositoryContract;
 use Api\Repositories\Stitch\Bridge\QueryResolver;
 use Api\Repositories\Stitch\Bridge\RelationshipResolver;
@@ -114,6 +114,25 @@ class Repository implements RepositoryContract
      */
     public function update(Pipe $pipe, ServerRequestInterface $request): array
     {
-        throw new Exception('Method not yet implemented');
+        return (new QueryResolver(
+            $this->model,
+            $pipe
+        ))->byKey()->hydrate()->fill($request->getParsedBody())->save()->toArray();
+    }
+
+    /**
+     * @param Pipe $pipe
+     * @return array
+     */
+    public function delete(Pipe $pipe): array
+    {
+        $record = (new QueryResolver(
+            $this->model,
+            $pipe
+        ))->byKey()->hydrate();
+
+        $record->delete();
+
+        return $record->toArray();
     }
 }

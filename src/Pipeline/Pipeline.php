@@ -2,6 +2,8 @@
 
 namespace Api\Pipeline;
 
+use Api\Pipeline\Pipes\Pipe;
+use Api\Pipeline\Pipes\Aggregate as Pipes;
 use Api\Http\Requests\Parser;
 use Api\Resources\Registry;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,10 +19,7 @@ class Pipeline
 
     protected $response;
 
-    /**
-     * @var array
-     */
-    protected $pipes = [];
+    protected $pipes;
 
     protected $prefix;
 
@@ -33,6 +32,7 @@ class Pipeline
     {
         $this->request = $request;
         $this->response = $response;
+        $this->pipes = new Pipes();
     }
 
     /**
@@ -78,7 +78,7 @@ class Pipeline
     {
         $pipe = $this->makePipe();
 
-        $this->pipes[] = $pipe;
+        $this->pipes->push($pipe);
 
         return $pipe;
     }
@@ -114,48 +114,6 @@ class Pipeline
     }
 
     /**
-     * @return array
-     */
-    public function all()
-    {
-        return $this->pipes;
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function last()
-    {
-        return $this->pipes[count($this->pipes) - 1] ?? null;
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function penultimate()
-    {
-        return $this->pipes[count($this->pipes) - 2] ?? null;
-    }
-
-    /**
-     * @param Pipe $pipe
-     * @return array
-     */
-    public function before(Pipe $pipe)
-    {
-        return array_slice($this->pipes, 0, array_search($pipe, $this->pipes));
-    }
-
-    /**
-     * @param Pipe $pipe
-     * @return array
-     */
-    public function after(Pipe $pipe)
-    {
-        return array_slice($this->pipes, array_search($pipe, $this->pipes) + 1);
-    }
-
-    /**
      * @return $this
      */
     protected function classify()
@@ -165,6 +123,40 @@ class Pipeline
         }
 
         return $this;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function last()
+    {
+        return $this->pipes->last();
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function penultimate()
+    {
+        return $this->pipes->penultimate();
+    }
+
+    /**
+     * @param Pipe $pipe
+     * @return array
+     */
+    public function before(Pipe $pipe)
+    {
+        return $this->pipes->before($pipe);
+    }
+
+    /**
+     * @param Pipe $pipe
+     * @return array
+     */
+    public function after(Pipe $pipe)
+    {
+        return $this->pipes->after($pipe);
     }
 
     /**
@@ -185,12 +177,19 @@ class Pipeline
     public function prepareResponse()
     {
         $pipe = $this->call()->last();
+        $data = $pipe->getData();
 
-        $this->response->getBody()->write($pipe->getData());
+        if ($data) {
+            $this->response->getBody()->write($data);
+        }
 
         switch ($pipe->getOperation()) {
             case 'create':
                 $status = '201';
+                break;
+
+            case 'delete':
+                $status = '204';
                 break;
 
             default:

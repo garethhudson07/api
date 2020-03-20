@@ -8,6 +8,8 @@ class Payload implements JsonSerializable
 {
     protected $message;
 
+    protected $data = [];
+
     /**
      * @param string $message
      * @return $this
@@ -20,12 +22,34 @@ class Payload implements JsonSerializable
     }
 
     /**
+     * @param array $data
+     * @return $this
+     */
+    public function data(array $data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
      * @return array
      */
     public function jsonSerialize()
     {
         return [
-            'message' => $this->message
+            'errors' => [
+                'title' => $this->message,
+                'meta' => $this->data
+            ]
         ];
     }
 

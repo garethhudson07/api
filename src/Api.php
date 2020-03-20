@@ -2,13 +2,9 @@
 
 namespace Api;
 
-use Api\Pipeline\Pipeline;
 use Api\Exceptions\Handler as ExceptionHandler;
 use Psr\Http\Message\ResponseInterface;
 use Api\Resources\Factory as ResourceFactory;
-use Api\Http\Requests\Factory as RequestFactory;
-use Api\Http\Responses\Factory as ResponseFactory;
-use Api\Guards\Contracts\Sentinel;
 use Closure;
 use Exception;
 
@@ -25,7 +21,7 @@ class Api
     public function __construct(Kernel $kernel)
     {
         $this->kernel = $kernel;
-        $this->resources = (new ResourceFactory($kernel->getContainer()))->registry();
+        $this->resources = (new ResourceFactory($kernel))->registry();
     }
 
     /**
@@ -47,6 +43,17 @@ class Api
     public function bind(...$arguments)
     {
         $this->kernel->bind(...$arguments);
+
+        return $this;
+    }
+
+    /**
+     * @param mixed ...$arguments
+     * @return $this
+     */
+    public function listen(...$arguments)
+    {
+        $this->kernel->listen(...$arguments);
 
         return $this;
     }
@@ -118,7 +125,7 @@ class Api
             return $callback();
         } catch (Exception $e) {
             return (new ExceptionHandler(
-                $this->kernel->resolve(ResponseFactory::class)->json()
+                $this->kernel->resolve('response')->json()
             ))->handle($e);
         }
     }
@@ -131,10 +138,7 @@ class Api
     {
         return $this->try(function ()
         {
-            $pipeline = (new Pipeline(
-                $this->kernel->resolve(RequestFactory::class)->prepare(),
-                $this->kernel->resolve(ResponseFactory::class)->json()
-            ));
+            $pipeline = $this->kernel->resolve('pipeline');
 
             if($prefix = $this->kernel->getConfig('request')->prefix) {
                 $pipeline->prefix($prefix);
@@ -142,7 +146,7 @@ class Api
 
             $pipeline->assemble($this->resources);
 
-            if ($sentinel = $this->kernel->resolve(Sentinel::class)) {
+            if ($sentinel = $this->kernel->resolve('sentinel')) {
                 $sentinel->protect($pipeline);
             }
 
@@ -155,7 +159,7 @@ class Api
      */
     protected function emitResponse(ResponseInterface $response)
     {
-        $this->kernel->resolve(ResponseFactory::class)->emitter()->emit($response);
+        $this->kernel->resolve('response')->emitter()->emit($response);
     }
 
     /**

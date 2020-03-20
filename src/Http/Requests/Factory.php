@@ -65,47 +65,22 @@ class Factory
     public function prepare()
     {
         $request = $this->instance();
+        $request = $request->withAttribute('segments', Parser::segments($request->getUri()->getPath()));
 
-        $request = $request->withAttribute(
-            'segments',
-            Parser::segments($request->getUri()->getPath())
-        );
-
-        switch ($this->instance()->getMethod()) {
+        switch ($request->getMethod()) {
             case 'DELETE':
                 return $request;
 
             case 'GET':
-                return $this->query($request);
+                return $request->withAttribute('query', Query::extract($request, $this->specConfig));
 
             default:
-                return $this->persist($request);
+                return $request->withParsedBody(
+                    json_decode(
+                        file_get_contents("php://input"),
+                        true
+                    ) ?: []
+                );
         }
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @return ServerRequestInterface
-     */
-    protected function query(ServerRequestInterface $request)
-    {
-        return $request->withAttribute(
-            'query',
-            Query::extract($request, $this->specConfig)
-        );
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @return ServerRequestInterface
-     */
-    protected function persist(ServerRequestInterface $request)
-    {
-        return $request->withParsedBody(
-            json_decode(
-                file_get_contents("php://input"),
-                true
-            )
-        );
     }
 }

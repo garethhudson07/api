@@ -26,9 +26,9 @@ class Handler
     public function handle(Exception $exception)
     {
         if ($exception instanceof ApiExceptionInterface) {
-            return $exception->formatResponse($this->response);
-        } else {
-            throw $exception;
+            return $exception->prepareResponse($this->response);
         }
+
+        throw $exception;
     }
 }

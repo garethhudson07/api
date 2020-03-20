@@ -2,25 +2,26 @@
 
 namespace Api\Resources;
 
-use League\Container\Container;
+use Api\Repositories\Contracts\Repository as RepositoryContract;
+use Api\Schema\Schema;
+use Api\Kernel;
 use Api\Resources\Relations\Factory as RelationsFactory;
 use Api\Repositories\Stitch\Repository as StitchRepository;
 use Api\Specs\Contracts\Representation;
 use Closure;
 use Stitch\Model;
-use Stitch\Stitch;
 
 class Factory
 {
-    protected $container;
+    protected $kernel;
 
     protected $relationsFactory;
 
     protected $registry;
 
-    public function __construct(Container $container)
+    public function __construct(Kernel $kernel)
     {
-        $this->container = $container;
+        $this->kernel = $kernel;
         $this->relationsFactory = new RelationsFactory($this);
     }
 
@@ -37,15 +38,22 @@ class Factory
     }
 
     /**
-     * @param $value
+     * @param Closure $callback
+     * @param RepositoryContract|null $repository
      * @return Collectable
      */
-    public function collectable($value)
+    public function collectable(Closure $callback, ?RepositoryContract $repository = null): Collectable
     {
+        $schema = $this->schema($callback);
+
         return new Collectable(
-            $value instanceof Model ? new StitchRepository($value) : $value,
+            $schema,
+            $repository ?: new StitchRepository(
+                new Model($schema->getTable())
+            ),
             $this->relationsFactory->registry(),
-            $this->container->get(Representation::class)
+            $this->kernel->resolve(Representation::class),
+            $this->kernel->getEmitter()->extend()
         );
     }
 
@@ -56,12 +64,12 @@ class Factory
     {
     }
 
-    /**
-     * @param Closure $callback
-     * @return Model
-     */
-    public function model(Closure $callback)
+    protected function schema(Closure $callback)
     {
-        return Stitch::make($callback);
+        $schema = new Schema();
+
+        $callback($schema);
+
+        return $schema;
     }
 }

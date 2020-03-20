@@ -4,7 +4,7 @@ namespace Api\Repositories\Stitch\Bridge;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Stitch\Model;
-use Api\Pipeline\Pipe;
+use Api\Pipeline\Pipes\Pipe;
 use Stitch\Queries\Query as BaseQuery;
 
 class QueryResolver

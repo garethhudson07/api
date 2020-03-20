@@ -2,6 +2,7 @@
 
 namespace Api\Pipeline;
 
+use Api\Pipeline\Pipes\Pipe;
 use Api\Resources\Relations\Relation;
 
 class Scope

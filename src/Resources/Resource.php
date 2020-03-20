@@ -2,12 +2,15 @@
 
 namespace Api\Resources;
 
-use Api\Pipeline\Pipe;
+use Api\Events\Payload;
+use Api\Pipeline\Pipes\Pipe;
 use Api\Repositories\Contracts\Repository;
+use Api\Schema\Schema;
 use Api\Specs\Contracts\Representation;
 use Psr\Http\Message\ServerRequestInterface;
 use Api\Resources\Relations\Relation;
 use Api\Resources\Relations\Registry as Relations;
+use Api\Events\Contracts\Emitter as EmitterInterface;
 use Exception;
 
 /**
@@ -16,6 +19,8 @@ use Exception;
  */
 class Resource
 {
+    protected $schema;
+
     /**
      * @var Repository
      */
@@ -31,6 +36,8 @@ class Resource
      */
     protected $representation;
 
+    protected $emitter;
+
     /**
      * @var array
      */
@@ -43,15 +50,19 @@ class Resource
 
     /**
      * Resource constructor.
+     * @param Schema $schema
      * @param Repository $repository
      * @param Relations $relations
      * @param Representation $representation
+     * @param EmitterInterface $emitter
      */
-    public function __construct(Repository $repository, Relations $relations, Representation $representation)
+    public function __construct(Schema $schema, Repository $repository, Relations $relations, Representation $representation, EmitterInterface $emitter)
     {
+        $this->schema = $schema;
         $this->repository = $repository;
         $this->relations = $relations;
         $this->representation = $representation;
+        $this->emitter = $emitter;
         $this->endpoints = new Endpoints();
     }
 
@@ -145,6 +156,18 @@ class Resource
     {
         return $this->relations->get($name);
     }
+
+    /**
+     * @param string $event
+     * @param $listener
+     * @return $this
+     */
+    public function listen(string $event, $listener)
+    {
+        $this->emitter->listen($event, $listener);
+
+        return $this;
+    }
     
     /**
      * @param Pipe $pipe
@@ -161,26 +184,10 @@ class Resource
      * @return mixed
      * @throws Exception
      */
-    public function getCollection(Pipe $pipe, ServerRequestInterface $request)
-    {
-        $this->endpoints->verify('index');
-
-        return $this->representation->forCollection(
-            $pipe->getEntity()->getName(),
-            $request,
-            $this->repository->getCollection($pipe, $request)
-        );
-    }
-
-    /**
-     * @param Pipe $pipe
-     * @param ServerRequestInterface $request
-     * @return mixed
-     * @throws Exception
-     */
     public function getRecord(Pipe $pipe, ServerRequestInterface $request)
     {
         $this->endpoints->verify('show');
+        $this->emitCrudEvent('readingOne', compact('pipe','request'));
 
         return $this->representation->forSingleton(
             $pipe->getEntity()->getName(),
@@ -195,31 +202,35 @@ class Resource
      * @return mixed
      * @throws Exception
      */
-    public function create(Pipe $pipe, ServerRequestInterface $request)
-    {
-        $this->endpoints->verify('create');
-
-        return $this->representation->forSingleton(
-            $pipe->getEntity()->getName(),
-            $request,
-            $this->repository->create($pipe, $request)
-        );
-    }
-
-    /**
-     * @param Pipe $pipe
-     * @param ServerRequestInterface $request
-     * @return mixed
-     * @throws Exception
-     */
     public function update(Pipe $pipe, ServerRequestInterface $request)
     {
         $this->endpoints->verify('update');
+        $this->emitCrudEvent('updating', compact('pipe','request'));
+        $this->schema->validate($request->getParsedBody());
+
+        $record = $this->repository->update($pipe, $request);
+
+        $this->emitCrudEvent('updated', compact('record'));
 
         return $this->representation->forSingleton(
             $pipe->getEntity()->getName(),
             $request,
             $this->repository->update($pipe, $request)
         );
+    }
+
+    /**
+     * @param string $action
+     * @param array $payloadAttributes
+     * @return $this
+     */
+    protected function emitCrudEvent(string $action, array $payloadAttributes)
+    {
+        $this->emitter->emit('crud', function (Payload $payload) use ($action, $payloadAttributes)
+        {
+            $payload->action($action)->fill($payloadAttributes);
+        });
+
+        return $this;
     }
 }
