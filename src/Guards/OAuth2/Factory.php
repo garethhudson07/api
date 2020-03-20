@@ -4,19 +4,19 @@ namespace Api\Guards\OAuth2;
 
 use Api\Guards\OAuth2\League\Factory as LeagueFactory;
 use Api\Config\Service;
-use League\Container\Container;
+use Api\Kernel;
 
 class Factory
 {
-    protected $container;
+    protected $kernel;
 
     protected $config;
 
     protected $leagueFactory;
 
-    public function __construct(Container $container, Service $config)
+    public function __construct(Kernel $kernel, Service $config)
     {
-        $this->container = $container;
+        $this->kernel = $kernel;
         $this->config = $config;
         $this->leagueFactory = new LeagueFactory($config);
     }
@@ -35,7 +35,7 @@ class Factory
     public function sentinel()
     {
         return new Sentinel(
-            $this->container->get('Psr\Http\Message\ServerRequestInterface'),
+            $this->kernel->resolve('request.factory')->instance(),
             $this->key()
         );
     }
@@ -47,7 +47,7 @@ class Factory
     {
         return new Key(
             $this->leagueFactory->resourceServer(),
-            $this->container->get('Psr\Http\Message\ServerRequestInterface'),
+            $this->kernel->resolve('request.factory')->instance(),
             $this->config->get('userRepository')
         );
     }
@@ -61,7 +61,7 @@ class Factory
     {
         return new Authoriser(
             $this->leagueFactory->authorisationServer(),
-            $this->container->get('Psr\Http\Message\ServerRequestInterface')
+            $this->kernel->resolve('request.factory')->instance()
         );
     }
 }

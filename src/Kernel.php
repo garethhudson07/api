@@ -24,10 +24,10 @@ class Kernel
     protected $emitter;
 
     protected const SERVICE_ALIASES = [
-        'request' => RequestFactory::class,
-        'response' => ResponseFactory::class,
+        'request.factory' => RequestFactory::class,
+        'response.factory' => ResponseFactory::class,
         'pipeline' => Pipeline::class,
-        'sentinel' => Sentinel::class,
+        'guard.sentinel' => Sentinel::class,
         'emitter' => Emitter::class
     ];
 

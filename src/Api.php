@@ -70,49 +70,49 @@ class Api
     /**
      * @throws Exception
      */
-//    public function authorise()
-//    {
-//        $this->emitResponse($this->generateAuthorisationResponse());
-//    }
+    public function authorise()
+    {
+        $this->emitResponse($this->generateAuthorisationResponse());
+    }
 
     /**
      * @return mixed|ResponseInterface
      * @throws Exception
      */
-//    public function generateAuthorisationResponse()
-//    {
-//        return $this->try(function ()
-//        {
-//            return $this->factory->guard()->authoriser($this->factory->request()->base())
-//                ->authoriseAndFormatResponse($this->factory->response()->base());
-//        });
-//    }
+    public function generateAuthorisationResponse()
+    {
+        return $this->try(function ()
+        {
+            return $this->kernel->guard()->authoriser($this->factory->request()->base())
+                ->authoriseAndFormatResponse($this->factory->response()->base());
+        });
+    }
 
     /**
      * @throws Exception
      */
-//    public function authorisedUser()
-//    {
-//        $this->emitResponse($this->generateAuthorisedUserResponse());
-//    }
+    public function authorisedUser()
+    {
+        $this->emitResponse($this->generateAuthorisedUserResponse());
+    }
 
     /**
      * @throws Exception
      */
-//    public function generateAuthorisedUserResponse()
-//    {
-//        $request = $this->kernel->resolve(RequestFactory::class)->instance();
-//        $key = $this->factory->guard()->key($request)->handle();
-//        $user = $key->getUser();
-//
-//        unset($user['password']);
-//
-//        return $this->kernel->resolve(ResponseFactory::class)->json(
-//            $this->factory->spec()
-//                ->representation()
-//                ->forSingleton('user', $request, $user)
-//        );
-//    }
+    public function generateAuthorisedUserResponse()
+    {
+        $request = $this->kernel->resolve('request.factory')->instance();
+        $key = $this->factory->guard()->key($request)->handle();
+        $user = $key->getUser();
+
+        unset($user['password']);
+
+        return $this->kernel->resolve(ResponseFactory::class)->json(
+            $this->factory->spec()
+                ->representation()
+                ->forSingleton('user', $request, $user)
+        );
+    }
 
     /**
      * @param Closure $callback
@@ -125,7 +125,7 @@ class Api
             return $callback();
         } catch (Exception $e) {
             return (new ExceptionHandler(
-                $this->kernel->resolve('response')->json()
+                $this->kernel->resolve('response.factory')->json()
             ))->handle($e);
         }
     }
@@ -146,7 +146,7 @@ class Api
 
             $pipeline->assemble($this->resources);
 
-            if ($sentinel = $this->kernel->resolve('sentinel')) {
+            if ($sentinel = $this->kernel->resolve('guard.sentinel')) {
                 $sentinel->protect($pipeline);
             }
 
@@ -159,7 +159,7 @@ class Api
      */
     protected function emitResponse(ResponseInterface $response)
     {
-        $this->kernel->resolve('response')->emitter()->emit($response);
+        $this->kernel->resolve('response.factory')->emitter()->emit($response);
     }
 
     /**
