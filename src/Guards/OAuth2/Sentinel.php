@@ -6,7 +6,7 @@ use Api\Guards\Contracts\Sentinel as SentinelContract;
 use Api\Exceptions\ApiException;
 use Api\Pipeline\Pipeline;
 use Api\Resources\Resource;
-use Api\Http\Requests\Relations as RequestRelations;
+use Api\Queries\Relations as QueryRelations;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Sentinel implements SentinelContract
@@ -70,13 +70,13 @@ class Sentinel implements SentinelContract
 
     /**
      * @param Resource $resource
-     * @param RequestRelations $requestRelations
+     * @param QueryRelations $QueryRelations
      * @return $this
      * @throws \Exception
      */
-    protected function checkRelations(Resource $resource, RequestRelations $requestRelations)
+    protected function checkRelations(Resource $resource, QueryRelations $QueryRelations)
     {
-        foreach ($requestRelations as $requestRelation) {
+        foreach ($QueryRelations as $requestRelation) {
             $relation = $resource->getRelation($requestRelation->getName());
 
             if ($relation) {

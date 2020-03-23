@@ -2,11 +2,12 @@
 
 namespace Api\Events\Contracts;
 
+use Api\Container;
 use Closure;
 
 interface Emitter
 {
-    public function extend(): Emitter;
+    public function extend(Container $container): Emitter;
 
     public function bubble(Emitter $parent): Emitter;
 

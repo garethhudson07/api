@@ -2,6 +2,7 @@
 
 namespace Api\Pipeline;
 
+use Api\Pipeline\contracts\Pipeline as PipelineInterface;
 use Api\Pipeline\Pipes\Pipe;
 use Api\Pipeline\Pipes\Aggregate as Pipes;
 use Api\Http\Requests\Parser;
@@ -13,7 +14,7 @@ use Psr\Http\Message\ResponseInterface;
  * Class Pipeline
  * @package Api\Pipeline
  */
-class Pipeline
+class Pipeline implements PipelineInterface
 {
     protected $request;
 
@@ -49,7 +50,7 @@ class Pipeline
     /**
      * @return array|mixed
      */
-    public function segments()
+    protected function segments()
     {
         $segments = $this->request->getAttribute('segments');
 

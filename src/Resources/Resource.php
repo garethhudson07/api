@@ -121,7 +121,7 @@ class Resource
      */
     public function hasMany(...$arguments)
     {
-        $this->relations->has(...array_merge([$this], $arguments));
+        $this->relations->include('has', array_merge([$this], $arguments));
 
         return $this;
     }
@@ -132,7 +132,7 @@ class Resource
      */
     public function belongsTo(...$arguments)
     {
-        $this->relations->belongsTo(...array_merge([$this], $arguments));
+        $this->relations->include('belongsTo', array_merge([$this], $arguments));
 
         return $this;
     }
@@ -143,7 +143,7 @@ class Resource
      */
     public function nest(...$arguments)
     {
-        $this->relations->nest(...array_merge([$this], $arguments));
+        $this->relations->include('relation', array_merge([$this], $arguments));
 
         return $this;
     }

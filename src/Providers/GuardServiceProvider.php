@@ -3,8 +3,9 @@
 namespace Api\Providers;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
+use Api\Container;
 use Api\Config\Manager as Config;
-use Api\Guards\Contracts\Sentinel;
+use Api\Guards\Contracts\Sentinel as SentinelInterface;
 use Api\Guards\OAuth2\Factory as OAuth2Factory;
 
 class GuardServiceProvider extends AbstractServiceProvider
@@ -15,7 +16,7 @@ class GuardServiceProvider extends AbstractServiceProvider
      * @var array
      */
     protected $provides = [
-        Sentinel::class
+        SentinelInterface::class
     ];
 
     /**
@@ -25,6 +26,8 @@ class GuardServiceProvider extends AbstractServiceProvider
     public function __construct(Config $config)
     {
         $this->config = $config;
+
+        Container::alias('guard.sentinel', SentinelInterface::class);
     }
 
     /**
@@ -38,7 +41,7 @@ class GuardServiceProvider extends AbstractServiceProvider
                 break;
 
             default:
-                $this->getContainer()->add(Sentinel::class, false);
+                $this->getContainer()->add(SentinelInterface::class, false);
         }
     }
 
@@ -48,7 +51,7 @@ class GuardServiceProvider extends AbstractServiceProvider
     protected function bindOAuth2(): void
     {
         $this->getContainer()
-            ->share(Sentinel::class, function ()
+            ->share(SentinelInterface::class, function ()
             {
                 return (new OAuth2Factory(
                     $this->getContainer(),

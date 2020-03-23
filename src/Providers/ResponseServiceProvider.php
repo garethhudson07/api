@@ -3,6 +3,8 @@
 namespace Api\Providers;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
+use Api\Container;
+use Api\Http\Responses\Contracts\Factory as FactoryInterface;
 use Api\Http\Responses\Factory;
 
 class ResponseServiceProvider extends AbstractServiceProvider
@@ -17,8 +19,16 @@ class ResponseServiceProvider extends AbstractServiceProvider
      * @var array
      */
     protected $provides = [
-        Factory::class,
+        FactoryInterface::class,
     ];
+
+    /**
+     * ResponseServiceProvider constructor.
+     */
+    public function __construct()
+    {
+        Container::alias('response.factory', FactoryInterface::class);
+    }
 
     /**
      * This is where the magic happens, within the method you can
@@ -28,7 +38,7 @@ class ResponseServiceProvider extends AbstractServiceProvider
      */
     public function register()
     {
-        $this->getContainer()->share(Factory::class, function ()
+        $this->getContainer()->share(FactoryInterface::class, function ()
         {
             return new Factory;
         });

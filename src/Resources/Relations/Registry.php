@@ -3,6 +3,7 @@
 namespace Api\Resources\Relations;
 
 use Api\Registry as AbstractRegistry;
+use Api\Container;
 use Closure;
 
 /**
@@ -15,38 +16,14 @@ class Registry extends AbstractRegistry
 
     /**
      * Registry constructor.
+     * @param Container $container
      * @param Factory $factory
      */
-    public function __construct(Factory $factory)
+    public function __construct(Container $container, Factory $factory)
     {
+        parent::__construct($container);
+
         $this->factory = $factory;
-    }
-
-    /**
-     * @param mixed ...$arguments
-     * @return Registry
-     */
-    public function has(...$arguments)
-    {
-        return $this->include('has', $arguments);
-    }
-
-    /**
-     * @param mixed ...$arguments
-     * @return Registry
-     */
-    public function belongsTo(...$arguments)
-    {
-        return $this->include('belongsTo', $arguments);
-    }
-
-    /**
-     * @param mixed ...$arguments
-     * @return Registry
-     */
-    public function nest(...$arguments)
-    {
-        return $this->include('relation', $arguments);
     }
 
     /**
@@ -54,7 +31,7 @@ class Registry extends AbstractRegistry
      * @param array $arguments
      * @return Registry
      */
-    protected function include(string $factoryMethod, array $arguments)
+    public function include(string $factoryMethod, array $arguments)
     {
         $localResource = array_shift($arguments);
         $name = array_shift($arguments);
@@ -84,10 +61,14 @@ class Registry extends AbstractRegistry
      */
     public function resolve(string $name)
     {
-        if ($this->items[$name] instanceof Closure) {
-            $this->items[$name] = $this->items[$name]();;
+        $item = $this->bindings[$name];
+
+        if ($item instanceof Closure) {
+            $this->items[$name] = $item();
+
+            return $this->items[$name];
         }
 
-        return $this->items[$name];
+        return parent::resolve($name);
     }
 }

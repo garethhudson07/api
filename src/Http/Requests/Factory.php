@@ -2,6 +2,7 @@
 
 namespace Api\Http\Requests;
 
+use Api\Http\Requests\Contracts\Factory as FactoryInterface;
 use Api\Config\Manager as ConfigManager;
 use Api\Config\Service as ConfigService;
 use Api\Queries\Query;
@@ -9,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 
-class Factory
+class Factory implements FactoryInterface
 {
     protected $requestConfig;
 

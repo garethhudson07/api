@@ -12,6 +12,9 @@ use Api\Providers\GuardServiceProvider;
 use Api\Providers\SpecServiceProvider;
 use Api\Providers\PipelineServiceProvider;
 use Stitch\Stitch;
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use Psr\Container\ContainerInterface;
+use League\Container\ReflectionContainer;
 use Closure;
 
 /**
@@ -47,7 +50,11 @@ class Package
     protected function init()
     {
         $this->buildConfig()
-            ->registerServiceProviders();
+            ->registerServices();
+
+        $this->addDelegateContainer(new ReflectionContainer());
+
+        return $this;
     }
 
     /**
@@ -73,7 +80,7 @@ class Package
     /**
      * @return $this
      */
-    protected function registerServiceProviders()
+    protected function registerServices()
     {
         $this->kernel->addServiceProvider(
             new RequestServiceProvider($this->kernel->getConfig('request'), $this->kernel->getConfig('specification'))
@@ -120,6 +127,28 @@ class Package
     public function listen(...$arguments)
     {
         $this->kernel->listen(...$arguments);
+
+        return $this;
+    }
+
+    /**
+     * @param AbstractServiceProvider $provider
+     * @return $this
+     */
+    public function addServiceProvider(AbstractServiceProvider $provider)
+    {
+        $this->kernel->addServiceProvider($provider);
+
+        return $this;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @return $this
+     */
+    public function addDelegateContainer(ContainerInterface $container)
+    {
+        $this->kernel->addDelegateContainer($container);
 
         return $this;
     }

@@ -3,6 +3,7 @@
 namespace Api\Resources;
 
 use Api\Registry as AbstractRegistry;
+use Api\Container;
 use Closure;
 
 class Registry extends AbstractRegistry
@@ -11,13 +12,14 @@ class Registry extends AbstractRegistry
 
     /**
      * Registry constructor.
+     * @param Container $container
      * @param Factory $factory
      */
-    public function __construct(Factory $factory)
+    public function __construct(Container $container, Factory $factory)
     {
-        $this->factory = $factory;
+        parent::__construct($container);
 
-        return $this;
+        $this->factory = $factory;
     }
 
     /**
@@ -26,13 +28,15 @@ class Registry extends AbstractRegistry
      */
     public function resolve(string $name)
     {
-        $item = $this->items[$name];
+        $item = $this->bindings[$name];
 
         if ($item instanceof Closure) {
             $item = $item($this->factory)->name($name);
             $this->items[$name] = $item;
+
+            return $item;
         }
 
-        return $item;
+        return parent::resolve($name);
     }
 }

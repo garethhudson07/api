@@ -3,9 +3,9 @@
 namespace Api\Providers;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
+use Api\Container;
+use Api\Pipeline\contracts\Pipeline as PipelineInterface;
 use Api\Pipeline\Pipeline;
-use Api\Http\Requests\Factory as RequestFactory;
-use Api\Http\Responses\Factory as ResponseFactory;
 
 class PipelineServiceProvider extends AbstractServiceProvider
 {
@@ -13,19 +13,27 @@ class PipelineServiceProvider extends AbstractServiceProvider
      * @var array
      */
     protected $provides = [
-        Pipeline::class
+        PipelineInterface::class
     ];
+
+    /**
+     * PipelineServiceProvider constructor.
+     */
+    public function __construct()
+    {
+        Container::alias('pipeline', PipelineInterface::class);
+    }
 
     /**
      * Register services
      */
     public function register()
     {
-        $this->getContainer()->share(Pipeline::class, function ()
+        $this->getContainer()->share(PipelineInterface::class, function ()
         {
             return new Pipeline(
-                $this->getContainer()->get(RequestFactory::class)->prepare(),
-                $this->getContainer()->get(ResponseFactory::class)->json()
+                $this->getContainer()->get('request.factory')->prepare(),
+                $this->getContainer()->get('response.factory')->json()
             );
         });
     }

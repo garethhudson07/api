@@ -3,16 +3,11 @@
 namespace Api;
 
 use Closure;
-use League\Container\Container;
 use Api\Config\Store as Configs;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Psr\Container\ContainerInterface;
 use Api\Events\Contracts\Emitter as EmitterInterface;
 use Api\Events\Factory as Events;
-use Api\Http\Requests\Factory as RequestFactory;
-use Api\Http\Responses\Factory as ResponseFactory;
-use Api\Pipeline\Pipeline;
-use Api\Guards\Contracts\Sentinel;
 use Api\Events\Contracts\Emitter;
 
 class Kernel
@@ -23,19 +18,11 @@ class Kernel
 
     protected $emitter;
 
-    protected const SERVICE_ALIASES = [
-        'request.factory' => RequestFactory::class,
-        'response.factory' => ResponseFactory::class,
-        'pipeline' => Pipeline::class,
-        'guard.sentinel' => Sentinel::class,
-        'emitter' => Emitter::class
-    ];
-
     /**
      * Kernel constructor.
      * @param Container $container
      * @param Configs $configs
-     * @param EmitterInterface $emitter
+     * @param Emitter $emitter
      */
     public function __construct(Container $container, Configs $configs, EmitterInterface $emitter)
     {
@@ -49,10 +36,12 @@ class Kernel
      */
     public static function make()
     {
+        $container = new Container();
+
         return new static(
-            new Container(),
+            $container,
             new Configs(),
-            Events::emitter()
+            Events::emitter($container)
         );
     }
 
@@ -61,10 +50,12 @@ class Kernel
      */
     public function extend()
     {
+        $container = new Container();
+
         return new static(
-            (new Container)->delegate($this->container),
+            ($container)->delegate($this->container),
             $this->configs->extend(),
-            $this->emitter->extend()
+            $this->emitter->extend($container)
         );
     }
 
@@ -135,14 +126,10 @@ class Kernel
 
     /**
      * @param $id
-     * @return array|mixed|object
+     * @return mixed
      */
     public function resolve($id)
     {
-        if (array_key_exists($id, $this::SERVICE_ALIASES)) {
-            $id = $this::SERVICE_ALIASES[$id];
-        }
-
         return $this->container->get($id);
     }
 

@@ -4,15 +4,23 @@ namespace Api\Events;
 
 use Api\Events\Contracts\Emitter as EmitterInterface;
 use League\Event\Emitter as BaseEmitter;
+use Api\Events\Listeners\Aggregate as ListenerAggregate;
+use Api\Container;
 
 class Factory
 {
     /**
+     * @param Container $container
      * @return EmitterInterface
      */
-    public static function emitter(): EmitterInterface
+    public static function emitter(Container $container): EmitterInterface
     {
-        return new Emitter(new BaseEmitter());
+        $baseEmitter = new BaseEmitter();
+
+        return new Emitter(
+            $baseEmitter,
+            new ListenerAggregate($container, $baseEmitter)
+        );
     }
 
     /**

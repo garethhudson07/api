@@ -1,6 +1,6 @@
 <?php
 
-namespace Api\Events;
+namespace Api\Events\Listeners;
 
 use League\Event\AbstractListener;
 

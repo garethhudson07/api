@@ -31,7 +31,7 @@ class Factory
     public function registry()
     {
         if (!$this->registry) {
-            $this->registry = new Registry($this);
+            $this->registry = new Registry($this->kernel->getContainer(), $this);
         }
 
         return $this->registry;
@@ -44,6 +44,7 @@ class Factory
      */
     public function collectable(Closure $callback, ?RepositoryContract $repository = null): Collectable
     {
+        $container = $this->kernel->getContainer();
         $schema = $this->schema($callback);
 
         return new Collectable(
@@ -51,9 +52,9 @@ class Factory
             $repository ?: new StitchRepository(
                 new Model($schema->getTable())
             ),
-            $this->relationsFactory->registry(),
+            $this->relationsFactory->registry($container),
             $this->kernel->resolve(Representation::class),
-            $this->kernel->getEmitter()->extend()
+            $this->kernel->getEmitter()->extend($container)
         );
     }
 
@@ -64,6 +65,10 @@ class Factory
     {
     }
 
+    /**
+     * @param Closure $callback
+     * @return Schema
+     */
     protected function schema(Closure $callback)
     {
         $schema = new Schema();

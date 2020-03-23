@@ -6,6 +6,7 @@ use Api\Resources\Factory as ResourceFactory;
 use Api\Resources\Relations\Stitch\BelongsTo;
 use Api\Resources\Relations\Stitch\Has;
 use Api\Resources\Resource;
+use Api\Container;
 
 class Factory
 {
@@ -17,11 +18,12 @@ class Factory
     }
 
     /**
+     * @param Container $container
      * @return Registry
      */
-    public function registry()
+    public function registry(Container $container)
     {
-        return new Registry($this);
+        return new Registry($container, $this);
     }
 
     /**

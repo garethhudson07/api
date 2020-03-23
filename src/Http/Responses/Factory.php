@@ -2,11 +2,12 @@
 
 namespace Api\Http\Responses;
 
+use Api\Http\Responses\Contracts\Factory as FactoryInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseInterface;
 use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
-class Factory
+class Factory implements FactoryInterface
 {
     protected $psr17Factory;
 

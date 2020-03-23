@@ -2,57 +2,81 @@
 
 namespace Api;
 
-use Closure;
-
 /**
  * Class Registry
  * @package Api
  */
-abstract class Registry
+class Registry extends Collection
 {
+    protected $container;
+
     /**
-     * The items contained in the collection.
+     * The items contained in the registry.
      *
      * @var array
      */
     protected $items = [];
 
+    protected $bindings = [];
+
     /**
-     * @param string $key
+     * Registry constructor.
+     * @param Container $container
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @param $key
      * @param $value
      * @return $this
      */
-    public function put(string $key, $value)
+    public function bind($key, $value)
     {
-        $this->items[$key] = $value;
+        if (is_null($key)) {
+            $this->bindings[] = $value;
+        } else {
+            $this->bindings[$key] = $value;
+        }
 
         return $this;
     }
 
     /**
-     * @param string $name
-     * @param Closure $callback
-     * @return $this
+     * Get an item at a given offset.
+     *
+     * @param mixed $key
+     * @return mixed
      */
-    public function bind(string $name, Closure $callback)
+    public function offsetGet($key)
     {
-        $this->items[$name] = $callback;
+        if ($this->has($key)) {
+            return $this->items[$key];
+        }
 
-        return $this;
-    }
+        if (array_key_exists($key, $this->bindings)) {
+            return $this->resolve($key);
+        }
 
-    /**
-     * @param $name
-     * @return mixed|null
-     */
-    public function get($name)
-    {
-        return array_key_exists($name, $this->items) ? $this->resolve($name) : null;
+        return null;
     }
 
     /**
      * @param string $name
      * @return mixed
      */
-    abstract public function resolve(string $name);
+    public function resolve(string $name)
+    {
+        $item = $this->bindings[$name];
+
+        if ($this->container->has($item)) {
+            $item = $this->container->get($item);
+
+            $this->items[$name] = $item;
+        }
+
+        return $item;
+    }
 }
