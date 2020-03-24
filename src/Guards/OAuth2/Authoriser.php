@@ -2,7 +2,6 @@
 
 namespace Api\Guards\OAuth2;
 
-use Api\Guards\OAuth2\League\Exceptions\AuthException;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use Psr\Http\Message\ResponseInterface;
@@ -24,7 +23,7 @@ class Authoriser
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function authoriseAndFormatResponse(ResponseInterface $response): ResponseInterface
+    public function authoriseAndPrepareResponse(ResponseInterface $response): ResponseInterface
     {
         try {
             return $this->server->respondToAccessTokenRequest($this->request, $response);

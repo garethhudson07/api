@@ -6,6 +6,8 @@ use League\Container\ServiceProvider\AbstractServiceProvider;
 use Api\Container;
 use Api\Config\Manager as Config;
 use Api\Guards\Contracts\Sentinel as SentinelInterface;
+use Api\Guards\OAuth2\Authoriser as AuthoriserInterface;
+use Api\Guards\Contracts\Key as KeyInterface;
 use Api\Guards\OAuth2\Factory as OAuth2Factory;
 
 class GuardServiceProvider extends AbstractServiceProvider
@@ -16,7 +18,9 @@ class GuardServiceProvider extends AbstractServiceProvider
      * @var array
      */
     protected $provides = [
-        SentinelInterface::class
+        SentinelInterface::class,
+        AuthoriserInterface::class,
+        KeyInterface::class
     ];
 
     /**
@@ -28,6 +32,8 @@ class GuardServiceProvider extends AbstractServiceProvider
         $this->config = $config;
 
         Container::alias('guard.sentinel', SentinelInterface::class);
+        Container::alias('guard.authoriser', AuthoriserInterface::class);
+        Container::alias('guard.key', KeyInterface::class);
     }
 
     /**
@@ -50,13 +56,26 @@ class GuardServiceProvider extends AbstractServiceProvider
      */
     protected function bindOAuth2(): void
     {
-        $this->getContainer()
-            ->share(SentinelInterface::class, function ()
-            {
-                return (new OAuth2Factory(
-                    $this->getContainer(),
-                    $this->config->service('OAuth2')
-                ))->sentinel();
-            });
+        $container = $this->getContainer();
+
+        $factory = new OAuth2Factory(
+            $this->getContainer(),
+            $this->config->service('OAuth2')
+        );
+
+        $container->share(SentinelInterface::class, function () use ($factory)
+        {
+            return $factory->sentinel();
+        });
+
+        $container->share(AuthoriserInterface::class, function () use ($factory)
+        {
+            $factory->authoriser();
+        });
+
+        $container->share(KeyInterface::class, function () use ($factory)
+        {
+            $factory->key();
+        });
     }
 }

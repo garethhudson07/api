@@ -54,7 +54,7 @@ class Factory
             ),
             $this->relationsFactory->registry($container),
             $this->kernel->resolve(Representation::class),
-            $this->kernel->getEmitter()->extend($container)
+            $this->kernel->getEmitter()->extend()
         );
     }
 

@@ -6,28 +6,59 @@ use Api\Events\Contracts\Emitter as EmitterInterface;
 use League\Event\Emitter as BaseEmitter;
 use Api\Events\Listeners\Aggregate as ListenerAggregate;
 use Api\Container;
+use Api\Registry;
 
 class Factory
 {
+    protected $container;
+
+    /**
+     * Factory constructor.
+     * @param Container $container
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @param Container $container
+     * @return static
+     */
+    public static function make(Container $container)
+    {
+        return new static($container);
+    }
+
     /**
      * @param Container $container
      * @return EmitterInterface
      */
-    public static function emitter(Container $container): EmitterInterface
+    public function emitter(): EmitterInterface
     {
         $baseEmitter = new BaseEmitter();
 
         return new Emitter(
+            $this,
             $baseEmitter,
-            new ListenerAggregate($container, $baseEmitter)
+            new ListenerAggregate($this, $baseEmitter)
         );
+    }
+
+    /**
+     * @param EmitterInterface $emitter
+     * @return EmitterInterface
+     */
+    public function extendEmitter(EmitterInterface $emitter)
+    {
+        return $this->emitter()->bubble($emitter);
     }
 
     /**
      * @param string $name
      * @return Event
      */
-    public static function event(string $name): Event
+    public function event(string $name): Event
     {
         return Event::named($name)->payload(static::payload());
     }
@@ -35,8 +66,16 @@ class Factory
     /**
      * @return Payload
      */
-    public static function payload()
+    public function payload()
     {
         return new Payload();
+    }
+
+    /**
+     * @return Registry
+     */
+    public function registry()
+    {
+        return new Registry($this->container);
     }
 }

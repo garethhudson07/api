@@ -4,6 +4,7 @@ namespace Api\Events;
 
 use Api\Events\Contracts\Emitter as EmitterInterface;
 use Api\Events\Contracts\Event as EventInterface;
+use Api\Events\Factory;
 use League\Event\Emitter as BaseEmitter;
 use Api\Events\Listeners\Aggregate as ListenerAggregate;
 use Api\Container;
@@ -11,6 +12,8 @@ use Closure;
 
 class Emitter implements EmitterInterface
 {
+    protected $factory;
+
     protected $baseEmitter;
 
     protected $listeners;
@@ -19,11 +22,13 @@ class Emitter implements EmitterInterface
 
     /**
      * Emitter constructor.
+     * @param \Api\Events\Factory $factory
      * @param BaseEmitter $baseEmitter
      * @param ListenerAggregate $listeners
      */
-    public function __construct(BaseEmitter $baseEmitter, ListenerAggregate $listeners)
+    public function __construct(Factory $factory, BaseEmitter $baseEmitter, ListenerAggregate $listeners)
     {
+        $this->factory = $factory;
         $this->baseEmitter = $baseEmitter;
         $this->listeners = $listeners;
     }
@@ -32,9 +37,9 @@ class Emitter implements EmitterInterface
      * @param Container $container
      * @return EmitterInterface
      */
-    public function extend(Container $container): EmitterInterface
+    public function extend(): EmitterInterface
     {
-        return Factory::emitter($container)->bubble($this);
+        return $this->factory->extendEmitter($this);
     }
 
     /**
@@ -55,7 +60,7 @@ class Emitter implements EmitterInterface
      */
     public function emit(string $event, ?Closure $closure = null): EventInterface
     {
-        $event = Factory::event($event);
+        $event = $this->factory->event($event);
 
         if ($closure) {
             $closure($event->getPayload());

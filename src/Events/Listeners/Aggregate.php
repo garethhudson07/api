@@ -2,21 +2,21 @@
 
 namespace Api\Events\Listeners;
 
-use Api\Container;
+use Api\Events\Factory;
 use League\Event\Emitter as BaseEmitter;
 use Api\Events\Contracts\Event as EventInterface;
 
 class Aggregate
 {
-    protected $container;
+    protected $factory;
 
     protected $baseEmitter;
 
     protected $items = [];
 
-    public function __construct(Container $container, BaseEmitter $baseEmitter)
+    public function __construct(Factory $factory, BaseEmitter $baseEmitter)
     {
-        $this->container = $container;
+        $this->factory = $factory;
         $this->baseEmitter = $baseEmitter;
     }
 
@@ -36,10 +36,18 @@ class Aggregate
     protected function flush(string $event)
     {
         if ($this->has($event)) {
-            $this->items[$event] = [];
+            $this->initEvent($event);
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $event
+     */
+    protected function initEvent(string $event)
+    {
+        $this->items[$event] = $this->factory->registry();
     }
 
     /**
@@ -49,7 +57,7 @@ class Aggregate
     public function add(string $event, $listener)
     {
         if (!$this->has($event)) {
-            $this->items[$event] = [];
+            $this->initEvent($event);
         }
 
         $this->items[$event][] = $listener;
@@ -65,9 +73,9 @@ class Aggregate
 
         if ($this->has($name)) {
             foreach ($this->items[$name] as $listener) {
-                if (is_string($listener)) {
-                    $listener = $this->container->get($listener);
-                }
+//                if (is_string($listener)) {
+//                    $listener = $this->container->get($listener);
+//                }
 
                 $this->baseEmitter->addListener($name, $listener);
             }

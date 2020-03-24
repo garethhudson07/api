@@ -83,8 +83,10 @@ class Api
     {
         return $this->try(function ()
         {
-            return $this->kernel->guard()->authoriser($this->factory->request()->base())
-                ->authoriseAndFormatResponse($this->factory->response()->base());
+            return $this->kernel->resolve('guard.authoriser')
+                ->authoriseAndPrepareResponse(
+                    $this->kernel->resolve('response.factory')->make()
+                );
         });
     }
 
@@ -101,16 +103,17 @@ class Api
      */
     public function generateAuthorisedUserResponse()
     {
-        $request = $this->kernel->resolve('request.factory')->instance();
-        $key = $this->factory->guard()->key($request)->handle();
+        $key = $this->kernel->resolve('guard.key')->handle();
         $user = $key->getUser();
 
         unset($user['password']);
 
-        return $this->kernel->resolve(ResponseFactory::class)->json(
-            $this->factory->spec()
-                ->representation()
-                ->forSingleton('user', $request, $user)
+        return $this->kernel->resolve('response.factory')->json(
+            $this->kernel->resolve('representation')->forSingleton(
+                'user',
+                $this->kernel->resolve('request.factory')->instance(),
+                $user
+            )
         );
     }
 

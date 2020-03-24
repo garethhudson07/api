@@ -41,7 +41,7 @@ class Kernel
         return new static(
             $container,
             new Configs(),
-            Events::emitter($container)
+            Events::make($container)->emitter()
         );
     }
 
@@ -55,7 +55,7 @@ class Kernel
         return new static(
             ($container)->delegate($this->container),
             $this->configs->extend(),
-            $this->emitter->extend($container)
+            Events::make($container)->extendEmitter($this->emitter)
         );
     }
 
