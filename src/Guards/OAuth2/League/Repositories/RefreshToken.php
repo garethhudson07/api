@@ -33,7 +33,7 @@ class RefreshToken implements RefreshTokenRepositoryInterface
      */
     public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity)
     {
-        $this->model->make([
+        $this->model->record([
             'id' => $refreshTokenEntity->getIdentifier(),
             'oauth_access_token_id' => $refreshTokenEntity->getAccessToken()->getIdentifier(),
             'revoked' => false,

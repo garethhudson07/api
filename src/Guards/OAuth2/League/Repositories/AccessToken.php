@@ -35,7 +35,7 @@ class AccessToken implements AccessTokenRepositoryInterface
      */
     public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity)
     {
-        $this->model->make([
+        $this->model->record([
             'id' => $accessTokenEntity->getIdentifier(),
             'client_id' => $accessTokenEntity->getClient()->getIdentifier(),
             'user_id' => $accessTokenEntity->getUserIdentifier(),

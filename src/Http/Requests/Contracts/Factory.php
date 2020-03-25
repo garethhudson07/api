@@ -2,13 +2,13 @@
 
 namespace Api\Http\Requests\Contracts;
 
-use Api\Config\Service as ConfigService;
+use Api\Config\Store as ConfigStore;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface Factory
 {
     /**
-     * @return ConfigService
+     * @return ConfigStore
      */
     public static function config();
 

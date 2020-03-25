@@ -4,7 +4,7 @@ namespace Api\Resources;
 
 use Api\Events\Payload;
 use Api\Pipeline\Pipes\Pipe;
-use Api\Repositories\Contracts\Repository;
+use Api\Repositories\Contracts\Resource;
 use Api\Schema\Schema;
 use Api\Specs\Contracts\Representation;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,7 +22,7 @@ class Resource
     protected $schema;
 
     /**
-     * @var Repository
+     * @var Resource
      */
     protected $repository;
 
@@ -51,12 +51,12 @@ class Resource
     /**
      * Resource constructor.
      * @param Schema $schema
-     * @param Repository $repository
+     * @param Resource $repository
      * @param Relations $relations
      * @param Representation $representation
      * @param EmitterInterface $emitter
      */
-    public function __construct(Schema $schema, Repository $repository, Relations $relations, Representation $representation, EmitterInterface $emitter)
+    public function __construct(Schema $schema, Resource $repository, Relations $relations, Representation $representation, EmitterInterface $emitter)
     {
         $this->schema = $schema;
         $this->repository = $repository;

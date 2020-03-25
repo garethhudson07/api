@@ -2,7 +2,7 @@
 
 namespace Api\Specs\JsonApi;
 
-use Api\Config\Service;
+use Api\Config\Store;
 
 class Factory
 {
@@ -11,7 +11,7 @@ class Factory
      */
     public static function config()
     {
-        return (new Service())->accepts(
+        return (new Store())->accepts(
             'relationsKey',
             'fieldsKey',
             'filtersKey',

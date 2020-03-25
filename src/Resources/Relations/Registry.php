@@ -2,7 +2,7 @@
 
 namespace Api\Resources\Relations;
 
-use Api\Registry as AbstractRegistry;
+use Api\Registries\Registry as BaseRegistry;
 use Api\Container;
 use Closure;
 
@@ -10,7 +10,7 @@ use Closure;
  * Class Collection
  * @package Api\Resources\Relations
  */
-class Registry extends AbstractRegistry
+class Registry extends BaseRegistry
 {
     protected $factory;
 
@@ -53,22 +53,5 @@ class Registry extends AbstractRegistry
                 return $relation->boot();
             }
         );
-    }
-
-    /**
-     * @param string $name
-     * @return mixed
-     */
-    public function resolve(string $name)
-    {
-        $item = $this->bindings[$name];
-
-        if ($item instanceof Closure) {
-            $this->items[$name] = $item();
-
-            return $this->items[$name];
-        }
-
-        return parent::resolve($name);
     }
 }

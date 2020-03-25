@@ -3,7 +3,7 @@
 namespace Api;
 
 use Closure;
-use Api\Config\Store as Configs;
+use Api\Config\Aggregate as Configs;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Psr\Container\ContainerInterface;
 use Api\Events\Contracts\Emitter as EmitterInterface;

@@ -48,6 +48,8 @@ class GuardServiceProvider extends AbstractServiceProvider
 
             default:
                 $this->getContainer()->add(SentinelInterface::class, false);
+                $this->getContainer()->add(AuthoriserInterface::class, false);
+                $this->getContainer()->add(KeyInterface::class, false);
         }
     }
 
@@ -70,12 +72,12 @@ class GuardServiceProvider extends AbstractServiceProvider
 
         $container->share(AuthoriserInterface::class, function () use ($factory)
         {
-            $factory->authoriser();
+            return $factory->authoriser();
         });
 
         $container->share(KeyInterface::class, function () use ($factory)
         {
-            $factory->key();
+            return $factory->key();
         });
     }
 }

@@ -2,11 +2,12 @@
 
 namespace Api\Resources;
 
-use Api\Registry as AbstractRegistry;
+use Api\Registries\Binding;
+use Api\Registries\Registry as BaseRegistry;
 use Api\Container;
 use Closure;
 
-class Registry extends AbstractRegistry
+class Registry extends BaseRegistry
 {
     protected $factory;
 
@@ -23,20 +24,17 @@ class Registry extends AbstractRegistry
     }
 
     /**
-     * @param string $name
+     * @param Binding $binding
      * @return mixed
      */
-    public function resolve(string $name)
+    public function resolve(Binding $binding)
     {
-        $item = $this->bindings[$name];
+        $value = $binding->getValue();
 
-        if ($item instanceof Closure) {
-            $item = $item($this->factory)->name($name);
-            $this->items[$name] = $item;
-
-            return $item;
+        if ($value instanceof Closure) {
+            return $value($this->factory)->name($binding->getKey());
         }
 
-        return parent::resolve($name);
+        return parent::resolve($binding);
     }
 }

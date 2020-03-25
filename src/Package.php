@@ -6,11 +6,6 @@ use Api\Config\Manager as ConfigManager;
 use Api\Guards\OAuth2\Factory as OAuth2Factory;
 use Api\Specs\JsonApi\Factory as JsonApiFactory;
 use Api\Http\Requests\Factory as RequestFactory;
-use Api\Providers\RequestServiceProvider;
-use Api\Providers\ResponseServiceProvider;
-use Api\Providers\GuardServiceProvider;
-use Api\Providers\SpecServiceProvider;
-use Api\Providers\PipelineServiceProvider;
 use Stitch\Stitch;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Psr\Container\ContainerInterface;
@@ -50,9 +45,7 @@ class Package
     protected function init()
     {
         $this->buildConfig()
-            ->registerServices();
-
-        $this->addDelegateContainer(new ReflectionContainer());
+            ->addDelegateContainer(new ReflectionContainer());
 
         return $this;
     }
@@ -72,26 +65,6 @@ class Package
         )->addConfig(
             'request',
             RequestFactory::config()
-        );
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    protected function registerServices()
-    {
-        $this->kernel->addServiceProvider(
-            new RequestServiceProvider($this->kernel->getConfig('request'), $this->kernel->getConfig('specification'))
-        )->addServiceProvider(
-            new ResponseServiceProvider()
-        )->addServiceProvider(
-            new GuardServiceProvider($this->kernel->getConfig('guard'))
-        )->addServiceProvider(
-            new SpecServiceProvider($this->kernel->getConfig('specification'))
-        )->addServiceProvider(
-            new PipelineServiceProvider()
         );
 
         return $this;

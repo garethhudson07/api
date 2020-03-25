@@ -2,7 +2,8 @@
 
 namespace Api\Guards\OAuth2\League;
 
-use Api\Config\Service;
+use Api\Container;
+use Api\Config\Store;
 use Api\Guards\OAuth2\League\Repositories\Client as ClientRepository;
 use Api\Guards\OAuth2\League\Repositories\AccessToken as AccessTokenRepository;
 use Api\Guards\OAuth2\League\Repositories\RefreshToken as RefreshTokenRepository;
@@ -13,6 +14,7 @@ use League\OAuth2\Server\Grant\PasswordGrant;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
 use League\OAuth2\Server\AuthorizationServer;
+use Api\Repositories\Contracts\User as UserRepositoryInterface;
 use Defuse\Crypto\Key;
 use Stitch\Stitch;
 use DateInterval;
@@ -20,23 +22,27 @@ use Exception;
 
 class Factory
 {
+    protected $container;
+
     protected $config;
 
     /**
      * Factory constructor.
-     * @param Service $config
+     * @param Container $container
+     * @param Store $config
      */
-    public function __construct(Service $config)
+    public function __construct(Container $container, Store $config)
     {
+        $this->container = $container;
         $this->config = $config;
     }
 
     /**
-     * @return Service
+     * @return Store
      */
-    public static function config(): Service
+    public static function config(): Store
     {
-        return (new Service())->accepts(
+        return (new Store())->accepts(
             'publicKeyPath',
             'privateKeyPath',
             'encryptionKey',
@@ -58,7 +64,7 @@ class Factory
         })->hasMany('redirects', Stitch::make(function ($table)
         {
             $table->name('oauth_client_redirects');
-            $table->integer('id')->autoIncrement()->primary();
+            $table->integer('id')->primary();
             $table->string('client_id')->references('id')->on('oauth_clients');
             $table->string('uri');
         })));
@@ -181,7 +187,9 @@ class Factory
     public function passwordGrant()
     {
         $grant = new PasswordGrant(
-            $this->userRepository($this->config->get('userRepository')),
+            $this->userRepository(
+                $this->container->get(UserRepositoryInterface::class)
+            ),
             $this->refreshTokenRepository()
         );
 

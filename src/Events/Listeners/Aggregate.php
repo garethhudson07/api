@@ -53,6 +53,7 @@ class Aggregate
     /**
      * @param string $event
      * @param $listener
+     * @return $this
      */
     public function add(string $event, $listener)
     {
@@ -60,7 +61,11 @@ class Aggregate
             $this->initEvent($event);
         }
 
-        $this->items[$event][] = $listener;
+        $registry = $this->items[$event];
+
+        is_string($listener) ? $registry->bind(null, $listener) : $registry->push($listener);
+
+        return $this;
     }
 
     /**
@@ -73,10 +78,6 @@ class Aggregate
 
         if ($this->has($name)) {
             foreach ($this->items[$name] as $listener) {
-//                if (is_string($listener)) {
-//                    $listener = $this->container->get($listener);
-//                }
-
                 $this->baseEmitter->addListener($name, $listener);
             }
 

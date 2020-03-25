@@ -9,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * Interface Repository
  * @package Api\Repositories\Contracts
  */
-interface Repository
+interface Resource
 {
     /**
      * @param Pipe $pipe

@@ -32,11 +32,11 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
     }
 
     /**
-     * @param string $key
+     * @param $key
      * @param $value
      * @return $this
      */
-    public function put(string $key, $value)
+    public function put($key, $value)
     {
         $this->offsetSet($key, $value);
 

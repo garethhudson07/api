@@ -5,6 +5,11 @@ namespace Api;
 use Api\Exceptions\Handler as ExceptionHandler;
 use Psr\Http\Message\ResponseInterface;
 use Api\Resources\Factory as ResourceFactory;
+use Api\Providers\RequestServiceProvider;
+use Api\Providers\ResponseServiceProvider;
+use Api\Providers\GuardServiceProvider;
+use Api\Providers\SpecServiceProvider;
+use Api\Providers\PipelineServiceProvider;
 use Closure;
 use Exception;
 
@@ -22,6 +27,28 @@ class Api
     {
         $this->kernel = $kernel;
         $this->resources = (new ResourceFactory($kernel))->registry();
+
+        $this->registerServices();
+    }
+
+    /**
+     * @return $this
+     */
+    protected function registerServices()
+    {
+        $this->kernel->addServiceProvider(
+            new RequestServiceProvider($this->kernel->getConfig('request'), $this->kernel->getConfig('specification'))
+        )->addServiceProvider(
+            new ResponseServiceProvider()
+        )->addServiceProvider(
+            new GuardServiceProvider($this->kernel->getConfig('guard'))
+        )->addServiceProvider(
+            new SpecServiceProvider($this->kernel->getConfig('specification'))
+        )->addServiceProvider(
+            new PipelineServiceProvider()
+        );
+
+        return $this;
     }
 
     /**
@@ -83,10 +110,15 @@ class Api
     {
         return $this->try(function ()
         {
-            return $this->kernel->resolve('guard.authoriser')
-                ->authoriseAndPrepareResponse(
+            $authoriser = $this->kernel->resolve('guard.authoriser');
+
+            if ($authoriser) {
+                return $authoriser->authoriseAndPrepareResponse(
                     $this->kernel->resolve('response.factory')->make()
                 );
+            }
+
+            return false;
         });
     }
 
@@ -103,18 +135,24 @@ class Api
      */
     public function generateAuthorisedUserResponse()
     {
-        $key = $this->kernel->resolve('guard.key')->handle();
-        $user = $key->getUser();
+        $key = $this->kernel->resolve('guard.key');
 
-        unset($user['password']);
+        if ($key) {
+            $key->handle();
+            $user = $key->getUser();
 
-        return $this->kernel->resolve('response.factory')->json(
-            $this->kernel->resolve('representation')->forSingleton(
-                'user',
-                $this->kernel->resolve('request.factory')->instance(),
-                $user
-            )
-        );
+            unset($user['password']);
+
+            return $this->kernel->resolve('response.factory')->json(
+                $this->kernel->resolve('representation')->forSingleton(
+                    'user',
+                    $this->kernel->resolve('request.factory')->instance(),
+                    $user
+                )
+            );
+        }
+
+        return false;
     }
 
     /**

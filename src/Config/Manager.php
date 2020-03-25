@@ -9,7 +9,7 @@ class Manager
 {
     protected $global;
 
-    protected $services;
+    protected $stores;
 
     protected $using;
 
@@ -20,19 +20,19 @@ class Manager
      */
     public function __construct()
     {
-        $this->services = new Collection();
+        $this->stores = new Collection();
     }
 
     /**
      * Add a service
      *
      * @param string $name
-     * @param Service $service
+     * @param Store $store
      * @return $this
      */
-    public function add(string $name, Service $service)
+    public function add(string $name, Store $store)
     {
-        $this->services->put($name, $service);
+        $this->stores->put($name, $store);
 
         return $this;
     }
@@ -45,11 +45,11 @@ class Manager
      */
     public function has(string $name)
     {
-        return $this->services->has($name);
+        return $this->stores->has($name);
     }
 
     /**
-     * Pull a service from the hierarchy
+     * Pull a store from the hierarchy
      *
      * @param string $name
      * @return mixed|null
@@ -57,7 +57,7 @@ class Manager
     public function service(string $name)
     {
         return $this->has($name)
-            ? $this->services->get($name)
+            ? $this->stores->get($name)
             : ($this->parent ? $this->parent->service($name) : null);
     }
 
@@ -76,7 +76,7 @@ class Manager
             return $this;
         }
 
-        throw new Exception("Cannot to use Unkown config $name");
+        throw new Exception("Cannot to use Unknown config $name");
     }
 
     /**
@@ -130,8 +130,8 @@ class Manager
      */
     public function get(string $key)
     {
-        if ($service = $this->enabled()) {
-            return $service->get($key);
+        if ($store = $this->enabled()) {
+            return $store->get($key);
         }
 
         return null;
@@ -160,13 +160,13 @@ class Manager
         $using = $this->using();
 
         if ($this->has($using)) {
-            $service = $this->service($using);
+            $store = $this->service($using);
         } else {
-            $service = $this->parent->enabled();
-            $this->services->put($using, $service->child());
+            $store = $this->parent->service($using)->extend();
+            $this->stores->put($using, $store);
         }
 
-        $service->set($key, $value);
+        $store->set($key, $value);
 
         return $this;
     }
@@ -180,6 +180,6 @@ class Manager
      */
     public function __call($name, $arguments)
     {
-        return $this->set($name, $arguments);
+        return $this->set($name, $arguments[0]);
     }
 }

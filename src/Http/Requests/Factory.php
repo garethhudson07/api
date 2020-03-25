@@ -4,7 +4,7 @@ namespace Api\Http\Requests;
 
 use Api\Http\Requests\Contracts\Factory as FactoryInterface;
 use Api\Config\Manager as ConfigManager;
-use Api\Config\Service as ConfigService;
+use Api\Config\Store as ConfigStore;
 use Api\Queries\Query;
 use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -20,21 +20,21 @@ class Factory implements FactoryInterface
 
     /**
      * Factory constructor.
-     * @param ConfigService $requestConfig
+     * @param ConfigStore $requestConfig
      * @param ConfigManager $specConfig
      */
-    public function __construct(ConfigService $requestConfig, ConfigManager $specConfig)
+    public function __construct(ConfigStore $requestConfig, ConfigManager $specConfig)
     {
         $this->requestConfig = $requestConfig;
         $this->specConfig = $specConfig;
     }
 
     /**
-     * @return ConfigService
+     * @return ConfigStore
      */
     public static function config()
     {
-        return (new ConfigService())->accepts('base', 'prefix');
+        return (new ConfigStore())->accepts('base', 'prefix');
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Api\Providers;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Api\Container;
-use Api\Config\Service as ConfigService;
+use Api\Config\Store as ConfigStore;
 use Api\Config\Manager as ConfigManager;
 use Api\Http\Requests\Factory;
 use Api\Http\Requests\Contracts\Factory as FactoryInterface;
@@ -30,10 +30,10 @@ class RequestServiceProvider extends AbstractServiceProvider
 
     /**
      * RequestServiceProvider constructor.
-     * @param ConfigService $requestConfig
+     * @param ConfigStore $requestConfig
      * @param ConfigManager $specConfig
      */
-    public function __construct(ConfigService $requestConfig, ConfigManager $specConfig)
+    public function __construct(ConfigStore $requestConfig, ConfigManager $specConfig)
     {
         $this->requestConfig = $requestConfig;
         $this->specConfig = $specConfig;

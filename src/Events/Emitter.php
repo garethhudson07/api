@@ -34,7 +34,6 @@ class Emitter implements EmitterInterface
     }
 
     /**
-     * @param Container $container
      * @return EmitterInterface
      */
     public function extend(): EmitterInterface

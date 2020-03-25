@@ -6,7 +6,7 @@ use Api\Events\Contracts\Emitter as EmitterInterface;
 use League\Event\Emitter as BaseEmitter;
 use Api\Events\Listeners\Aggregate as ListenerAggregate;
 use Api\Container;
-use Api\Registry;
+use Api\Registries\Registry;
 
 class Factory
 {
@@ -31,7 +31,6 @@ class Factory
     }
 
     /**
-     * @param Container $container
      * @return EmitterInterface
      */
     public function emitter(): EmitterInterface

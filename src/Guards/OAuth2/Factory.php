@@ -3,7 +3,7 @@
 namespace Api\Guards\OAuth2;
 
 use Api\Guards\OAuth2\League\Factory as LeagueFactory;
-use Api\Config\Service;
+use Api\Config\Store;
 use Api\Container;
 
 class Factory
@@ -14,15 +14,15 @@ class Factory
 
     protected $leagueFactory;
 
-    public function __construct(Container $container, Service $config)
+    public function __construct(Container $container, Store $config)
     {
         $this->container = $container;
         $this->config = $config;
-        $this->leagueFactory = new LeagueFactory($config);
+        $this->leagueFactory = new LeagueFactory($container, $config);
     }
 
     /**
-     * @return Service
+     * @return Store
      */
     public static function config()
     {

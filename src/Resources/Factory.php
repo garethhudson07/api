@@ -2,11 +2,11 @@
 
 namespace Api\Resources;
 
-use Api\Repositories\Contracts\Repository as RepositoryContract;
+use Api\Repositories\Contracts\Resource as RepositoryContract;
 use Api\Schema\Schema;
 use Api\Kernel;
 use Api\Resources\Relations\Factory as RelationsFactory;
-use Api\Repositories\Stitch\Repository as StitchRepository;
+use Api\Repositories\Stitch\Resource as StitchRepository;
 use Api\Specs\Contracts\Representation;
 use Closure;
 use Stitch\Model;
