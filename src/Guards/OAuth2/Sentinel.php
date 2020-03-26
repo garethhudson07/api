@@ -40,7 +40,7 @@ class Sentinel implements SentinelContract
         $this->checkPipeline($pipeline)
             ->checkRelations(
                 $pipeline->last()->getResource(),
-                $this->request->getAttribute('relations')
+                $this->request->getAttribute('query')->relations()
             );
 
         return $this;
