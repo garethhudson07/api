@@ -161,6 +161,14 @@ class Pipeline implements PipelineInterface
     }
 
     /**
+     * @return Pipes
+     */
+    public function all()
+    {
+        return $this->pipes;
+    }
+
+    /**
      * @return $this
      */
     public function call()
