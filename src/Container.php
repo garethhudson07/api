@@ -3,6 +3,7 @@
 namespace Api;
 
 use League\Container\Container as BaseContainer;
+use League\Container\ReflectionContainer;
 
 class Container extends BaseContainer
 {
@@ -44,6 +45,10 @@ class Container extends BaseContainer
     {
         if (static::hasAlias($id)) {
             $id = static::getIdByAlias($id);
+        }
+
+        if (!$this->has($id)) {
+            $this->delegate(new ReflectionContainer());
         }
 
         return parent::get($id, $new);

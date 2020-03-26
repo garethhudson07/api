@@ -3,7 +3,7 @@
 namespace Api\Repositories\Stitch;
 
 use Api\Pipeline\Pipes\Pipe;
-use Api\Repositories\Contracts\Resource as RepositoryContract;
+use Api\Repositories\Contracts\Resource as RepositoryInterface;
 use Api\Repositories\Stitch\Bridge\QueryResolver;
 use Api\Repositories\Stitch\Bridge\RelationshipResolver;
 use Exception;
@@ -14,7 +14,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * Class Repository
  * @package Api\Repositories\Stitch
  */
-class Resource implements RepositoryContract
+class Resource implements RepositoryInterface
 {
     /**
      * @var Model

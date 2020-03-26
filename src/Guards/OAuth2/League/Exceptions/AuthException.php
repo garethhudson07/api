@@ -26,7 +26,7 @@ class AuthException extends RuntimeException implements ApiExceptionInterface
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function formatResponse(ResponseInterface $response): ResponseInterface
+    public function prepareResponse(ResponseInterface $response): ResponseInterface
     {
         return $this->baseException->generateHttpResponse($response);
     }

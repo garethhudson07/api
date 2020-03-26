@@ -80,10 +80,6 @@ class Registry extends Collection
             return $value();
         }
 
-        if ($this->container->has($value)) {
-            return $this->container->get($value);
-        }
-
-        return null;
+        return $this->container->get($value);
     }
 }

@@ -3,9 +3,9 @@
 namespace Api\Resources;
 
 use Api\Pipeline\Pipes\Pipe;
-use Api\Repositories\Contracts\Resource;
 use Api\Resources\Relations\Registry as Relations;
 use Api\Schema\Schema;
+use Api\Repositories\Contracts\Resource as RepositoryInterface;
 use Api\Specs\Contracts\Representation;
 use Api\Events\Contracts\Emitter as EmitterInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,7 +16,15 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class Collectable extends Resource
 {
-    public function __construct(Schema $schema, Resource $repository, Relations $relations, Representation $representation, EmitterInterface $emitter)
+    /**
+     * Collectable constructor.
+     * @param Schema $schema
+     * @param RepositoryInterface $repository
+     * @param Relations $relations
+     * @param Representation $representation
+     * @param EmitterInterface $emitter
+     */
+    public function __construct(Schema $schema, RepositoryInterface $repository, Relations $relations, Representation $representation, EmitterInterface $emitter)
     {
         parent::__construct($schema, $repository, $relations, $representation, $emitter);
 

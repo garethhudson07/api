@@ -43,21 +43,29 @@ class Factory implements FactoryInterface
     public function instance()
     {
         if (!$this->instance) {
-            if ($this->requestConfig->has('instance')) {
-                $this->instance = $this->requestConfig->instance;
+            if ($this->requestConfig->has('base')) {
+                $this->instance = $this->requestConfig->base;
             } else {
-                $psr17Factory = new Psr17Factory();
-
-                $this->instance = (new ServerRequestCreator(
-                    $psr17Factory,
-                    $psr17Factory,
-                    $psr17Factory,
-                    $psr17Factory
-                ))->fromGlobals();
+                $this->instance = $this->make();
             }
         }
 
         return $this->instance;
+    }
+
+    /**
+     * @return ServerRequestInterface
+     */
+    public function make()
+    {
+        $psr17Factory = new Psr17Factory();
+
+        return (new ServerRequestCreator(
+            $psr17Factory,
+            $psr17Factory,
+            $psr17Factory,
+            $psr17Factory
+        ))->fromGlobals();
     }
 
     /**

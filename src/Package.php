@@ -9,7 +9,6 @@ use Api\Http\Requests\Factory as RequestFactory;
 use Stitch\Stitch;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Psr\Container\ContainerInterface;
-use League\Container\ReflectionContainer;
 use Closure;
 
 /**
@@ -28,7 +27,7 @@ class Package
     {
         $this->kernel = Kernel::make();
 
-        $this->init();
+        $this->buildConfig();
     }
 
     /**
@@ -37,17 +36,6 @@ class Package
     public static function addConnection(Closure $callback)
     {
         Stitch::addConnection($callback);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function init()
-    {
-        $this->buildConfig()
-            ->addDelegateContainer(new ReflectionContainer());
-
-        return $this;
     }
 
     /**

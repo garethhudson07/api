@@ -3,6 +3,7 @@
 namespace Api;
 
 use Api\Exceptions\Handler as ExceptionHandler;
+use League\Container\ReflectionContainer;
 use Psr\Http\Message\ResponseInterface;
 use Api\Resources\Factory as ResourceFactory;
 use Api\Providers\RequestServiceProvider;
@@ -37,7 +38,10 @@ class Api
     protected function registerServices()
     {
         $this->kernel->addServiceProvider(
-            new RequestServiceProvider($this->kernel->getConfig('request'), $this->kernel->getConfig('specification'))
+            new RequestServiceProvider(
+                $this->kernel->getConfig('request'),
+                $this->kernel->getConfig('specification')
+            )
         )->addServiceProvider(
             new ResponseServiceProvider()
         )->addServiceProvider(
