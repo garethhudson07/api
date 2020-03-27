@@ -48,6 +48,8 @@ class Factory implements FactoryInterface
             } else {
                 $this->instance = $this->make();
             }
+
+            return $this->prepare();
         }
 
         return $this->instance;
@@ -71,25 +73,27 @@ class Factory implements FactoryInterface
     /**
      * @return ServerRequestInterface
      */
-    public function prepare()
+    protected function prepare()
     {
         $request = $this->instance();
         $request = $request->withAttribute('segments', Parser::segments($request->getUri()->getPath()));
 
         switch ($request->getMethod()) {
-            case 'DELETE':
-                return $request;
-
             case 'GET':
-                return $request->withAttribute('query', Query::extract($request, $this->specConfig));
+                $request = $request->withAttribute('query', Query::extract($request, $this->specConfig));
+                break;
 
             default:
-                return $request->withParsedBody(
+                $request = $request->withParsedBody(
                     json_decode(
                         file_get_contents("php://input"),
                         true
                     ) ?: []
                 );
         }
+
+        $this->instance = $request;
+
+        return $request;
     }
 }

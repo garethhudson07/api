@@ -16,9 +16,4 @@ interface Factory
      * @return \Psr\Http\Message\ServerRequestInterface
      */
     public function instance();
-
-    /**
-     * @return ServerRequestInterface
-     */
-    public function prepare();
 }

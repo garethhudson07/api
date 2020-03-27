@@ -32,7 +32,7 @@ class PipelineServiceProvider extends AbstractServiceProvider
         $this->getContainer()->share(PipelineInterface::class, function ()
         {
             return new Pipeline(
-                $this->getContainer()->get('request.factory')->prepare(),
+                $this->getContainer()->get('request.factory')->instance(),
                 $this->getContainer()->get('response.factory')->json()
             );
         });
