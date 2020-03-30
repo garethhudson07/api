@@ -32,7 +32,7 @@ class Registry extends BaseRegistry
         $value = $binding->getValue();
 
         if ($value instanceof Closure) {
-            return $value($this->factory)->name($binding->getKey());
+            return $value($this->factory, $this->container)->name($binding->getKey());
         }
 
         return parent::resolve($binding);
