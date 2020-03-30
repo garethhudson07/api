@@ -2,7 +2,6 @@
 
 namespace Api\Http\Requests;
 
-use Api\Http\Requests\Contracts\Factory as FactoryInterface;
 use Api\Config\Manager as ConfigManager;
 use Api\Config\Store as ConfigStore;
 use Api\Queries\Query;
@@ -10,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 
-class Factory implements FactoryInterface
+class Factory
 {
     protected $requestConfig;
 
@@ -44,12 +43,10 @@ class Factory implements FactoryInterface
     {
         if (!$this->instance) {
             if ($this->requestConfig->has('base')) {
-                $this->instance = $this->requestConfig->base;
+                $this->instance = $this->prepare($this->requestConfig->base);
             } else {
-                $this->instance = $this->make();
+                $this->instance = $this->prepare($this->make());
             }
-
-            return $this->prepare();
         }
 
         return $this->instance;
@@ -71,11 +68,11 @@ class Factory implements FactoryInterface
     }
 
     /**
+     * @param ServerRequestInterface $request
      * @return ServerRequestInterface
      */
-    protected function prepare()
+    protected function prepare(ServerRequestInterface $request)
     {
-        $request = $this->instance();
         $request = $request->withAttribute('segments', Parser::segments($request->getUri()->getPath()));
 
         switch ($request->getMethod()) {
@@ -84,15 +81,15 @@ class Factory implements FactoryInterface
                 break;
 
             default:
-                $request = $request->withParsedBody(
-                    json_decode(
-                        file_get_contents("php://input"),
-                        true
-                    ) ?: []
-                );
+                if (($request->getServerParams()['CONTENT_TYPE'] ?? null) === 'application/vnd.api+json') {
+                    $request = $request->withParsedBody(
+                        json_decode(
+                            file_get_contents("php://input"),
+                            true
+                        ) ?: []
+                    );
+                }
         }
-
-        $this->instance = $request;
 
         return $request;
     }

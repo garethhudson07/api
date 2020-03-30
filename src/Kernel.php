@@ -53,7 +53,7 @@ class Kernel
         $container = new Container();
 
         return new static(
-            ($container)->delegate($this->container),
+            $container->delegate($this->container),
             $this->configs->extend(),
             Events::make($container)->extendEmitter($this->emitter)
         );

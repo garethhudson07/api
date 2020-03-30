@@ -3,7 +3,6 @@
 namespace Api;
 
 use Api\Exceptions\Handler as ExceptionHandler;
-use League\Container\ReflectionContainer;
 use Psr\Http\Message\ResponseInterface;
 use Api\Resources\Factory as ResourceFactory;
 use Api\Providers\RequestServiceProvider;
@@ -150,7 +149,7 @@ class Api
             return $this->kernel->resolve('response.factory')->json(
                 $this->kernel->resolve('representation')->forSingleton(
                     'user',
-                    $this->kernel->resolve('request.factory')->instance(),
+                    $this->kernel->resolve('request'),
                     $user
                 )
             );

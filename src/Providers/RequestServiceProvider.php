@@ -4,10 +4,10 @@ namespace Api\Providers;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Api\Container;
+use Psr\Http\Message\ServerRequestInterface;
 use Api\Config\Store as ConfigStore;
 use Api\Config\Manager as ConfigManager;
 use Api\Http\Requests\Factory;
-use Api\Http\Requests\Contracts\Factory as FactoryInterface;
 
 class RequestServiceProvider extends AbstractServiceProvider
 {
@@ -25,7 +25,7 @@ class RequestServiceProvider extends AbstractServiceProvider
      * @var array
      */
     protected $provides = [
-        FactoryInterface::class,
+        ServerRequestInterface::class,
     ];
 
     /**
@@ -38,7 +38,7 @@ class RequestServiceProvider extends AbstractServiceProvider
         $this->requestConfig = $requestConfig;
         $this->specConfig = $specConfig;
 
-        Container::alias('request.factory', FactoryInterface::class);
+        Container::alias('request', ServerRequestInterface::class);
     }
 
     /**
@@ -49,9 +49,12 @@ class RequestServiceProvider extends AbstractServiceProvider
      */
     public function register()
     {
-        $this->getContainer()->share(FactoryInterface::class, function ()
+        $this->getContainer()->share(ServerRequestInterface::class, function ()
         {
-            return new Factory($this->requestConfig, $this->specConfig);
+            return (new Factory(
+                $this->requestConfig,
+                $this->specConfig)
+            )->instance();
         });
     }
 }
