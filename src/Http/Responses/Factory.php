@@ -27,11 +27,12 @@ class Factory implements FactoryInterface
     }
 
     /**
+     * @param string $content
      * @return ResponseInterface
      */
-    public function json(): ResponseInterface
+    public function json(string $content = ''): ResponseInterface
     {
-        return $this->make()->withHeader('Content-Type', 'application/json');
+        return $this->make($content)->withHeader('Content-Type', 'application/json');
     }
 
     /**
