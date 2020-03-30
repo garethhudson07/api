@@ -37,11 +37,14 @@ class Sentinel implements SentinelContract
     {
         $this->key->handle();
 
-        $this->checkPipeline($pipeline)
-            ->checkRelations(
+        $this->checkPipeline($pipeline);
+
+        if ($this->request->getMethod() === 'GET') {
+            $this->checkRelations(
                 $pipeline->last()->getResource(),
                 $this->request->getAttribute('query')->relations()
             );
+        }
 
         return $this;
     }

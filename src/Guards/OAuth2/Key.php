@@ -8,6 +8,7 @@ use Api\Guards\OAuth2\Scopes\Scope;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\ResourceServer;
 use Psr\Http\Message\ServerRequestInterface;
+use Api\Repositories\Contracts\User as UserRepositoryInterface;
 
 class Key
 {
@@ -33,7 +34,7 @@ class Key
      * @param ServerRequestInterface $request
      * @param $userRepository
      */
-    public function __construct(ResourceServer $server, ServerRequestInterface $request, $userRepository)
+    public function __construct(ResourceServer $server, ServerRequestInterface $request, UserRepositoryInterface $userRepository)
     {
         $this->server = $server;
         $this->request = $request;

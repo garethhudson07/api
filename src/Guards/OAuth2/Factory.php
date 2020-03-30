@@ -5,6 +5,7 @@ namespace Api\Guards\OAuth2;
 use Api\Guards\OAuth2\League\Factory as LeagueFactory;
 use Api\Config\Store;
 use Api\Container;
+use Api\Repositories\Contracts\User as UserRepositoryInterface;
 
 class Factory
 {
@@ -26,7 +27,7 @@ class Factory
      */
     public static function config()
     {
-        return LeagueFactory::config()->accepts('userRepository');
+        return LeagueFactory::config();
     }
 
     /**
@@ -48,7 +49,7 @@ class Factory
         return new Key(
             $this->leagueFactory->resourceServer(),
             $this->container->get('request'),
-            $this->config->get('userRepository')
+            $this->container->get(UserRepositoryInterface::class)
         );
     }
 
