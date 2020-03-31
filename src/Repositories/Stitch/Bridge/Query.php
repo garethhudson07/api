@@ -48,10 +48,8 @@ class Query
      */
     public function with(RequestRelations $relations)
     {
-        foreach ($relations as $relation) {
+        foreach ($relations->collapse() as $relation) {
             $this->baseQuery->with($relation->path());
-
-            $this->with($relation->getRelations());
         }
 
         return $this;

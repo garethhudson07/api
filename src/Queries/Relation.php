@@ -79,7 +79,13 @@ class Relation
     public function path()
     {
         if ($this->path) {
-            $this->path = ($this->parent ? $this->parent->path() : '') . '.' . $this->name;
+            return $this->path;
+        }
+
+        if($this->parent) {
+            $this->path = "{$this->parent->path()}.{$this->name}";
+
+            return $this->path;
         }
 
         return $this->name;
