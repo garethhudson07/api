@@ -59,7 +59,7 @@ class Factory
      */
     public function event(string $name): Event
     {
-        return Event::named($name)->payload(static::payload());
+        return Event::named($name)->payload($this->payload());
     }
 
     /**
