@@ -1,6 +1,6 @@
 <?php
 
-namespace Api\Pipeline\contracts;
+namespace Api\Pipeline\Contracts;
 
 use Psr\Http\Message\ResponseInterface;
 use Api\Resources\Registry;
