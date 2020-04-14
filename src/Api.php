@@ -138,24 +138,27 @@ class Api
      */
     public function generateAuthorisedUserResponse()
     {
-        $key = $this->kernel->resolve('guard.key');
+        return $this->try(function ()
+        {
+            $key = $this->kernel->resolve('guard.key');
 
-        if ($key) {
-            $key->handle();
-            $user = $key->getUser();
+            if ($key) {
+                $key->handle();
+                $user = $key->getUser();
 
-            unset($user['password']);
+                unset($user['password']);
 
-            return $this->kernel->resolve('response.factory')->json(
-                $this->kernel->resolve('representation')->forSingleton(
-                    'user',
-                    $this->kernel->resolve('request'),
-                    $user
-                )
-            );
-        }
+                return $this->kernel->resolve('response.factory')->json(
+                    $this->kernel->resolve('representation')->forSingleton(
+                        'user',
+                        $this->kernel->resolve('request'),
+                        $user
+                    )
+                );
+            }
 
-        return false;
+            return false;
+        });
     }
 
     /**
