@@ -2,7 +2,7 @@
 
 namespace Api\Pipeline;
 
-use Api\Pipeline\contracts\Pipeline as PipelineInterface;
+use Api\Pipeline\Contracts\Pipeline as PipelineInterface;
 use Api\Pipeline\Pipes\Pipe;
 use Api\Pipeline\Pipes\Aggregate as Pipes;
 use Api\Http\Requests\Parser;
