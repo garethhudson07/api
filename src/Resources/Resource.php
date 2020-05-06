@@ -143,7 +143,7 @@ class Resource
      */
     public function nest(...$arguments)
     {
-        $this->relations->include('relation', array_merge([$this], $arguments));
+        $this->relations->include('nest', array_merge([$this], $arguments));
 
         return $this;
     }

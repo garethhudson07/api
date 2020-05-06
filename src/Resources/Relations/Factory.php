@@ -45,6 +45,15 @@ class Factory
     }
 
     /**
+     * @param Resource $resource
+     * @return mixed
+     */
+    public function nest(Resource $resource)
+    {
+        return $this->make(Nest::class, $resource);
+    }
+
+    /**
      * @param string $class
      * @param Resource $resource
      * @return mixed
