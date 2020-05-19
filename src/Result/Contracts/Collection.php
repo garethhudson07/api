@@ -1,6 +1,6 @@
 <?php
 
-namespace Api\Repositories\Contracts;
+namespace Api\Result\Contracts;
 
 interface Collection
 {
