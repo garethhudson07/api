@@ -215,7 +215,7 @@ class Resource
         return $this->representation->forSingleton(
             $pipe->getEntity()->getName(),
             $request,
-            $this->repository->update($pipe, $request)
+            $record
         );
     }
 
