@@ -51,7 +51,7 @@ class QueryResolver
      * @param ServerRequestInterface $request
      * @return Query
      */
-    protected function resolve(BaseQuery $baseQuery, ServerRequestInterface $request)
+    public function resolve(BaseQuery $baseQuery, ServerRequestInterface $request)
     {
         $parsedQuery = $request->getAttribute('query');
 
