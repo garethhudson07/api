@@ -29,6 +29,17 @@ class Query
         $this->baseQuery = $baseQuery;
     }
 
+    /**
+     * @return BaseQuery
+     */
+    public function getBaseQuery()
+    {
+        return $this->baseQuery;
+    }
+
+    /**
+     * @return \Stitch\Queries\Collection
+     */
     public function get()
     {
         return $this->baseQuery->get();
