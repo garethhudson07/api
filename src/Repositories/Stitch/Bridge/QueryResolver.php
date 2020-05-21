@@ -65,7 +65,7 @@ class QueryResolver
     /**
      * @return BaseQuery
      */
-    protected function keyedQuery()
+    public function keyedQuery()
     {
         return $this->baseQuery()->where(
             $this->model->getTable()->getPrimaryKey()->getName(),
@@ -76,7 +76,7 @@ class QueryResolver
     /**
      * @return BaseQuery
      */
-    protected function baseQuery()
+    public function baseQuery()
     {
         $baseQuery = $this->model->query()->dehydrated();
 
