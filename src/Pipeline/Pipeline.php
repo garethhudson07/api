@@ -2,6 +2,7 @@
 
 namespace Api\Pipeline;
 
+use Api\Exceptions\NotFoundException;
 use Api\Pipeline\Contracts\Pipeline as PipelineInterface;
 use Api\Pipeline\Pipes\Pipe;
 use Api\Pipeline\Pipes\Aggregate as Pipes;
@@ -105,7 +106,11 @@ class Pipeline implements PipelineInterface
             $pipe = $this->newPipe();
 
             if ($penultimate = $this->penultimate()) {
-                $pipe->setEntity($penultimate->getResource()->getRelation($segment))->scope($penultimate);
+                if (!$relation = $penultimate->getResource()->getRelation($segment)) {
+                    throw new NotFoundException("Unknown resource type [$segment]");
+                }
+
+                $pipe->setEntity($relation)->scope($penultimate);
             } else {
                 $pipe->setEntity($resources->get($segment));
             }
