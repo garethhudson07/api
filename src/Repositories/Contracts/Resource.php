@@ -13,9 +13,9 @@ interface Resource
 {
     /**
      * @param Pipe $pipe
-     * @return array
+     * @return array|null
      */
-    public function getByKey(Pipe $pipe): array;
+    public function getByKey(Pipe $pipe): ?array;
 
     /**
      * @param Pipe $pipe
@@ -27,9 +27,9 @@ interface Resource
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return array
+     * @return array|null
      */
-    public function getRecord(Pipe $pipe, ServerRequestInterface $request): array;
+    public function getRecord(Pipe $pipe, ServerRequestInterface $request): ?array;
 
     /**
      * @param Pipe $pipe

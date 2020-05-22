@@ -53,14 +53,16 @@ class Resource implements RepositoryInterface
 
     /**
      * @param Pipe $pipe
-     * @return array
+     * @return array|null
      */
-    public function getByKey(Pipe $pipe): array
+    public function getByKey(Pipe $pipe): ?array
     {
-        return (new QueryResolver(
+        $record = (new QueryResolver(
             $this->model,
             $pipe
-        ))->byKey()->toArray();
+        ))->byKey();
+
+        return $record ? $record->toArray() : null;
     }
 
     /**
@@ -81,16 +83,18 @@ class Resource implements RepositoryInterface
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return array
+     * @return array|null
      */
-    public function getRecord(Pipe $pipe, ServerRequestInterface $request): array
+    public function getRecord(Pipe $pipe, ServerRequestInterface $request): ?array
     {
         $this->associateRelationships($pipe, $request);
 
-        return (new QueryResolver(
+        $record = (new QueryResolver(
             $this->model,
             $pipe
-        ))->record($request)->toArray();
+        ))->record($request);
+
+        return $record ? $record->toArray() : null;
     }
 
     /**
