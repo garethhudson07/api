@@ -104,17 +104,17 @@ class Pipeline implements PipelineInterface
             }
 
             $pipe = $this->newPipe();
-
-            if ($penultimate = $this->penultimate()) {
-                $resource = $penultimate->getResource()->getRelation($segment);
-                $pipe->setEntity($resource)->scope($penultimate);
-            } else {
-                $resource = $resources->get($segment);
-                $pipe->setEntity($resource);
-            }
+            $penultimate = $this->penultimate();
+            $resource = $penultimate ? $penultimate->getResource()->getRelation($segment) : $resources->get($segment);
 
             if (!$resource) {
                 throw new NotFoundException("Unknown resource type [$segment]");
+            }
+
+            $pipe->setEntity($resource);
+
+            if (!$penultimate) {
+                $pipe->scope($penultimate);
             }
         }
 
