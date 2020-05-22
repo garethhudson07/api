@@ -3,7 +3,6 @@
 namespace Api\Resources;
 
 use Api\Events\Payload;
-use Api\Exceptions\NotFoundException;
 use Api\Pipeline\Pipes\Pipe;
 use Api\Schema\Schema;
 use Api\Repositories\Contracts\Resource as RepositoryInterface;
@@ -190,10 +189,8 @@ class Resource
         $this->endpoints->verify('show');
         $this->emitCrudEvent('readingOne', compact('pipe','request'));
 
-        $record = $this->repository->getRecord($pipe, $request);
-
-        if (is_null($record)) {
-            throw new NotFoundException('Resource does not exist');
+        if(!$record = $this->repository->getRecord($pipe, $request)) {
+            return null;
         }
 
         return $this->representation->forSingleton(

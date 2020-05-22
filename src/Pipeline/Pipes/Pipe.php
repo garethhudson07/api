@@ -2,6 +2,7 @@
 
 namespace Api\Pipeline\Pipes;
 
+use Api\Exceptions\NotFoundException;
 use Api\Pipeline\Pipeline;
 use Api\Pipeline\Scope;
 use Psr\Http\Message\ServerRequestInterface;
@@ -168,6 +169,10 @@ class Pipe
     public function call()
     {
         $this->data = $this->getResource()->{$this->method}(...$this->arguments);
+
+        if (is_null($this->data)) {
+            throw new NotFoundException('Resource does not exist')
+        }
 
         return $this;
     }
