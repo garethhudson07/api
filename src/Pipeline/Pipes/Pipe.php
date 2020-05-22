@@ -171,7 +171,7 @@ class Pipe
         $this->data = $this->getResource()->{$this->method}(...$this->arguments);
 
         if (is_null($this->data)) {
-            throw new NotFoundException('Resource does not exist')
+            throw new NotFoundException('Resource does not exist');
         }
 
         return $this;
