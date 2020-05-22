@@ -113,7 +113,7 @@ class Pipeline implements PipelineInterface
 
             $pipe->setEntity($resource);
 
-            if (!$penultimate) {
+            if ($penultimate) {
                 $pipe->scope($penultimate);
             }
         }
