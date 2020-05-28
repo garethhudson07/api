@@ -36,7 +36,7 @@ class Factory
     public function sentinel()
     {
         return new Sentinel(
-            $this->container->get('request'),
+            $this->container->get('request.instance'),
             $this->key()
         );
     }
@@ -48,7 +48,7 @@ class Factory
     {
         return new Key(
             $this->leagueFactory->resourceServer(),
-            $this->container->get('request'),
+            $this->container->get('request.instance'),
             $this->container->get(UserRepositoryInterface::class)
         );
     }
@@ -62,7 +62,7 @@ class Factory
     {
         return new Authoriser(
             $this->leagueFactory->authorisationServer(),
-            $this->container->get('request')
+            $this->container->get('request.instance')
         );
     }
 }

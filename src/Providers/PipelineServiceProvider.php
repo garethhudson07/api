@@ -29,11 +29,13 @@ class PipelineServiceProvider extends AbstractServiceProvider
      */
     public function register()
     {
-        $this->getContainer()->share(PipelineInterface::class, function ()
+        $container = $this->getContainer();
+
+        $container->share(PipelineInterface::class, function () use ($container)
         {
             return new Pipeline(
-                $this->getContainer()->get('request'),
-                $this->getContainer()->get('response.factory')->json()
+                $container->get('request.instance'),
+                $container->get('response.factory')->json()
             );
         });
     }

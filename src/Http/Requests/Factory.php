@@ -2,6 +2,7 @@
 
 namespace Api\Http\Requests;
 
+use Api\Http\Requests\Contracts\Factory as FactoryInterface;
 use Api\Config\Manager as ConfigManager;
 use Api\Config\Store as ConfigStore;
 use Api\Queries\Query;
@@ -9,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 
-class Factory
+class Factory implements FactoryInterface
 {
     protected $requestConfig;
 
@@ -31,31 +32,15 @@ class Factory
     /**
      * @return ConfigStore
      */
-    public static function config()
+    public static function config(): ConfigStore
     {
         return (new ConfigStore())->accepts('base', 'prefix');
     }
 
     /**
-     * @return \Psr\Http\Message\ServerRequestInterface
-     */
-    public function instance()
-    {
-        if (!$this->instance) {
-            if ($this->requestConfig->has('base')) {
-                $this->instance = $this->prepare($this->requestConfig->base);
-            } else {
-                $this->instance = $this->prepare($this->make());
-            }
-        }
-
-        return $this->instance;
-    }
-
-    /**
      * @return ServerRequestInterface
      */
-    public function make()
+    public function make(): ServerRequestInterface
     {
         $psr17Factory = new Psr17Factory();
 
@@ -71,7 +56,7 @@ class Factory
      * @param ServerRequestInterface $request
      * @return ServerRequestInterface
      */
-    protected function prepare(ServerRequestInterface $request)
+    public function prepare(ServerRequestInterface $request): ServerRequestInterface
     {
         $request = $request->withAttribute('segments', Parser::segments($request->getUri()->getPath()));
 
