@@ -151,7 +151,7 @@ class Api
                 return $this->kernel->resolve('response.factory')->json(
                     $this->kernel->resolve('representation')->forSingleton(
                         'user',
-                        $this->kernel->resolve('request'),
+                        $this->kernel->resolve('request.instance'),
                         $user
                     )
                 );
