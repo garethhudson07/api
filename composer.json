@@ -26,7 +26,8 @@
         "ext-mbstring": "*",
         "respect/validation": "^1.1",
         "league/event": "^2.2",
-        "garethhudson07/container": "^3.3"
+        "garethhudson07/container": "^3.3",
+        "garethhudson07/stitch": "^1.0"
     },
     "autoload": {
         "psr-4": {
