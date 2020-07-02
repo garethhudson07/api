@@ -92,6 +92,18 @@ class Representation implements RepresentationContract
     }
 
     /**
+     * @param $string
+     * @return string|string[]|null
+     */
+    protected function unicode2html($string) {
+        return preg_replace_callback('/[\x{80}-\x{10FFFF}]/u', function ($m) {
+            $char = current($m);
+            $utf = iconv('UTF-8', 'UCS-4', $char);
+            return sprintf("&#x%s;", ltrim(strtoupper(bin2hex($utf)), "0"));
+        }, $string);
+    }
+    
+    /**
      * @param array $data
      * @return array
      */
@@ -101,12 +113,10 @@ class Representation implements RepresentationContract
             if (is_array($datum)) {
                 return $this->encodeUtf8($datum);
             }
-
             if (!is_string($datum)) {
                 return $datum;
             }
-
-            return utf8_encode($datum);
+            return $this->unicode2html(utf8_encode($datum));
         }, $data);
     }
 
