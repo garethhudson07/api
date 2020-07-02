@@ -85,7 +85,7 @@ class Representation implements RepresentationContract
      */
     protected function prepare($data)
     {
-        $data = $this->encodeUtf8($data);
+//        $data = $this->encodeUtf8($data);
         $data = $this->camelKeys($data);
 
         return $data;
@@ -102,7 +102,7 @@ class Representation implements RepresentationContract
             return sprintf("&#x%s;", ltrim(strtoupper(bin2hex($utf)), "0"));
         }, $string);
     }
-    
+
     /**
      * @param array $data
      * @return array
