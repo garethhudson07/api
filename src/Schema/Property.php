@@ -21,6 +21,7 @@ class Property
         ],
         'column' => [
             'primary',
+            'increments',
             'references',
             'on'
         ]
