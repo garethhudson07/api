@@ -106,7 +106,7 @@ class Resource implements RepositoryInterface
     public function create(Pipe $pipe, ServerRequestInterface $request): array
     {
         return $this->model->record(
-            $request->getParsedBody()
+            $request->getParsedBody()['data']['attributes']
         )->save()->toArray();
     }
 
@@ -121,7 +121,9 @@ class Resource implements RepositoryInterface
         return (new QueryResolver(
             $this->model,
             $pipe
-        ))->byKey()->hydrate()->fill($request->getParsedBody())->save()->toArray();
+        ))->byKey()->hydrate()->fill(
+            $request->getParsedBody()['data']['attributes']
+        )->save()->toArray();
     }
 
     /**
