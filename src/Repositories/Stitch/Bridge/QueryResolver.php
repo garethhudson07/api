@@ -25,7 +25,7 @@ class QueryResolver
     }
 
     /**
-     * @return null|\Stitch\Records\Record
+     * @return null|\Stitch\Result\Record
      */
     public function byKey()
     {
@@ -34,7 +34,7 @@ class QueryResolver
 
     /**
      * @param ServerRequestInterface $request
-     * @return null|\Stitch\Records\Record
+     * @return null|\Stitch\Result\Record
      */
     public function record(ServerRequestInterface $request)
     {
