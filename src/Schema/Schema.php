@@ -7,6 +7,13 @@ use Stitch\DBAL\Schema\Column;
 use Stitch\DBAL\Schema\Table;
 use Api\Schema\Validation\Aggregate as Validators;
 
+/**
+ * Class Schema
+ * @package Api\Schema
+ * @method Property string(string $name)
+ * @method Property integer(string $name)
+ * @method Property boolean(string $name)
+ */
 class Schema
 {
     protected $table;
