@@ -5,6 +5,13 @@ namespace Api\Schema;
 use Api\Schema\Validation\Validator;
 use Stitch\DBAL\Schema\Column;
 
+/**
+ * Class Property
+ * @package Api\Schema
+ * @method Property primary()
+ * @method Property references(string $columnName)
+ * @method Property on(string $tableName)
+ */
 class Property
 {
     protected $name;

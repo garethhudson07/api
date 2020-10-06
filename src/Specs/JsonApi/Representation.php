@@ -1,6 +1,6 @@
 <?php
 
-namespace Api\specs\JsonApi;
+namespace Api\Specs\JsonApi;
 
 use Api\Specs\Contracts\Representation as RepresentationContract;
 use Api\Queries\Relation as RequestRelation;
@@ -106,6 +106,7 @@ class Representation implements RepresentationContract
     /**
      * @param array $data
      * @return array
+     * @noinspection PhpUnused
      */
     protected function encodeUtf8(array $data): array
     {

@@ -46,7 +46,7 @@ class Query
     }
 
     /**
-     * @return null|\Stitch\Records\Record
+     * @return null|\Stitch\Result\Record
      */
     public function first()
     {
