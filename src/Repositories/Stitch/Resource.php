@@ -74,6 +74,12 @@ class Resource implements RepositoryInterface
     {
         $this->associateRelationships($pipe, $request);
 
+//        var_dump('repo data');
+//        var_dump((new QueryResolver(
+//            $this->model,
+//            $pipe
+//        ))->collection($request)->toArray());
+
         return (new QueryResolver(
             $this->model,
             $pipe
