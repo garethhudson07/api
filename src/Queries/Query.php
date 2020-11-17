@@ -105,15 +105,6 @@ class Query
      */
     public function parseFilters($input)
     {
-        if (is_array($input)) {
-            $this->apply($input, function ($instance, $value)
-            {
-                $instance->setFilters(Parser::filters($value));
-            });
-
-            return $this;
-        }
-
         return $this->setFilters(Parser::filters($input));
     }
 
@@ -163,6 +154,8 @@ class Query
      */
     public function parseOffset($input)
     {
+        $this->setOffset(Parser::integer($input));
+
         return $this;
     }
 
@@ -227,6 +220,17 @@ class Query
     public function setLimit($limit)
     {
         $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
+     * @param $offset
+     * @return $this
+     */
+    public function setOffset($offset)
+    {
+        $this->offset = $offset;
 
         return $this;
     }

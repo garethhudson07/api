@@ -59,7 +59,8 @@ class QueryResolver
             ->select($parsedQuery->fields())
             ->where($parsedQuery->filters())
             ->orderBy($parsedQuery->sort())
-            ->limit($parsedQuery->limit());
+            ->limit($parsedQuery->limit())
+            ->offset($parsedQuery->offset());
     }
 
     /**

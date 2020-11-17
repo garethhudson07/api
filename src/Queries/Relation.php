@@ -22,11 +22,6 @@ class Relation
     protected $fields = [];
 
     /**
-     * @var
-     */
-    protected $filters;
-
-    /**
      * @var array
      */
     protected $relations;
@@ -117,25 +112,6 @@ class Relation
     public function getName(): string
     {
         return $this->name;
-    }
-
-    /**
-     * @return Expression
-     */
-    public function getFilters(): Expression
-    {
-        return $this->filters;
-    }
-
-    /**
-     * @param Expression $filters
-     * @return $this
-     */
-    public function setFilters(Expression $filters)
-    {
-        $this->filters = $filters;
-
-        return $this;
     }
 
     /**
