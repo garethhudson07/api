@@ -120,14 +120,21 @@ class Query
     }
 
     /**
-     * @param string $input
+     * @param $input
      * @return $this
      */
-    public function parseSort(string $input)
+    public function parseSort($input)
     {
-        $this->sort = Parser::sort($input);
+        if (is_array($input)) {
+            $this->apply($input, function ($instance, $value)
+            {
+                $instance->setSort(Parser::sort($value));
+            });
 
-        return $this;
+            return $this;
+        }
+        
+        return $this->setSort(Parser::sort($input));
     }
 
     /**
@@ -206,6 +213,17 @@ class Query
     }
 
     /**
+     * @param array $sort
+     * @return $this
+     */
+    public function setSort(array $sort)
+    {
+        $this->sort = $sort;
+
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function sort()
@@ -225,6 +243,14 @@ class Query
     }
 
     /**
+     * @return $this
+     */
+    public function limit()
+    {
+        return $this->limit;
+    }
+
+    /**
      * @param $offset
      * @return $this
      */
@@ -233,14 +259,6 @@ class Query
         $this->offset = $offset;
 
         return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function limit()
-    {
-        return $this->limit;
     }
 
     /**

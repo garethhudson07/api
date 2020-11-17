@@ -70,6 +70,10 @@ class Query
                 return "$path.$field";
             }, $relation->getFields()));
 
+            foreach ($relation->getSort() as $order) {
+                $this->baseQuery->orderBy("$path.{$order->getProperty()}", $order->getDirection());
+            }
+
             if ($limit !== NULL) {
                 $this->baseQuery->limit($path, $limit);
             }

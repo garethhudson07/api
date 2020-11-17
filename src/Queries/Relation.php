@@ -26,6 +26,8 @@ class Relation
      */
     protected $relations;
 
+    protected $sort = [];
+
     protected $limit;
 
     /**
@@ -174,5 +176,24 @@ class Relation
     public function getLimit()
     {
         return $this->limit;
+    }
+
+    /**
+     * @param array $sort
+     * @return $this
+     */
+    public function setSort(array $sort)
+    {
+        $this->sort = $sort;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSort()
+    {
+        return $this->sort;
     }
 }
