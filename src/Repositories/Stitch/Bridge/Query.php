@@ -57,10 +57,15 @@ class Query
      * @param RequestRelations $relations
      * @return $this
      */
-    public function with(RequestRelations $relations)
+    public function include(RequestRelations $relations)
     {
         foreach ($relations->collapse() as $relation) {
+            $path = $relation->path();
             $this->baseQuery->with($relation->path());
+            $this->baseQuery->select(...array_map(function ($field) use ($path)
+            {
+                return "$path.$field";
+            }, $relation->getFields()));
         }
 
         return $this;
@@ -75,17 +80,6 @@ class Query
         if ($fields) {
             $this->baseQuery->select(...$fields);
         }
-
-//        foreach ($relations->collapse() as $relation) {
-//            if ($fields = $relation->getFields()) {
-//                $path = $relation->path();
-//
-//                $this->baseQuery->limit(...array_map(function ($field) use ($path)
-//                {
-//                    return "$field.$path";
-//                }, $fields));
-//            }
-//        }
 
         return $this;
     }

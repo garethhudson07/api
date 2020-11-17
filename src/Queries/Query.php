@@ -62,6 +62,13 @@ class Query
         foreach ($items as $name => $value) {
             if ($name === $this->type) {
                 $callback($this, $value);
+
+                foreach ($this->relations->collapse() as $relation) {
+                    if ($relation->getName() === $this->type) {
+                        $callback($relation, $value);
+                    }
+                }
+
                 continue;
             }
 

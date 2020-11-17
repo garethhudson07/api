@@ -30,7 +30,7 @@ class Representation implements RepresentationContract
     {
         $this->encoder = Encoder::instance([
             Arr::class => ArrSchema::class
-        ])->withEncodeOptions(JSON_PRETTY_PRINT | JSON_INVALID_UTF8_IGNORE);
+        ])->withEncodeOptions(JSON_INVALID_UTF8_IGNORE);
     }
 
     /**
