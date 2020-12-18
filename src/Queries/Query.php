@@ -4,10 +4,13 @@ namespace Api\Queries;
 
 use Api\Config\Manager;
 use Closure;
+use Api\Specs\Contracts\Parser as ParserInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Query
 {
+    protected $parser;
+
     protected $type;
 
     protected $relations;
@@ -24,25 +27,28 @@ class Query
 
     /**
      * Query constructor.
+     * @param ParserInterface $parser
      * @param string $type
      */
-    public function __construct(string $type)
+    public function __construct(ParserInterface $parser, string $type)
     {
+        $this->parser = $parser;
         $this->type = $type;
-        $this->relations = new Relations();
     }
 
     /**
+     * @param ParserInterface $parser
      * @param ServerRequestInterface $request
      * @param Manager $config
      * @return Query
      */
-    public static function extract(ServerRequestInterface $request, Manager $config)
+    public static function extract(ParserInterface $parser, ServerRequestInterface $request, Manager $config)
     {
         $segments = $request->getAttribute('segments');
         $params = $request->getQueryParams();
 
         return (new static(
+            $parser,
             $segments[count($segments) - 1]
         ))->parseRelations($params[$config->get('relationsKey')] ?? '')
             ->parseFields($params[$config->get('fieldsKey')] ?? '')
@@ -89,13 +95,17 @@ class Query
         if (is_array($input)) {
             $this->apply($input, function ($instance, $value)
             {
-                $instance->setFields(Parser::list($value));
+                $instance->setFields(
+                    $this->parser->fields($value)
+                );
             });
 
             return $this;
         }
 
-        return $this->setFields(Parser::list($input));
+        return $this->setFields(
+            $this->parser->fields($input)
+        );
     }
 
     /**
@@ -105,7 +115,9 @@ class Query
      */
     public function parseFilters($input)
     {
-        return $this->setFilters(Parser::filters($input));
+        return $this->setFilters(
+            $this->parser->filters($input)
+        );
     }
 
     /**
@@ -114,7 +126,7 @@ class Query
      */
     public function parseRelations(string $input)
     {
-        $this->relations->fill(Parser::relations($input));
+        $this->relations = $this->parser->relations($input);
 
         return $this;
     }
@@ -128,13 +140,17 @@ class Query
         if (is_array($input)) {
             $this->apply($input, function ($instance, $value)
             {
-                $instance->setSort(Parser::sort($value));
+                $instance->setSort(
+                    $this->parser->sort($value)
+                );
             });
 
             return $this;
         }
-        
-        return $this->setSort(Parser::sort($input));
+
+        return $this->setSort(
+            $this->parser->sort($input)
+        );
     }
 
     /**
@@ -146,13 +162,17 @@ class Query
         if (is_array($input)) {
             $this->apply($input, function ($instance, $value)
             {
-                $instance->setLimit(Parser::integer($value));
+                $instance->setLimit(
+                    intval($value)
+                );
             });
 
             return $this;
         }
 
-        return $this->setLimit(Parser::integer($input));
+        return $this->setLimit(
+            intval($input)
+        );
     }
 
     /**
@@ -161,7 +181,9 @@ class Query
      */
     public function parseOffset($input)
     {
-        $this->setOffset(Parser::integer($input));
+        $this->setOffset(
+            intval($input)
+        );
 
         return $this;
     }

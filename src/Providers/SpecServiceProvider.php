@@ -5,7 +5,9 @@ namespace Api\Providers;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Api\Config\Manager as Config;
 use Api\Specs\Contracts\Representation as RepresentationInterface;
+use Api\Specs\Contracts\Parser as ParserInterface;
 use Api\Specs\JsonApi\Representation as JsonApiRepresentation;
+use Api\Specs\JsonApi\Parser as JsonApiParser;
 use Api\Container;
 
 class SpecServiceProvider extends AbstractServiceProvider
@@ -23,6 +25,7 @@ class SpecServiceProvider extends AbstractServiceProvider
      */
     protected $provides = [
         RepresentationInterface::class,
+        ParserInterface::class,
     ];
 
     /**
@@ -34,6 +37,7 @@ class SpecServiceProvider extends AbstractServiceProvider
         $this->config = $config;
 
         Container::alias('representation', RepresentationInterface::class);
+        Container::alias('request.parser', ParserInterface::class);
     }
 
     /**
@@ -59,6 +63,11 @@ class SpecServiceProvider extends AbstractServiceProvider
         $this->getContainer()->share(RepresentationInterface::class, function ()
         {
             return new JsonApiRepresentation();
+        });
+
+        $this->getContainer()->share(ParserInterface::class, function ()
+        {
+            return new JsonApiParser();
         });
     }
 }

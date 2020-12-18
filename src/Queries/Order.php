@@ -19,26 +19,6 @@ class Order
     protected $direction;
 
     /**
-     * @param string $input
-     * @return Order
-     */
-    public static function parse(string $input)
-    {
-        $direction = 'ASC';
-        $operator = substr($input, 0, 1);
-
-        if ($operator == '-' || $operator == '+') {
-            if ($operator == '-') {
-                $direction = 'DESC';
-            }
-
-            $input = substr($input, 1);
-        }
-
-        return (new static())->setProperty($input)->setDirection($direction);
-    }
-
-    /**
      * @return string
      */
     public function getProperty(): string

@@ -2,8 +2,6 @@
 
 namespace Api\Queries;
 
-use Oilstone\RsqlParser\Expression;
-
 /**
  * Class Relation
  * @package Api\Http\Requests
@@ -38,25 +36,6 @@ class Relation
     {
         $this->name = $name;
         $this->relations = new Relations();
-    }
-
-    /**
-     * @param string $path
-     * @return Relation
-     */
-    public static function parse(string $path)
-    {
-        $pieces = explode('.', $path, 2);
-        $name = array_shift($pieces);
-        $instance = (new static($name));
-
-        if ($pieces) {
-            $instance->addRelation(
-                static::parse($pieces[0])->setParent($instance)
-            );
-        }
-
-        return $instance;
     }
 
     /**
