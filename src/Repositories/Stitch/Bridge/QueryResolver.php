@@ -55,7 +55,7 @@ class QueryResolver
     {
         $parsedQuery = $request->getAttribute('query');
 
-        return (new Query($baseQuery))->with($parsedQuery->relations())
+        return (new Query($baseQuery))->include($parsedQuery->relations())
             ->select($parsedQuery->fields())
             ->where($parsedQuery->filters())
             ->orderBy($parsedQuery->sort())

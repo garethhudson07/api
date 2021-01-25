@@ -5,6 +5,7 @@ namespace Api\Resources\Relations;
 use Api\Resources\Factory as ResourceFactory;
 use Api\Resources\Relations\Stitch\BelongsTo;
 use Api\Resources\Relations\Stitch\Has;
+use Api\Resources\Relations\Stitch\HasOne;
 use Api\Resources\Resource;
 use Api\Container;
 
@@ -42,6 +43,15 @@ class Factory
     public function has(Resource $resource)
     {
         return $this->make(Has::class, $resource);
+    }
+
+    /**
+     * @param Resource $resource
+     * @return mixed
+     */
+    public function hasOne(Resource $resource)
+    {
+        return $this->make(HasOne::class, $resource);
     }
 
     /**

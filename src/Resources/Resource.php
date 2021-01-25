@@ -130,6 +130,17 @@ class Resource
      * @param mixed ...$arguments
      * @return $this
      */
+    public function hasOne(...$arguments)
+    {
+        $this->relations->include('hasOne', array_merge([$this], $arguments));
+
+        return $this;
+    }
+
+    /**
+     * @param mixed ...$arguments
+     * @return $this
+     */
     public function belongsTo(...$arguments)
     {
         $this->relations->include('belongsTo', array_merge([$this], $arguments));
