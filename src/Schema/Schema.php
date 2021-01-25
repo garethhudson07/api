@@ -49,6 +49,18 @@ class Schema
 
         return $this;
     }
+    
+
+    /**
+     * @param string $name
+     * @return $this
+     */
+    public function database(string $name)
+    {
+        $this->table->database($name);
+
+        return $this;
+    }
 
     /**
      * @return Table

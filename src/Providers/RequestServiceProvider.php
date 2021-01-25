@@ -76,9 +76,9 @@ class RequestServiceProvider extends AbstractServiceProvider implements Bootable
     {
         $container = $this->getContainer();
 
-        $container->share(FactoryInterface::class, function ()
+        $container->share(FactoryInterface::class, function () use ($container)
         {
-            return (new Factory($this->requestConfig, $this->specConfig));
+            return (new Factory($container, $this->requestConfig, $this->specConfig));
         });
 
         $container->share(ServerRequestInterface::class, function () use ($container)

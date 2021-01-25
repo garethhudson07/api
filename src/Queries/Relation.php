@@ -2,8 +2,6 @@
 
 namespace Api\Queries;
 
-use Oilstone\RsqlParser\Expression;
-
 /**
  * Class Relation
  * @package Api\Http\Requests
@@ -22,14 +20,11 @@ class Relation
     protected $fields = [];
 
     /**
-     * @var
-     */
-    protected $filters;
-
-    /**
      * @var array
      */
     protected $relations;
+
+    protected $sort = [];
 
     protected $limit;
 
@@ -41,25 +36,6 @@ class Relation
     {
         $this->name = $name;
         $this->relations = new Relations();
-    }
-
-    /**
-     * @param string $path
-     * @return Relation
-     */
-    public static function parse(string $path)
-    {
-        $pieces = explode('.', $path, 2);
-        $name = array_shift($pieces);
-        $instance = (new static($name));
-
-        if ($pieces) {
-            $instance->addRelation(
-                static::parse($pieces[0])->setParent($instance)
-            );
-        }
-
-        return $instance;
     }
 
     /**
@@ -117,25 +93,6 @@ class Relation
     public function getName(): string
     {
         return $this->name;
-    }
-
-    /**
-     * @return Expression
-     */
-    public function getFilters(): Expression
-    {
-        return $this->filters;
-    }
-
-    /**
-     * @param Expression $filters
-     * @return $this
-     */
-    public function setFilters(Expression $filters)
-    {
-        $this->filters = $filters;
-
-        return $this;
     }
 
     /**
@@ -198,5 +155,24 @@ class Relation
     public function getLimit()
     {
         return $this->limit;
+    }
+
+    /**
+     * @param array $sort
+     * @return $this
+     */
+    public function setSort(array $sort)
+    {
+        $this->sort = $sort;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSort()
+    {
+        return $this->sort;
     }
 }

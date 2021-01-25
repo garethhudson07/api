@@ -61,11 +61,22 @@ class Query
     {
         foreach ($relations->collapse() as $relation) {
             $path = $relation->path();
+            $limit = $relation->getLimit();
+
             $this->baseQuery->with($relation->path());
+
             $this->baseQuery->select(...array_map(function ($field) use ($path)
             {
                 return "$path.$field";
             }, $relation->getFields()));
+
+            foreach ($relation->getSort() as $order) {
+                $this->baseQuery->orderBy("$path.{$order->getProperty()}", $order->getDirection());
+            }
+
+            if ($limit !== NULL) {
+                $this->baseQuery->limit($path, $limit);
+            }
         }
 
         return $this;
@@ -114,6 +125,19 @@ class Query
     {
         if ($limit) {
             $this->baseQuery->limit($limit);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $offset
+     * @return $this
+     */
+    public function offset($offset)
+    {
+        if ($offset) {
+            $this->baseQuery->offset($offset);
         }
 
         return $this;

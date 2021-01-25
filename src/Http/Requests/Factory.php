@@ -2,6 +2,7 @@
 
 namespace Api\Http\Requests;
 
+use Api\Container;
 use Api\Http\Requests\Contracts\Factory as FactoryInterface;
 use Api\Config\Manager as ConfigManager;
 use Api\Config\Store as ConfigStore;
@@ -12,6 +13,8 @@ use Nyholm\Psr7Server\ServerRequestCreator;
 
 class Factory implements FactoryInterface
 {
+    protected $container;
+
     protected $requestConfig;
 
     protected $specConfig;
@@ -20,11 +23,13 @@ class Factory implements FactoryInterface
 
     /**
      * Factory constructor.
+     * @param Container $container
      * @param ConfigStore $requestConfig
      * @param ConfigManager $specConfig
      */
-    public function __construct(ConfigStore $requestConfig, ConfigManager $specConfig)
+    public function __construct(Container $container, ConfigStore $requestConfig, ConfigManager $specConfig)
     {
+        $this->container = $container;
         $this->requestConfig = $requestConfig;
         $this->specConfig = $specConfig;
     }
@@ -62,7 +67,14 @@ class Factory implements FactoryInterface
 
         switch ($request->getMethod()) {
             case 'GET':
-                $request = $request->withAttribute('query', Query::extract($request, $this->specConfig));
+                $request = $request->withAttribute(
+                    'query',
+                    Query::extract(
+                        $this->container->get('request.parser'),
+                        $request,
+                        $this->specConfig
+                    )
+                );
                 break;
 
             default:
