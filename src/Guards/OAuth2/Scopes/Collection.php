@@ -2,26 +2,22 @@
 
 namespace Api\Guards\OAuth2\Scopes;
 
+/**
+ * Class Collection
+ * @package Api\Guards\OAuth2\Scopes
+ */
 class Collection
 {
-    protected $items = [];
-
     /**
-     * @param Scope $scope
-     * @return $this
+     * @var array
      */
-    public function push(Scope $scope)
-    {
-        $this->items[] = $scope;
-
-        return $this;
-    }
+    protected $items = [];
 
     /**
      * @param array $scopes
      * @return $this
      */
-    public function fill(array $scopes)
+    public function fill(array $scopes): self
     {
         foreach ($scopes as $scope) {
             $this->push($scope);
@@ -31,11 +27,22 @@ class Collection
     }
 
     /**
+     * @param Scope $scope
+     * @return $this
+     */
+    public function push(Scope $scope): self
+    {
+        $this->items[] = $scope;
+
+        return $this;
+    }
+
+    /**
      * @param string $operation
      * @param string $resource
      * @return bool
      */
-    public function can(string $operation, string $resource)
+    public function can(string $operation, string $resource): bool
     {
         foreach ($this->items as $scope) {
             if ($scope->isFor($resource) && $scope->isAllowedTo($operation)) {
