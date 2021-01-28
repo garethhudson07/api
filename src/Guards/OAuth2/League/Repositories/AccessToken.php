@@ -1,16 +1,27 @@
 <?php
 
+/**
+ * @noinspection PhpUndefinedMethodInspection
+ * @noinspection PhpUndefinedFieldInspection
+ */
+
 namespace Api\Guards\OAuth2\League\Repositories;
 
 use Api\Guards\OAuth2\League\Entities\AccessToken as Entity;
-use Api\Guards\OAuth2\Scopes\Scope;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 use Stitch\Model;
 
+/**
+ * Class AccessToken
+ * @package Api\Guards\OAuth2\League\Repositories
+ */
 class AccessToken implements AccessTokenRepositoryInterface
 {
+    /**
+     * @var Model
+     */
     protected $model;
 
     /**
@@ -23,15 +34,18 @@ class AccessToken implements AccessTokenRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param ClientEntityInterface $clientEntity
+     * @param array $scopes
+     * @param mixed|null $userIdentifier
+     * @return Entity
      */
-    public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null)
+    public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null): Entity
     {
         return new Entity($clientEntity, $scopes, $userIdentifier);
     }
 
     /**
-     * {@inheritdoc}
+     * @param AccessTokenEntityInterface $accessTokenEntity
      */
     public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity)
     {
@@ -39,13 +53,12 @@ class AccessToken implements AccessTokenRepositoryInterface
             'id' => $accessTokenEntity->getIdentifier(),
             'client_id' => $accessTokenEntity->getClient()->getIdentifier(),
             'user_id' => $accessTokenEntity->getUserIdentifier(),
-            'revoked' => false,
             'expires_at' => $accessTokenEntity->getExpiryDateTime()->format('Y-m-d H:i:s')
         ])->save();
     }
 
     /**
-     * {@inheritdoc}
+     * @param $tokenId
      */
     public function revokeAccessToken($tokenId)
     {
@@ -55,9 +68,10 @@ class AccessToken implements AccessTokenRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param $tokenId
+     * @return bool
      */
-    public function isAccessTokenRevoked($tokenId)
+    public function isAccessTokenRevoked($tokenId): bool
     {
         $token = $this->model->find($tokenId);
 
