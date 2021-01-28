@@ -2,19 +2,28 @@
 
 namespace Api\Guards\OAuth2;
 
-use Api\Guards\Contracts\Sentinel as SentinelContract;
 use Api\Exceptions\ApiException;
+use Api\Guards\Contracts\Sentinel as SentinelContract;
 use Api\Pipeline\Pipeline;
-use Api\Resources\Resource;
 use Api\Queries\Relations as QueryRelations;
+use Api\Resources\Resource;
+use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * Class Sentinel
+ * @package Api\Guards\OAuth2
+ */
 class Sentinel implements SentinelContract
 {
+    /**
+     * @var ServerRequestInterface
+     */
     protected $request;
 
-    protected $pipeline;
-
+    /**
+     * @var Key
+     */
     protected $key;
 
     /**
@@ -31,9 +40,9 @@ class Sentinel implements SentinelContract
     /**
      * @param Pipeline $pipeline
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    public function protect(Pipeline $pipeline)
+    public function protect(Pipeline $pipeline): SentinelContract
     {
         $this->key->handle();
 
@@ -50,19 +59,11 @@ class Sentinel implements SentinelContract
     }
 
     /**
-     * @return null
-     */
-    public function getUser()
-    {
-        return $this->key->getUser();
-    }
-
-    /**
      * @param Pipeline $pipeline
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function checkPipeline(Pipeline $pipeline)
+    protected function checkPipeline(Pipeline $pipeline): self
     {
         foreach ($pipeline->all() as $pipe) {
             $this->verify($pipe->getOperation(), $pipe->getResource()->getName());
@@ -72,12 +73,34 @@ class Sentinel implements SentinelContract
     }
 
     /**
+     * @param string $operation
+     * @param string $resource
+     * @throws Exception
+     */
+    protected function verify(string $operation, string $resource)
+    {
+        $scopes = $this->key->getScopes();
+
+        if ($scopes === null || !$scopes->can($operation, $resource)) {
+            $this->reject();
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function reject()
+    {
+        throw new ApiException('access_denied');
+    }
+
+    /**
      * @param Resource $resource
      * @param QueryRelations $QueryRelations
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function checkRelations(Resource $resource, QueryRelations $QueryRelations)
+    protected function checkRelations(Resource $resource, QueryRelations $QueryRelations): self
     {
         foreach ($QueryRelations as $requestRelation) {
             $relation = $resource->getRelation($requestRelation->getName());
@@ -95,24 +118,18 @@ class Sentinel implements SentinelContract
     }
 
     /**
-     * @param string $operation
-     * @param string $resource
-     * @throws \Exception
+     * @return array|mixed|null
      */
-    protected function verify(string $operation, string $resource)
+    public function getUser(): ?array
     {
-        $scopes = $this->key->getScopes();
-
-        if ($scopes === null || !$scopes->can($operation, $resource)) {
-            $this->reject();
-        }
+        return $this->key->getUser();
     }
 
     /**
-     * @throws \Exception
+     * @return int|mixed|string|null
      */
-    protected function reject()
+    public function getUserId()
     {
-        throw new ApiException('access_denied');
+        return $this->key->getUserId();
     }
 }
