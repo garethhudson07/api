@@ -35,10 +35,10 @@ class Aggregate extends Collection
     }
 
     /**
-     * @param $exception
+     * @param Throwable $exception
      * @return null
      */
-    public function renderer($exception)
+    public function renderer(Throwable $exception)
     {
         foreach ($this->items as $item) {
             if ($item->respondsTo($exception)) {
