@@ -22,6 +22,14 @@ class Payload implements JsonSerializable
     }
 
     /**
+     * @return mixed
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
      * @param array $data
      * @return $this
      */

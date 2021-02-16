@@ -4,11 +4,15 @@ namespace Api;
 
 use Closure;
 use Api\Config\Aggregate as Configs;
+use Api\Exceptions\Handlers\Master as ExceptionHandler;
+use Api\Exceptions\Handlers\Aggregate as ExceptionHandlers;
+use Api\Exceptions\Contracts\Handler as ExceptionHandlersInterface;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Psr\Container\ContainerInterface;
 use Api\Events\Contracts\Emitter as EmitterInterface;
 use Api\Events\Factory as Events;
 use Api\Events\Contracts\Emitter;
+use Throwable;
 
 class Kernel
 {
@@ -16,18 +20,22 @@ class Kernel
 
     protected $configs;
 
+    protected $exceptionDelegates;
+
     protected $emitter;
 
     /**
      * Kernel constructor.
      * @param Container $container
      * @param Configs $configs
+     * @param ExceptionHandlers $exceptionDelegates
      * @param Emitter $emitter
      */
-    public function __construct(Container $container, Configs $configs, EmitterInterface $emitter)
+    public function __construct(Container $container, Configs $configs, ExceptionHandlers $exceptionDelegates, EmitterInterface $emitter)
     {
         $this->container = $container;
         $this->configs = $configs;
+        $this->exceptionDelegates = $exceptionDelegates;
         $this->emitter = $emitter;
     }
 
@@ -41,6 +49,7 @@ class Kernel
         return new static(
             $container,
             new Configs(),
+            new ExceptionHandlers(),
             Events::make($container)->emitter()
         );
     }
@@ -55,6 +64,7 @@ class Kernel
         return new static(
             $container->delegate($this->container),
             $this->configs->extend(),
+            $this->exceptionDelegates->extend(),
             Events::make($container)->extendEmitter($this->emitter)
         );
     }
@@ -176,5 +186,29 @@ class Kernel
         $this->emitter->listen(...$arguments);
 
         return $this;
+    }
+
+    /**
+     * @param ExceptionHandlersInterface $handler
+     * @return $this
+     */
+    public function exceptionHandler(ExceptionHandlersInterface $handler)
+    {
+        $this->exceptionDelegates->push($handler);
+
+        return $this;
+    }
+
+    /**
+     * @param Throwable $exception
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws Throwable
+     */
+    public function handleException(Throwable $exception)
+    {
+        return (new ExceptionHandler(
+            $this->exceptionDelegates,
+            $this->resolve('response.factory')->json()
+        ))->handle($exception);
     }
 }

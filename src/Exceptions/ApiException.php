@@ -27,6 +27,14 @@ class ApiException extends RuntimeException implements ApiExceptionInterface
     }
 
     /**
+     * @return Payload
+     */
+    public function getPayload()
+    {
+        return $this->payload;
+    }
+
+    /**
      * @param array $data
      * @return $this
      */

@@ -2,7 +2,6 @@
 
 namespace Api;
 
-use Api\Exceptions\Handler as ExceptionHandler;
 use Psr\Http\Message\ResponseInterface;
 use Api\Resources\Factory as ResourceFactory;
 use Api\Providers\RequestServiceProvider;
@@ -11,7 +10,7 @@ use Api\Providers\GuardServiceProvider;
 use Api\Providers\SpecServiceProvider;
 use Api\Providers\PipelineServiceProvider;
 use Closure;
-use Exception;
+use Throwable;
 
 /**
  * Class Api
@@ -89,6 +88,17 @@ class Api
     }
 
     /**
+     * @param mixed ...$arguments
+     * @return $this
+     */
+    public function exceptionHandler(...$arguments)
+    {
+        $this->kernel->exceptionHandler(...$arguments);
+
+        return $this;
+    }
+
+    /**
      * @param string $name
      * @param Closure $callback
      */
@@ -98,7 +108,7 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws Throwable
      */
     public function authorise()
     {
@@ -107,7 +117,7 @@ class Api
 
     /**
      * @return mixed|ResponseInterface
-     * @throws Exception
+     * @throws Throwable
      */
     public function generateAuthorisationResponse()
     {
@@ -126,7 +136,7 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws Throwable
      */
     public function authorisedUser()
     {
@@ -134,7 +144,7 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws Throwable
      */
     public function generateAuthorisedUserResponse()
     {
@@ -164,22 +174,20 @@ class Api
     /**
      * @param Closure $callback
      * @return mixed|ResponseInterface
-     * @throws Exception
+     * @throws \Throwable
      */
     protected function try(Closure $callback)
     {
         try {
             return $callback();
-        } catch (Exception $e) {
-            return (new ExceptionHandler(
-                $this->kernel->resolve('response.factory')->json()
-            ))->handle($e);
+        } catch (Throwable $exception) {
+            return $this->kernel->handleException($exception);
         }
     }
 
     /**
      * @return mixed|ResponseInterface
-     * @throws Exception
+     * @throws Throwable
      */
     public function generateResponse()
     {
@@ -210,7 +218,7 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws Throwable
      */
     public function respond()
     {

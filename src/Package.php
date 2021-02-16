@@ -93,6 +93,17 @@ class Package
     }
 
     /**
+     * @param mixed ...$arguments
+     * @return $this
+     */
+    public function exceptionHandler(...$arguments)
+    {
+        $this->kernel->exceptionHandler(...$arguments);
+
+        return $this;
+    }
+
+    /**
      * @param AbstractServiceProvider $provider
      * @return $this
      */

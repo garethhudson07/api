@@ -221,7 +221,7 @@ class Resource
     {
         $this->endpoints->verify('update');
         $this->emitCrudEvent('updating', compact('pipe','request'));
-        $this->schema->validate($request->getParsedBody());
+        $this->schema->validate($request->getParsedBody()['data']['attributes']);
 
         $record = $this->repository->update($pipe, $request);
 
