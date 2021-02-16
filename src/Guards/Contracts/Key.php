@@ -2,20 +2,31 @@
 
 namespace Api\Guards\Contracts;
 
+use Api\Guards\OAuth2\Scopes\Collection;
+
+/**
+ * Interface Key
+ * @package Api\Guards\Contracts
+ */
 interface Key
 {
     /**
      * @return $this
      */
-    public function handle();
+    public function handle(): self;
 
     /**
-     * @return null
+     * @return array|null
      */
-    public function getUser();
+    public function getUser(): ?array;
 
     /**
-     * @return mixed
+     * @return string|int|null
      */
-    public function getScopes();
+    public function getUserId();
+
+    /**
+     * @return Collection|null
+     */
+    public function getScopes(): ?Collection;
 }
