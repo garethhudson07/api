@@ -2,16 +2,16 @@
 
 namespace Api\Resources;
 
+use Api\Events\Contracts\Emitter as EmitterInterface;
 use Api\Events\Payload;
 use Api\Pipeline\Pipes\Pipe;
-use Api\Schema\Schema;
 use Api\Repositories\Contracts\Resource as RepositoryInterface;
-use Api\Specs\Contracts\Representation;
-use Psr\Http\Message\ServerRequestInterface;
-use Api\Resources\Relations\Relation;
 use Api\Resources\Relations\Registry as Relations;
-use Api\Events\Contracts\Emitter as EmitterInterface;
+use Api\Resources\Relations\Relation;
+use Api\Schema\Schema;
+use Api\Specs\Contracts\Representation;
 use Exception;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class Resource
@@ -19,6 +19,9 @@ use Exception;
  */
 class Resource
 {
+    /**
+     * @var Schema
+     */
     protected $schema;
 
     /**
@@ -36,6 +39,9 @@ class Resource
      */
     protected $representation;
 
+    /**
+     * @var EmitterInterface
+     */
     protected $emitter;
 
     /**
@@ -44,7 +50,7 @@ class Resource
     protected $endpoints;
 
     /**
-     * @var
+     * @var string
      */
     protected $name;
 
@@ -76,9 +82,9 @@ class Resource
 
     /**
      * @param string $name
-     * @return $this
+     * @return self
      */
-    public function name(string $name)
+    public function name(string $name): self
     {
         $this->name = $name;
 
@@ -86,18 +92,18 @@ class Resource
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
      * @param mixed ...$arguments
-     * @return $this
+     * @return self
      */
-    public function except(...$arguments)
+    public function except(...$arguments): self
     {
         $this->endpoints->except(...$arguments);
 
@@ -106,9 +112,9 @@ class Resource
 
     /**
      * @param mixed ...$arguments
-     * @return $this
+     * @return self
      */
-    public function only(...$arguments)
+    public function only(...$arguments): self
     {
         $this->endpoints->only(...$arguments);
 
@@ -117,9 +123,9 @@ class Resource
 
     /**
      * @param mixed ...$arguments
-     * @return $this
+     * @return self
      */
-    public function hasMany(...$arguments)
+    public function hasMany(...$arguments): self
     {
         $this->relations->include('has', array_merge([$this], $arguments));
 
@@ -128,9 +134,9 @@ class Resource
 
     /**
      * @param mixed ...$arguments
-     * @return $this
+     * @return self
      */
-    public function hasOne(...$arguments)
+    public function hasOne(...$arguments): self
     {
         $this->relations->include('hasOne', array_merge([$this], $arguments));
 
@@ -139,9 +145,9 @@ class Resource
 
     /**
      * @param mixed ...$arguments
-     * @return $this
+     * @return self
      */
-    public function belongsTo(...$arguments)
+    public function belongsTo(...$arguments): self
     {
         $this->relations->include('belongsTo', array_merge([$this], $arguments));
 
@@ -150,9 +156,9 @@ class Resource
 
     /**
      * @param mixed ...$arguments
-     * @return $this
+     * @return self
      */
-    public function nest(...$arguments)
+    public function nest(...$arguments): self
     {
         $this->relations->include('nest', array_merge([$this], $arguments));
 
@@ -163,7 +169,7 @@ class Resource
      * @param string $name
      * @return Relation|null
      */
-    public function getRelation(string $name)
+    public function getRelation(string $name): ?Relation
     {
         return $this->relations->get($name);
     }
@@ -171,15 +177,15 @@ class Resource
     /**
      * @param string $event
      * @param $listener
-     * @return $this
+     * @return self
      */
-    public function listen(string $event, $listener)
+    public function listen(string $event, $listener): self
     {
         $this->emitter->listen($event, $listener);
 
         return $this;
     }
-    
+
     /**
      * @param Pipe $pipe
      * @return mixed
@@ -198,9 +204,9 @@ class Resource
     public function getRecord(Pipe $pipe, ServerRequestInterface $request)
     {
         $this->endpoints->verify('show');
-        $this->emitCrudEvent('readingOne', compact('pipe','request'));
+        $this->emitCrudEvent('readingOne', compact('pipe', 'request'));
 
-        if(!$record = $this->repository->getRecord($pipe, $request)) {
+        if (!$record = $this->repository->getRecord($pipe, $request)) {
             return null;
         }
 
@@ -212,6 +218,20 @@ class Resource
     }
 
     /**
+     * @param string $action
+     * @param array $payloadAttributes
+     * @return self
+     */
+    protected function emitCrudEvent(string $action, array $payloadAttributes): self
+    {
+        $this->emitter->emit('crud', function (Payload $payload) use ($action, $payloadAttributes) {
+            $payload->action($action)->fill($payloadAttributes);
+        });
+
+        return $this;
+    }
+
+    /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
      * @return mixed
@@ -220,8 +240,8 @@ class Resource
     public function update(Pipe $pipe, ServerRequestInterface $request)
     {
         $this->endpoints->verify('update');
-        $this->emitCrudEvent('updating', compact('pipe','request'));
-        $this->schema->validate($request->getParsedBody()['data']['attributes']);
+        $this->emitCrudEvent('updating', compact('pipe', 'request'));
+        $this->schema->validate($request->getParsedBody()['data']['attributes'] ?? []);
 
         $record = $this->repository->update($pipe, $request);
 
@@ -232,20 +252,5 @@ class Resource
             $request,
             $record
         );
-    }
-
-    /**
-     * @param string $action
-     * @param array $payloadAttributes
-     * @return $this
-     */
-    protected function emitCrudEvent(string $action, array $payloadAttributes)
-    {
-        $this->emitter->emit('crud', function (Payload $payload) use ($action, $payloadAttributes)
-        {
-            $payload->action($action)->fill($payloadAttributes);
-        });
-
-        return $this;
     }
 }

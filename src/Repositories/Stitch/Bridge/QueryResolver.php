@@ -6,11 +6,23 @@ use Psr\Http\Message\ServerRequestInterface;
 use Stitch\Model;
 use Api\Pipeline\Pipes\Pipe;
 use Stitch\Queries\Query as BaseQuery;
+use Stitch\Result\Record as ResultRecord;
+use Stitch\Result\Set;
 
+/**
+ * Class QueryResolver
+ * @package Api\Repositories\Stitch\Bridge
+ */
 class QueryResolver
 {
+    /**
+     * @var Model
+     */
     protected $model;
 
+    /**
+     * @var Pipe
+     */
     protected $pipe;
 
     /**
@@ -25,23 +37,27 @@ class QueryResolver
     }
 
     /**
-     * @return null|\Stitch\Result\Record
+     * @return null|ResultRecord
      */
-    public function byKey()
+    public function byKey(): ?ResultRecord
     {
         return $this->keyedQuery()->first();
     }
 
     /**
      * @param ServerRequestInterface $request
-     * @return null|\Stitch\Result\Record
+     * @return null|ResultRecord
      */
-    public function record(ServerRequestInterface $request)
+    public function record(ServerRequestInterface $request): ?ResultRecord
     {
         return $this->resolve($this->keyedQuery(), $request)->first();
     }
 
-    public function collection(ServerRequestInterface $request)
+    /**
+     * @param ServerRequestInterface $request
+     * @return Set
+     */
+    public function collection(ServerRequestInterface $request): Set
     {
         return $this->resolve($this->baseQuery(), $request)->get();
     }
@@ -51,7 +67,7 @@ class QueryResolver
      * @param ServerRequestInterface $request
      * @return Query
      */
-    public function resolve(BaseQuery $baseQuery, ServerRequestInterface $request)
+    public function resolve(BaseQuery $baseQuery, ServerRequestInterface $request): Query
     {
         $parsedQuery = $request->getAttribute('query');
 
@@ -66,7 +82,7 @@ class QueryResolver
     /**
      * @return BaseQuery
      */
-    public function keyedQuery()
+    public function keyedQuery(): BaseQuery
     {
         return $this->baseQuery()->where(
             $this->model->getTable()->getPrimaryKey()->getName(),
@@ -77,7 +93,7 @@ class QueryResolver
     /**
      * @return BaseQuery
      */
-    public function baseQuery()
+    public function baseQuery(): BaseQuery
     {
         $baseQuery = $this->model->query()->dehydrated();
 

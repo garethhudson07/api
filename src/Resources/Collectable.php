@@ -8,6 +8,7 @@ use Api\Schema\Schema;
 use Api\Repositories\Contracts\Resource as RepositoryInterface;
 use Api\Specs\Contracts\Representation;
 use Api\Events\Contracts\Emitter as EmitterInterface;
+use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -41,7 +42,7 @@ class Collectable extends Resource
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function getCollection(Pipe $pipe, ServerRequestInterface $request)
     {
@@ -59,13 +60,13 @@ class Collectable extends Resource
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function create(Pipe $pipe, ServerRequestInterface $request)
     {
         $this->endpoints->verify('create');
         $this->emitCrudEvent('creating', compact('pipe','request'));
-        $this->schema->validate($request->getParsedBody()['data']['attributes']);
+        $this->schema->validate($request->getParsedBody()['data']['attributes'] ?? []);
 
         $record = $this->repository->create($pipe, $request);
 
@@ -81,9 +82,9 @@ class Collectable extends Resource
     /**
      * @param Pipe $pipe
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
-    public function delete(Pipe $pipe)
+    public function delete(Pipe $pipe): array
     {
         $this->endpoints->verify('delete');
         $this->emitCrudEvent('deleting', compact('pipe'));

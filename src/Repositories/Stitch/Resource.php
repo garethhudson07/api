@@ -46,7 +46,7 @@ class Resource implements RepositoryInterface
     /**
      * @return Model
      */
-    public function getModel()
+    public function getModel(): Model
     {
         return $this->model;
     }
@@ -73,7 +73,7 @@ class Resource implements RepositoryInterface
     public function getCollection(Pipe $pipe, ServerRequestInterface $request): array
     {
         $this->associateRelationships($pipe, $request);
-        
+
         return (new QueryResolver(
             $this->model,
             $pipe
@@ -106,7 +106,7 @@ class Resource implements RepositoryInterface
     public function create(Pipe $pipe, ServerRequestInterface $request): array
     {
         return $this->model->record(
-            $request->getParsedBody()['data']['attributes']
+            $request->getParsedBody()['data']['attributes'] ?? []
         )->save()->toArray();
     }
 
@@ -122,7 +122,7 @@ class Resource implements RepositoryInterface
             $this->model,
             $pipe
         ))->byKey()->hydrate()->fill(
-            $request->getParsedBody()['data']['attributes']
+            $request->getParsedBody()['data']['attributes'] ?? []
         )->save()->toArray();
     }
 
