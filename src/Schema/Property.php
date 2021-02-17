@@ -14,14 +14,9 @@ use Stitch\DBAL\Schema\Column;
  */
 class Property
 {
-    protected $name;
-
-    protected $type;
-
-    protected $column;
-
-    protected $validator;
-
+    /**
+     * @var array
+     */
     protected const PASSTHROUGH_MAP = [
         'validator' => [
             'required'
@@ -33,6 +28,23 @@ class Property
             'on'
         ]
     ];
+
+    /**
+     * @var string
+     */
+    protected $name;
+    /**
+     * @var string
+     */
+    protected $type;
+    /**
+     * @var Column
+     */
+    protected $column;
+    /**
+     * @var Validator
+     */
+    protected $validator;
 
     /**
      * Property constructor.
@@ -52,7 +64,7 @@ class Property
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -60,7 +72,7 @@ class Property
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -68,9 +80,9 @@ class Property
     /**
      * @param $name
      * @param $arguments
-     * @return $this
+     * @return self
      */
-    public function __call($name, $arguments)
+    public function __call($name, $arguments): self
     {
         if (in_array($name, $this::PASSTHROUGH_MAP['column'])) {
             $this->column->{$name}(...$arguments);
