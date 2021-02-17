@@ -4,17 +4,27 @@ namespace Api\Exceptions;
 
 use JsonSerializable;
 
+/**
+ * Class Payload
+ * @package Api\Exceptions
+ */
 class Payload implements JsonSerializable
 {
+    /**
+     * @var
+     */
     protected $message;
 
+    /**
+     * @var array
+     */
     protected $data = [];
 
     /**
      * @param string $message
      * @return $this
      */
-    public function message(string $message)
+    public function message(string $message): Payload
     {
         $this->message = $message;
 
@@ -33,7 +43,7 @@ class Payload implements JsonSerializable
      * @param array $data
      * @return $this
      */
-    public function data(array $data)
+    public function data(array $data): Payload
     {
         $this->data = $data;
 
@@ -43,7 +53,7 @@ class Payload implements JsonSerializable
     /**
      * @return mixed
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
@@ -51,7 +61,7 @@ class Payload implements JsonSerializable
     /**
      * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'errors' => [
@@ -64,16 +74,16 @@ class Payload implements JsonSerializable
     /**
      * @return string
      */
-    public function toJson()
+    public function __toString(): string
     {
-        return json_encode($this);
+        return $this->toJson();
     }
 
     /**
      * @return string
      */
-    public function __toString()
+    public function toJson(): string
     {
-        return $this->toJson();
+        return json_encode($this);
     }
 }

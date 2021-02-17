@@ -4,6 +4,7 @@ namespace Api\Guards\OAuth2;
 
 use Api\Exceptions\ApiException;
 use Api\Guards\Contracts\Sentinel as SentinelContract;
+use Api\Guards\OAuth2\League\Exceptions\AuthException;
 use Api\Pipeline\Pipeline;
 use Api\Queries\Relations as QueryRelations;
 use Api\Resources\Resource;
@@ -82,16 +83,22 @@ class Sentinel implements SentinelContract
         $scopes = $this->key->getScopes();
 
         if ($scopes === null || !$scopes->can($operation, $resource)) {
-            $this->reject();
+            $this->reject('invalid_token_scopes', 'The operation failed as no valid scopes were found for this token');
         }
     }
 
     /**
-     * @throws Exception
+     * @param string $message
+     * @param string|null $description
+     * @throws ApiException
+     * @throws AuthException
      */
-    protected function reject()
+    protected function reject(string $message = 'access_denied', ?string $description = null)
     {
-        throw new ApiException('access_denied');
+        throw (new AuthException($message))->data([
+            'error' => $message,
+            'error_description' => $description,
+        ]);
     }
 
     /**
