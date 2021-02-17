@@ -23,6 +23,14 @@ class AuthException extends RuntimeException implements ApiExceptionInterface
     }
 
     /**
+     * @return OAuthServerException
+     */
+    public function getBaseException(): OAuthServerException
+    {
+        return $this->baseException;
+    }
+
+    /**
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
