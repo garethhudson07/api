@@ -7,12 +7,27 @@ use League\OAuth2\Server\Exception\OAuthServerException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * Class Authoriser
+ * @package Api\Guards\OAuth2
+ */
 class Authoriser
 {
+    /**
+     * @var AuthorizationServer
+     */
     protected $server;
 
+    /**
+     * @var ServerRequestInterface
+     */
     protected $request;
 
+    /**
+     * Authoriser constructor.
+     * @param AuthorizationServer $server
+     * @param ServerRequestInterface $request
+     */
     public function __construct(AuthorizationServer $server, ServerRequestInterface $request)
     {
         $this->server = $server;
@@ -22,13 +37,10 @@ class Authoriser
     /**
      * @param ResponseInterface $response
      * @return ResponseInterface
+     * @throws OAuthServerException
      */
     public function authoriseAndPrepareResponse(ResponseInterface $response): ResponseInterface
     {
-        try {
-            return $this->server->respondToAccessTokenRequest($this->request, $response);
-        } catch (OAuthServerException $exception) {
-            return $exception->generateHttpResponse($response);
-        }
+        return $this->server->respondToAccessTokenRequest($this->request, $response);
     }
 }
