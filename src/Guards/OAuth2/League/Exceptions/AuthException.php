@@ -2,32 +2,33 @@
 
 namespace Api\Guards\OAuth2\League\Exceptions;
 
+use Api\Exceptions\ApiException;
 use Api\Exceptions\Contracts\ApiException as ApiExceptionInterface;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use Psr\Http\Message\ResponseInterface;
-use RuntimeException;
 
-class AuthException extends RuntimeException implements ApiExceptionInterface
+/**
+ * Class AuthException
+ * @package Api\Guards\OAuth2\League\Exceptions
+ */
+class AuthException extends ApiException implements ApiExceptionInterface
 {
+    /**
+     * @var OAuthServerException
+     */
     protected $baseException;
 
     /**
      * @param OAuthServerException $exception
      * @return $this
      */
-    public function setBaseException(OAuthServerException $exception)
+    public function setBaseException(OAuthServerException $exception): AuthException
     {
         $this->baseException = $exception;
 
-        return $this;
-    }
+        $this->payload->data($exception->getPayload());
 
-    /**
-     * @return OAuthServerException
-     */
-    public function getBaseException(): OAuthServerException
-    {
-        return $this->baseException;
+        return $this;
     }
 
     /**

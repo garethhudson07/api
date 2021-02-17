@@ -3,14 +3,24 @@
 namespace Api\Exceptions;
 
 use Api\Exceptions\Contracts\ApiException as ApiExceptionInterface;
+use Exception;
 use Psr\Http\Message\ResponseInterface;
-use RuntimeException;
 use Throwable;
 
-class ApiException extends RuntimeException implements ApiExceptionInterface
+/**
+ * Class ApiException
+ * @package Api\Exceptions
+ */
+class ApiException extends Exception implements ApiExceptionInterface
 {
+    /**
+     * @var int
+     */
     protected $status = 500;
 
+    /**
+     * @var Payload
+     */
     protected $payload;
 
     /**
@@ -29,7 +39,7 @@ class ApiException extends RuntimeException implements ApiExceptionInterface
     /**
      * @return Payload
      */
-    public function getPayload()
+    public function getPayload(): Payload
     {
         return $this->payload;
     }
@@ -38,7 +48,7 @@ class ApiException extends RuntimeException implements ApiExceptionInterface
      * @param array $data
      * @return $this
      */
-    public function data(array $data)
+    public function data(array $data): ApiException
     {
         $this->payload->data($data);
 
