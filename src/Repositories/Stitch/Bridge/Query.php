@@ -5,6 +5,8 @@ namespace Api\Repositories\Stitch\Bridge;
 use Oilstone\RsqlParser\Expression;
 use Stitch\Queries\Query as BaseQuery;
 use Api\Queries\Relations as RequestRelations;
+use Stitch\Result\Record as ResultRecord;
+use Stitch\Result\Set;
 
 class Query
 {
@@ -32,32 +34,32 @@ class Query
     /**
      * @return BaseQuery
      */
-    public function getBaseQuery()
+    public function getBaseQuery(): BaseQuery
     {
         return $this->baseQuery;
     }
 
     /**
-     * @return \Stitch\Queries\Collection
+     * @return Set
      */
-    public function get()
+    public function get(): Set
     {
         return $this->baseQuery->get();
     }
 
     /**
-     * @return null|\Stitch\Result\Record
+     * @return null|ResultRecord
      */
-    public function first()
+    public function first(): ?ResultRecord
     {
         return $this->baseQuery->first();
     }
 
     /**
      * @param RequestRelations $relations
-     * @return $this
+     * @return self
      */
-    public function include(RequestRelations $relations)
+    public function include(RequestRelations $relations): self
     {
         foreach ($relations->collapse() as $relation) {
             $path = $relation->path();
@@ -84,9 +86,9 @@ class Query
 
     /**
      * @param array $fields
-     * @return $this
+     * @return self
      */
-    public function select(array $fields)
+    public function select(array $fields): self
     {
         if ($fields) {
             $this->baseQuery->select(...$fields);
@@ -97,18 +99,18 @@ class Query
 
     /**
      * @param Expression $expression
-     * @return Query
+     * @return self
      */
-    public function where(Expression $expression)
+    public function where(Expression $expression): self
     {
         return $this->applyRsqlExpression($this->baseQuery, $expression);
     }
 
     /**
      * @param array $orders
-     * @return $this
+     * @return self
      */
-    public function orderBy(array $orders)
+    public function orderBy(array $orders): self
     {
         foreach ($orders as $order) {
             $this->baseQuery->orderBy($order->getProperty(), $order->getDirection());
@@ -119,9 +121,9 @@ class Query
 
     /**
      * @param $limit
-     * @return $this
+     * @return self
      */
-    public function limit($limit)
+    public function limit($limit): self
     {
         if ($limit) {
             $this->baseQuery->limit($limit);
@@ -132,9 +134,9 @@ class Query
 
     /**
      * @param $offset
-     * @return $this
+     * @return self
      */
-    public function offset($offset)
+    public function offset($offset): self
     {
         if ($offset) {
             $this->baseQuery->offset($offset);
@@ -146,9 +148,9 @@ class Query
     /**
      * @param $query
      * @param Expression $expression
-     * @return $this
+     * @return self
      */
-    protected function applyRsqlExpression($query, Expression $expression)
+    protected function applyRsqlExpression($query, Expression $expression): self
     {
         foreach ($expression as $item) {
             $method = $item['operator'] === 'OR' ? 'orWhere' : 'where';
@@ -176,6 +178,7 @@ class Query
     /**
      * @param $operator
      * @return mixed
+     * @noinspection PhpMissingReturnTypeInspection
      */
     protected function resolveConstraintOperator($operator)
     {
