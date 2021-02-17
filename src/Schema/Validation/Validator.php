@@ -2,25 +2,28 @@
 
 namespace Api\Schema\Validation;
 
+use Respect\Validation\Exceptions\ComponentException;
 use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Rules;
 
+/**
+ * Class Validator
+ * @package Api\Schema\Validation
+ */
 class Validator
 {
-    protected $type;
-
-    protected $required = false;
-
-    protected $rules;
-
-    protected $messages;
-
+    /**
+     * @const array
+     */
     protected const LOCAL_RULES = [
         'required',
         'minLength',
         'maxLength'
     ];
 
+    /**
+     * @const array
+     */
     protected const RULE_MAP = [
         'alpha' => 'Alpha',
         'alphaNumeric' => 'Alnum',
@@ -29,7 +32,9 @@ class Validator
         'max' => 'Max',
         'email' => 'Email'
     ];
-
+    /**
+     * @const array
+     */
     protected const MESSAGE_TEMPLATES = [
         'type' => 'Must be of type {{type}}',
         'alpha' => 'Must only contain characters (a-z, A-Z)',
@@ -43,6 +48,26 @@ class Validator
     ];
 
     /**
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * @var bool
+     */
+    protected $required = false;
+
+    /**
+     * @var Rules\AllOf
+     */
+    protected $rules;
+
+    /**
+     * @var array
+     */
+    protected $messages = [];
+
+    /**
      * Validator constructor.
      * @param string $type
      */
@@ -50,22 +75,18 @@ class Validator
     {
         $this->type = $type;
         $this->rules = new Rules\AllOf();
-        $this->rules->addRule(new Rules\Type($type));
+
+        try {
+            $this->rules->addRule(new Rules\Type($type));
+        } catch (ComponentException $e) {
+            // Ignore unknown validation types
+        }
     }
 
     /**
-     * @param string $name
-     * @return bool
+     * @return self
      */
-    public function hasRule(string $name)
-    {
-        return in_array($name, $this::LOCAL_RULES) || array_key_exists($name, $this::RULE_MAP);
-    }
-
-    /**
-     * @return $this
-     */
-    public function required()
+    public function required(): self
     {
         $this->required = true;
 
@@ -74,26 +95,34 @@ class Validator
 
     /**
      * @param int $length
-     * @return $this
+     * @return self
      */
-    public function minLength(int $length)
+    public function minLength(int $length): self
     {
-        $this->rules->addRule(
-            (new Rules\Length($length))->setName('minLength')
-        );
+        try {
+            $this->rules->addRule(
+                (new Rules\Length($length))->setName('minLength')
+            );
+        } catch (ComponentException $e) {
+            // Ignore invalid length rules
+        }
 
         return $this;
     }
 
     /**
      * @param int $length
-     * @return $this
+     * @return self
      */
-    public function maxLength(int $length)
+    public function maxLength(int $length): self
     {
-        $this->rules->addRule(
-            (new Rules\Length(null, $length))->setName('maxLength')
-        );
+        try {
+            $this->rules->addRule(
+                (new Rules\Length(null, $length))->setName('maxLength')
+            );
+        } catch (ComponentException $e) {
+            // Ignore invalid length rules
+        }
 
         return $this;
     }
@@ -119,10 +148,19 @@ class Validator
     }
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasRule(string $name): bool
+    {
+        return in_array($name, $this::LOCAL_RULES) || array_key_exists($name, $this::RULE_MAP);
+    }
+
+    /**
      * @param $value
      * @return bool
      */
-    public function run($value)
+    public function run($value): bool
     {
         try {
             if (!$this->required) {
@@ -140,9 +178,9 @@ class Validator
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getMessages()
+    public function getMessages(): array
     {
         return $this->messages;
     }

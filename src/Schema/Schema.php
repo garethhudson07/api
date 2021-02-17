@@ -14,11 +14,6 @@ use Stitch\DBAL\Schema\Table;
  * @method Property string(string $name)
  * @method Property integer(string $name)
  * @method Property boolean(string $name)
- * @method Property primary()
- * @method Property increments()
- * @method Property references(string $name)
- * @method Property on(string $table)
- * @method Property required()
  */
 class Schema
 {

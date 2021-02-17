@@ -9,23 +9,42 @@ use Stitch\DBAL\Schema\Column;
  * Class Property
  * @package Api\Schema
  * @method Property primary()
- * @method Property references(string $columnName)
- * @method Property on(string $tableName)
+ * @method Property increments()
+ * @method Property references(string $name)
+ * @method Property on(string $table)
+ * @method Property required()
+ * @method Property minLength(int $minLength)
+ * @method Property maxLength(int $minLength)
+ * @method Property alpha()
+ * @method Property alphaNumeric()
+ * @method Property between($start, $end)
+ * @method Property min($minimum)
+ * @method Property max($maximum)
+ * @method Property email()
  */
 class Property
 {
     /**
-     * @var array
+     * @const array
      */
     protected const PASSTHROUGH_MAP = [
         'validator' => [
-            'required'
+            'required',
+            'minLength',
+            'maxLength',
+            'alpha',
+            'alphaNumeric',
+            'between',
+            'min',
+            'max',
+            'email',
         ],
+
         'column' => [
             'primary',
             'increments',
             'references',
-            'on'
+            'on',
         ]
     ];
 
@@ -33,14 +52,17 @@ class Property
      * @var string
      */
     protected $name;
+
     /**
      * @var string
      */
     protected $type;
+
     /**
      * @var Column
      */
     protected $column;
+
     /**
      * @var Validator
      */
