@@ -4,7 +4,14 @@ namespace Api\Schema\Validation;
 
 use Api\Exceptions\ApiException;
 
+/**
+ * Class ValidationException
+ * @package Api\Schema\Validation
+ */
 class ValidationException extends ApiException
 {
-    protected $status = 400;
+    /**
+     * @var int
+     */
+    protected $status = 422;
 }

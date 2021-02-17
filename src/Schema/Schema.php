@@ -2,10 +2,11 @@
 
 namespace Api\Schema;
 
+use Api\Schema\Validation\Aggregate as Validators;
+use Api\Schema\Validation\ValidationException;
 use Api\Schema\Validation\Validator;
 use Stitch\DBAL\Schema\Column;
 use Stitch\DBAL\Schema\Table;
-use Api\Schema\Validation\Aggregate as Validators;
 
 /**
  * Class Schema
@@ -16,12 +17,24 @@ use Api\Schema\Validation\Aggregate as Validators;
  */
 class Schema
 {
+    /**
+     * @var Table
+     */
     protected $table;
 
+    /**
+     * @var array
+     */
     protected $properties = [];
 
+    /**
+     * @var Validators
+     */
     protected $validators;
 
+    /**
+     * Schema constructor.
+     */
     public function __construct()
     {
         $this->table = new Table();
@@ -30,9 +43,9 @@ class Schema
 
     /**
      * @param string $name
-     * @return $this
+     * @return self
      */
-    public function table(string $name)
+    public function table(string $name): self
     {
         $this->table->name($name);
 
@@ -41,21 +54,9 @@ class Schema
 
     /**
      * @param string $name
-     * @return $this
+     * @return self
      */
-    public function connection(string $name)
-    {
-        $this->table->connection($name);
-
-        return $this;
-    }
-    
-
-    /**
-     * @param string $name
-     * @return $this
-     */
-    public function database(string $name)
+    public function database(string $name): self
     {
         $this->table->database($name);
 
@@ -65,7 +66,7 @@ class Schema
     /**
      * @return Table
      */
-    public function getTable()
+    public function getTable(): Table
     {
         return $this->table;
     }
@@ -73,11 +74,21 @@ class Schema
     /**
      * @param array $input
      * @return bool
-     * @throws \Exception
+     * @throws ValidationException
      */
-    public function validate(array $input)
+    public function validate(array $input): bool
     {
         return $this->validators->run($input);
+    }
+
+    /**
+     * @param string $method
+     * @param array $arguments
+     * @return Property
+     */
+    public function __call(string $method, array $arguments): Property
+    {
+        return $this->addProperty($method, $arguments[0]);
     }
 
     /**
@@ -103,15 +114,5 @@ class Schema
         $this->validators[$name] = $validator;
 
         return $property;
-    }
-
-    /**
-     * @param string $method
-     * @param array $arguments
-     * @return Property
-     */
-    public function __call(string $method, array $arguments)
-    {
-        return $this->addProperty($method, $arguments[0]);
     }
 }

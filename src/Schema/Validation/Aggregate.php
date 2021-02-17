@@ -4,11 +4,23 @@ namespace Api\Schema\Validation;
 
 use Api\Collection;
 
+/**
+ * Class Aggregate
+ * @package Api\Schema\Validation
+ */
 class Aggregate extends Collection
 {
+    /**
+     * @var array
+     */
     protected $messages;
 
-    public function run(array $input)
+    /**
+     * @param array $input
+     * @return bool
+     * @throws ValidationException
+     */
+    public function run(array $input): bool
     {
         $this->messages = [];
 
@@ -22,7 +34,7 @@ class Aggregate extends Collection
 
         if (count($this->messages) > 0) {
             throw (new ValidationException('The supplied resource is invalid.'))->data([
-                'attributes' => $this->messages
+                'error_messages' => $this->messages
             ]);
         }
 

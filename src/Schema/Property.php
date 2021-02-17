@@ -9,30 +9,64 @@ use Stitch\DBAL\Schema\Column;
  * Class Property
  * @package Api\Schema
  * @method Property primary()
- * @method Property references(string $columnName)
- * @method Property on(string $tableName)
+ * @method Property increments()
+ * @method Property references(string $name)
+ * @method Property on(string $table)
+ * @method Property required()
+ * @method Property minLength(int $minLength)
+ * @method Property maxLength(int $minLength)
+ * @method Property alpha()
+ * @method Property alphaNumeric()
+ * @method Property between($start, $end)
+ * @method Property min($minimum)
+ * @method Property max($maximum)
+ * @method Property email()
  */
 class Property
 {
-    protected $name;
-
-    protected $type;
-
-    protected $column;
-
-    protected $validator;
-
+    /**
+     * @const array
+     */
     protected const PASSTHROUGH_MAP = [
         'validator' => [
-            'required'
+            'required',
+            'minLength',
+            'maxLength',
+            'alpha',
+            'alphaNumeric',
+            'between',
+            'min',
+            'max',
+            'email',
         ],
+
         'column' => [
             'primary',
             'increments',
             'references',
-            'on'
+            'on',
         ]
     ];
+
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * @var Column
+     */
+    protected $column;
+
+    /**
+     * @var Validator
+     */
+    protected $validator;
 
     /**
      * Property constructor.
@@ -52,7 +86,7 @@ class Property
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -60,7 +94,7 @@ class Property
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -68,9 +102,9 @@ class Property
     /**
      * @param $name
      * @param $arguments
-     * @return $this
+     * @return self
      */
-    public function __call($name, $arguments)
+    public function __call($name, $arguments): self
     {
         if (in_array($name, $this::PASSTHROUGH_MAP['column'])) {
             $this->column->{$name}(...$arguments);

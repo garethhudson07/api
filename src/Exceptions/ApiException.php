@@ -46,9 +46,9 @@ class ApiException extends Exception implements ApiExceptionInterface
 
     /**
      * @param array $data
-     * @return $this
+     * @return self
      */
-    public function data(array $data): ApiException
+    public function data(array $data): self
     {
         $this->payload->data($data);
 
