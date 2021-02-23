@@ -12,6 +12,9 @@ use Closure;
  */
 class Registry extends Collection
 {
+    /**
+     * @var Container
+     */
     protected $container;
 
     /**
@@ -28,7 +31,7 @@ class Registry extends Collection
      * @param $value
      * @return $this
      */
-    public function bind($key, $value)
+    public function bind($key, $value): Registry
     {
         $binding = (new Binding($this))->value($value);
 
@@ -45,13 +48,13 @@ class Registry extends Collection
     /**
      * Get an item at a given offset.
      *
-     * @param mixed $key
+     * @param mixed $offset
      * @return mixed
      */
-    public function offsetGet($key)
+    public function offsetGet($offset)
     {
-        if ($this->has($key)) {
-            $item = $this->items[$key];
+        if ($this->has($offset)) {
+            $item = $this->items[$offset];
 
             if ($item instanceof Binding) {
                 return $item->resolve();
@@ -63,7 +66,10 @@ class Registry extends Collection
         return null;
     }
 
-    public function getIterator()
+    /**
+     * @return Iterator
+     */
+    public function getIterator(): Iterator
     {
         return new Iterator($this->items);
     }
