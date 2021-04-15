@@ -49,7 +49,7 @@ class Factory
         return new Key(
             $this->leagueFactory->resourceServer(),
             $this->container->get('request.instance'),
-            $this->container->get(UserRepositoryInterface::class)
+            $this->container->has(UserRepositoryInterface::class) ? $this->container->get(UserRepositoryInterface::class) : null
         );
     }
 

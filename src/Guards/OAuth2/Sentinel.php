@@ -139,4 +139,12 @@ class Sentinel implements SentinelContract
     {
         return $this->key->getUserId();
     }
+
+    /**
+     * @return string
+     */
+    public function getClientId(): string
+    {
+        return $this->key->getClientId();
+    }
 }

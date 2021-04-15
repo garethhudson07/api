@@ -61,9 +61,9 @@ class Key implements KeyContract
      * Sentinel constructor.
      * @param ResourceServer $server
      * @param ServerRequestInterface $request
-     * @param $userRepository
+     * @param ?UserRepositoryInterface $userRepository
      */
-    public function __construct(ResourceServer $server, ServerRequestInterface $request, UserRepositoryInterface $userRepository)
+    public function __construct(ResourceServer $server, ServerRequestInterface $request, ?UserRepositoryInterface $userRepository = null)
     {
         $this->server = $server;
         $this->request = $request;
@@ -123,6 +123,14 @@ class Key implements KeyContract
     public function getUserId()
     {
         return $this->userId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientId(): string
+    {
+        return $this->clientId;
     }
 
     /**
