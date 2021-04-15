@@ -32,7 +32,7 @@ class Factory implements FactoryInterface
      */
     public function json(string $content = ''): ResponseInterface
     {
-        return $this->make($content)->withHeader('Content-Type', 'application/json');
+        return $this->make($content)->withHeader('Content-Type', 'application/vnd.api+json');
     }
 
     /**
