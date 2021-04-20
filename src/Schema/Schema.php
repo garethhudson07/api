@@ -5,8 +5,6 @@ namespace Api\Schema;
 use Api\Schema\Validation\Aggregate as Validators;
 use Api\Schema\Validation\ValidationException;
 use Api\Schema\Validation\Validator;
-use Stitch\DBAL\Schema\Column;
-use Stitch\DBAL\Schema\Table;
 
 /**
  * Class Schema
@@ -17,10 +15,6 @@ use Stitch\DBAL\Schema\Table;
  */
 class Schema
 {
-    /**
-     * @var Table
-     */
-    protected $table;
 
     /**
      * @var array
@@ -37,38 +31,7 @@ class Schema
      */
     public function __construct()
     {
-        $this->table = new Table();
         $this->validators = new Validators();
-    }
-
-    /**
-     * @param string $name
-     * @return self
-     */
-    public function table(string $name): self
-    {
-        $this->table->name($name);
-
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @return self
-     */
-    public function database(string $name): self
-    {
-        $this->table->database($name);
-
-        return $this;
-    }
-
-    /**
-     * @return Table
-     */
-    public function getTable(): Table
-    {
-        return $this->table;
     }
 
     /**
@@ -92,27 +55,30 @@ class Schema
     }
 
     /**
-     * @param $type
-     * @param $name
+     * @param string $type
+     * @param string $name
      * @return Property
      */
-    protected function addProperty($type, $name): Property
+    protected function addProperty(string $type, string $name): Property
     {
-        $validator = new Validator($type);
-        $column = new Column($this->table, $name, $type);
-
-        $this->table->pushColumn($column);
-
-        $property = new Property(
-            $name,
-            $type,
-            $column,
-            $validator
-        );
+        $property = $this->makeProperty($name, $type);
 
         $this->properties[$name] = $property;
-        $this->validators[$name] = $validator;
+        $this->validators[$name] = $property->getValidator();
 
         return $property;
+    }
+
+    /**
+     * @param string $name
+     * @param string $type
+     */
+    protected function makeProperty(string $name, string $type)
+    {
+        return new Property(
+            $name,
+            $type,
+            new Validator($type)
+        );
     }
 }

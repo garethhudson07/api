@@ -108,6 +108,15 @@ class Api
     }
 
     /**
+     * @param string $name
+     * @return mixed|null
+     */
+    public function resolve(string $name)
+    {
+        return $this->resources->get($name);
+    }
+
+    /**
      * @throws Throwable
      */
     public function authorise()

@@ -25,30 +25,6 @@ use Stitch\DBAL\Schema\Column;
 class Property
 {
     /**
-     * @const array
-     */
-    protected const PASSTHROUGH_MAP = [
-        'validator' => [
-            'required',
-            'minLength',
-            'maxLength',
-            'alpha',
-            'alphaNumeric',
-            'between',
-            'min',
-            'max',
-            'email',
-        ],
-
-        'column' => [
-            'primary',
-            'increments',
-            'references',
-            'on',
-        ]
-    ];
-
-    /**
      * @var string
      */
     protected $name;
@@ -59,11 +35,6 @@ class Property
     protected $type;
 
     /**
-     * @var Column
-     */
-    protected $column;
-
-    /**
      * @var Validator
      */
     protected $validator;
@@ -72,14 +43,12 @@ class Property
      * Property constructor.
      * @param string $name
      * @param string $type
-     * @param Column $column
      * @param Validator $validator
      */
-    public function __construct(string $name, string $type, Column $column, Validator $validator)
+    public function __construct(string $name, string $type, Validator $validator)
     {
         $this->name = $name;
         $this->type = $type;
-        $this->column = $column;
         $this->validator = $validator;
     }
 
@@ -100,17 +69,21 @@ class Property
     }
 
     /**
+     * @return Validator
+     */
+    public function getValidator(): Validator
+    {
+        return $this->validator;
+    }
+
+    /**
      * @param $name
      * @param $arguments
      * @return self
      */
     public function __call($name, $arguments): self
     {
-        if (in_array($name, $this::PASSTHROUGH_MAP['column'])) {
-            $this->column->{$name}(...$arguments);
-        }
-
-        if (in_array($name, $this::PASSTHROUGH_MAP['validator']) || $this->validator->hasRule($name)) {
+        if ($this->validator->hasRule($name)) {
             $this->validator->{$name}(...$arguments);
         }
 

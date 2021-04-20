@@ -4,6 +4,7 @@ namespace Api\Resources;
 
 use Api\Repositories\Contracts\Resource as RepositoryContract;
 use Api\Schema\Schema;
+use Api\Schema\Stitch\Schema as StitchSchema;
 use Api\Kernel;
 use Api\Resources\Relations\Factory as RelationsFactory;
 use Api\Repositories\Stitch\Resource as StitchRepository;
@@ -45,13 +46,20 @@ class Factory
     public function collectable(Closure $callback, ?RepositoryContract $repository = null): Collectable
     {
         $container = $this->kernel->getContainer();
-        $schema = $this->schema($callback);
+
+        if ($repository) {
+            $schema = $this->schema($callback);
+        } else {
+            $schema = $this->stitchSchema($callback);
+
+            $repository = new StitchRepository(
+                new Model($schema->getTable())
+            );
+        }
 
         return new Collectable(
             $schema,
-            $repository ?: new StitchRepository(
-                new Model($schema->getTable())
-            ),
+            $repository,
             $this->relationsFactory->registry($container),
             $this->kernel->resolve(Representation::class),
             $this->kernel->getEmitter()->extend()
@@ -69,9 +77,22 @@ class Factory
      * @param Closure $callback
      * @return Schema
      */
-    protected function schema(Closure $callback)
+    protected function schema(Closure $callback): Schema
     {
         $schema = new Schema();
+
+        $callback($schema);
+
+        return $schema;
+    }
+
+    /**
+     * @param Closure $callback
+     * @return StitchSchema
+     */
+    protected function stitchSchema(Closure $callback): StitchSchema
+    {
+        $schema = new StitchSchema();
 
         $callback($schema);
 

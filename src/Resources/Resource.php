@@ -73,6 +73,14 @@ class Resource
     }
 
     /**
+     * @return Schema
+     */
+    public function getSchema(): Schema
+    {
+        return $this->schema;
+    }
+
+    /**
      * @return mixed
      */
     public function getRepository()
