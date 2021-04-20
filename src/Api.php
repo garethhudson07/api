@@ -185,7 +185,7 @@ class Api
      * @return mixed|ResponseInterface
      * @throws \Throwable
      */
-    protected function try(Closure $callback)
+    public function try(Closure $callback)
     {
         try {
             return $callback();
