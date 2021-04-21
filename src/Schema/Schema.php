@@ -2,9 +2,9 @@
 
 namespace Api\Schema;
 
-use Api\Schema\Validation\Aggregate as Validators;
+use Api\Schema\Validation\Aggregate as ValidatorAggregate;
 use Api\Schema\Validation\ValidationException;
-use Api\Schema\Validation\Validator;
+use Api\Schema\Validation\Factory as ValidatorFactory;
 
 /**
  * Class Schema
@@ -15,24 +15,10 @@ use Api\Schema\Validation\Validator;
  */
 class Schema
 {
-
     /**
      * @var array
      */
     protected $properties = [];
-
-    /**
-     * @var Validators
-     */
-    protected $validators;
-
-    /**
-     * Schema constructor.
-     */
-    public function __construct()
-    {
-        $this->validators = new Validators();
-    }
 
     /**
      * @param array $input
@@ -41,7 +27,29 @@ class Schema
      */
     public function validate(array $input): bool
     {
-        return $this->validators->run($input);
+        $validator = $this->resolveValidator();
+
+        if (!$validator->run($input)) {
+            throw (new ValidationException('The supplied resource is invalid.'))->data([
+                'error_messages' => $validator->getMessages()
+            ]);
+        }
+
+        return true;
+    }
+
+    /**
+     * @return ValidatorAggregate
+     */
+    public function resolveValidator(): ValidatorAggregate
+    {
+        $validator = new ValidatorAggregate();
+
+        foreach ($this->properties as $property) {
+            $validator[$property->getName()] = $property->resolveValidator();
+        }
+
+        return $validator;
     }
 
     /**
@@ -51,22 +59,28 @@ class Schema
      */
     public function __call(string $method, array $arguments): Property
     {
-        return $this->addProperty($method, $arguments[0]);
+        $type = $method;
+
+        if ($method === 'nest') {
+            $type = 'schema';
+        }
+
+        $property = $this->makeProperty($arguments[0], $type);
+
+        $this->addProperty($property);
+
+        return $property;
     }
 
     /**
-     * @param string $type
-     * @param string $name
-     * @return Property
+     * @param $property
+     * @return $this
      */
-    protected function addProperty(string $type, string $name): Property
+    protected function addProperty($property): self
     {
-        $property = $this->makeProperty($name, $type);
+        $this->properties[$property->getName()] = $property;
 
-        $this->properties[$name] = $property;
-        $this->validators[$name] = $property->getValidator();
-
-        return $property;
+        return $this;
     }
 
     /**
@@ -77,8 +91,7 @@ class Schema
     {
         return new Property(
             $name,
-            $type,
-            new Validator($type)
+            ValidatorFactory::make($type)
         );
     }
 }

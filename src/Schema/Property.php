@@ -3,7 +3,9 @@
 namespace Api\Schema;
 
 use Api\Schema\Validation\Validator;
-use Stitch\DBAL\Schema\Column;
+use Api\Schema\Validation\Nested as NestedValidator;
+use Api\Schema\Validation\Factory as ValidatorFactory;
+use Closure;
 
 /**
  * Class Property
@@ -30,25 +32,20 @@ class Property
     protected $name;
 
     /**
-     * @var string
-     */
-    protected $type;
-
-    /**
      * @var Validator
      */
     protected $validator;
 
+    protected $accepts;
+
     /**
      * Property constructor.
      * @param string $name
-     * @param string $type
-     * @param Validator $validator
+     * @param $validator
      */
-    public function __construct(string $name, string $type, Validator $validator)
+    public function __construct(string $name, $validator)
     {
         $this->name = $name;
-        $this->type = $type;
         $this->validator = $validator;
     }
 
@@ -61,19 +58,35 @@ class Property
     }
 
     /**
-     * @return string
+     * @return NestedValidator|Validator
      */
-    public function getType(): string
+    public function resolveValidator()
     {
-        return $this->type;
+        if ($this->validator instanceof NestedValidator && $this->accepts) {
+            $this->validator->childValidator(
+                $this->accepts instanceof Schema ? $this->accepts->resolveValidator() : ValidatorFactory::make($this->accepts)
+            );
+        }
+
+        return $this->validator;
     }
 
     /**
-     * @return Validator
+     * @param $arg
+     * @return $this
      */
-    public function getValidator(): Validator
+    public function accepts($arg)
     {
-        return $this->validator;
+        if ($arg instanceof Closure) {
+            $this->accepts = new schema();
+            $arg($this->accepts);
+
+            return $this;
+        }
+
+        $this->accepts = $arg;
+
+        return $this;
     }
 
     /**

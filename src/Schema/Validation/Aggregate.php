@@ -18,7 +18,6 @@ class Aggregate extends Collection
     /**
      * @param array $input
      * @return bool
-     * @throws ValidationException
      */
     public function run(array $input): bool
     {
@@ -33,11 +32,17 @@ class Aggregate extends Collection
         }
 
         if (count($this->messages) > 0) {
-            throw (new ValidationException('The supplied resource is invalid.'))->data([
-                'error_messages' => $this->messages
-            ]);
+            return false;
         }
 
         return true;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMessages(): array
+    {
+        return $this->messages;
     }
 }

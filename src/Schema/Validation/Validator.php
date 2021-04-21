@@ -32,6 +32,7 @@ class Validator
         'max' => 'Max',
         'email' => 'Email'
     ];
+
     /**
      * @const array
      */

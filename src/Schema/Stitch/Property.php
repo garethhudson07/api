@@ -3,7 +3,6 @@
 namespace Api\Schema\Stitch;
 
 use Api\Schema\Property as BaseProperty;
-use Api\Schema\Validation\Validator;
 use Stitch\DBAL\Schema\Column;
 
 /**
@@ -20,15 +19,22 @@ class Property extends BaseProperty
     /**
      * Property constructor.
      * @param string $name
-     * @param string $type
-     * @param Validator $validator
+     * @param $validator
      * @param Column $column
      */
-    public function __construct(string $name, string $type, Validator $validator, Column $column)
+    public function __construct(string $name, $validator, Column $column)
     {
-        parent::__construct($name, $type, $validator);
+        parent::__construct($name, $validator);
 
         $this->column = $column;
+    }
+
+    /**
+     * @return Column
+     */
+    public function getColumn(): Column
+    {
+        return $this->column;
     }
 
     /**

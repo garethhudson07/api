@@ -3,9 +3,7 @@
 namespace Api\Schema\Stitch;
 
 use Api\Schema\Schema as BaseSchema;
-use Api\Schema\Validation\Aggregate as Validators;
-use Api\Schema\Validation\ValidationException;
-use Api\Schema\Validation\Validator;
+use Api\Schema\Validation\Factory as ValidatorFactory;
 use Stitch\DBAL\Schema\Column;
 use Stitch\DBAL\Schema\Table;
 
@@ -28,8 +26,6 @@ class Schema extends BaseSchema
      */
     public function __construct()
     {
-        parent::__construct();
-
         $this->table = new Table();
     }
 
@@ -64,20 +60,28 @@ class Schema extends BaseSchema
     }
 
     /**
+     * @param $property
+     * @return $this
+     */
+    protected function addProperty($property): self
+    {
+        parent::addProperty($property);
+
+        $this->table->pushColumn($property->getColumn());
+
+        return $this;
+    }
+
+    /**
      * @param string $name
      * @param string $type
      */
     protected function makeProperty(string $name, string $type)
     {
-        $column = new Column($this->table, $name, $type);
-
-        $this->table->pushColumn($column);
-
         return new Property(
             $name,
-            $type,
-            new Validator($type),
-            $column
+            ValidatorFactory::make($type),
+            new Column($this->table, $name, $type)
         );
     }
 }
