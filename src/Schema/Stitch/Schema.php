@@ -63,7 +63,7 @@ class Schema extends BaseSchema
      * @param $property
      * @return $this
      */
-    protected function addProperty($property): self
+    public function addProperty($property): self
     {
         parent::addProperty($property);
 
