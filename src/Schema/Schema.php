@@ -76,7 +76,7 @@ class Schema
      * @param $property
      * @return $this
      */
-    protected function addProperty($property): self
+    public function addProperty($property): self
     {
         $this->properties[$property->getName()] = $property;
 
@@ -93,5 +93,23 @@ class Schema
             $name,
             ValidatorFactory::make($type)
         );
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasProperty(string $name): bool
+    {
+        return array_key_exists($name, $this->properties);
+    }
+
+    /**
+     * @param string $name
+     * @return mixed|null
+     */
+    public function getProperty(string $name)
+    {
+        return $this->properties[$name] ?? null;
     }
 }
