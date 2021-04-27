@@ -58,6 +58,14 @@ class Property
     }
 
     /**
+     * @return mixed
+     */
+    public function getAccepts()
+    {
+        return $this->accepts;
+    }
+
+    /**
      * @return NestedValidator|Validator
      */
     public function resolveValidator()

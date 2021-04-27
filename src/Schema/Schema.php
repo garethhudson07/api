@@ -21,6 +21,14 @@ class Schema
     protected $properties = [];
 
     /**
+     * @return array
+     */
+    public function getProperties(): array
+    {
+        return $this->properties;
+    }
+
+    /**
      * @param array $input
      * @return bool
      * @throws ValidationException
@@ -80,6 +88,19 @@ class Schema
     public function addProperty($property): self
     {
         $this->properties[$property->getName()] = $property;
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return $this
+     */
+    public function removeProperty(string $name): self
+    {
+        if (array_key_exists($name, $this->properties)) {
+            unset($this->properties[$name]);
+        }
 
         return $this;
     }
