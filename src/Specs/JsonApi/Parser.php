@@ -145,4 +145,28 @@ class Parser implements ParserContract
             Str::snake($input)
         )->setDirection($direction);
     }
+
+    /**
+     * @param array $input
+     * @return array
+     */
+    public function attributes(array $input): array
+    {
+        $output = [];
+
+        foreach ($input as $key => $value) {
+            if (!is_integer($key)) {
+                $key = Str::snake($key);
+            }
+
+            if (is_array($value)) {
+                $output[$key] = $this->attributes($value);
+                continue;
+            }
+
+            $output[$key] = $value;
+        }
+
+        return $output;
+    }
 }

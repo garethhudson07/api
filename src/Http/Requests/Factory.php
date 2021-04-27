@@ -78,13 +78,17 @@ class Factory implements FactoryInterface
                 break;
 
             default:
+                $body = json_decode(
+                    file_get_contents("php://input"),
+                    true
+                ) ?: [];
+
+                if (array_key_exists('data', $body) && array_key_exists('attributes', $body['data'])) {
+                    $body['data']['attributes'] = $this->container->get('request.parser')->attributes($body['data']['attributes']);
+                }
+
                 if (($request->getServerParams()['CONTENT_TYPE'] ?? null) === 'application/vnd.api+json') {
-                    $request = $request->withParsedBody(
-                        json_decode(
-                            file_get_contents("php://input"),
-                            true
-                        ) ?: []
-                    );
+                    $request = $request->withParsedBody($body);
                 }
         }
 
