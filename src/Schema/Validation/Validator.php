@@ -38,6 +38,7 @@ class Validator
      */
     protected const MESSAGE_TEMPLATES = [
         'type' => 'Must be of type {{type}}',
+        'notEmpty' => 'This field is required',
         'alpha' => 'Must only contain characters (a-z, A-Z)',
         'alphaNumeric' => 'Must only contain characters (a-z, A-Z, 0-9)',
         'between' => 'must be between {{minValue}} and {{maxValue}}',
