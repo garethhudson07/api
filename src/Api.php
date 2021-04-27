@@ -31,6 +31,14 @@ class Api
     }
 
     /**
+     * @return Kernel
+     */
+    public function getKernel(): Kernel
+    {
+        return $this->kernel;
+    }
+
+    /**
      * @return $this
      */
     protected function registerServices()
