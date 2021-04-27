@@ -168,6 +168,10 @@ class Validator
                 return (new Rules\Optional($this->rules))->assert($value);
             }
 
+            if (!$this->rules->hasRule('NotEmpty')) {
+                $this->rules->addRule(new Rules\NotEmpty());
+            }
+
             return $this->rules->assert($value);
         } catch (NestedValidationException $e) {
             $this->messages = array_values(
