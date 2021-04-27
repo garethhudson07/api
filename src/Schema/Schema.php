@@ -29,9 +29,10 @@ class Schema
     {
         $validator = $this->resolveValidator();
 
+        // TODO move camel casing to representation class
         if (!$validator->run($input)) {
             throw (new ValidationException('The supplied resource is invalid.'))->data([
-                'error_messages' => $validator->getMessages()
+                'errorMessages' => $validator->getMessages()
             ]);
         }
 

@@ -24,9 +24,10 @@ class Collection extends Nested
                     $this->messages['items'] = [];
                 }
 
+                // TODO move camel casing to representation class
                 $this->messages['items'][] = [
                     'index' => $key,
-                    'error_messages' => $this->childValidator->getMessages()
+                    'errorMessages' => $this->childValidator->getMessages()
                 ];
             }
         }

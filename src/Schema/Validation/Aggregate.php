@@ -3,6 +3,7 @@
 namespace Api\Schema\Validation;
 
 use Api\Collection;
+use Api\Support\Str;
 
 /**
  * Class Aggregate
@@ -26,8 +27,9 @@ class Aggregate extends Collection
         foreach ($this->items as $key => $validator) {
             $value = $input[$key] ?? null;
 
+            // TODO move camel casing to dedicated representation class
             if (!$validator->run($value)) {
-                $this->messages[$key] = $validator->getMessages();
+                $this->messages[Str::camel($key)] = $validator->getMessages();
             }
         }
 
