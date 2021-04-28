@@ -12,6 +12,9 @@ use Api\Schema\Validation\Factory as ValidatorFactory;
  * @method Property string(string $name)
  * @method Property integer(string $name)
  * @method Property boolean(string $name)
+ * @method Property decimal(string $name)
+ * @method Property nest(string $name)
+ * @method Property collection(string $name)
  */
 class Schema
 {

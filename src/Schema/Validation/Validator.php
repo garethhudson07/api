@@ -18,7 +18,7 @@ class Validator
     protected const LOCAL_RULES = [
         'required',
         'minLength',
-        'maxLength'
+        'maxLength',
     ];
 
     /**
@@ -30,7 +30,20 @@ class Validator
         'between' => 'Between',
         'min' => 'Min',
         'max' => 'Max',
-        'email' => 'Email'
+        'email' => 'Email',
+        'date' => 'Date',
+        'decimals' => 'Decimal',
+        'uuid' => 'Uuid',
+        'checked' => 'TrueVal',
+    ];
+
+    /**
+     * @const array
+     */
+    protected const TYPE_MAP = [
+        'boolean' => 'bool',
+        'integer' => 'int',
+        'decimal' => 'float',
     ];
 
     /**
@@ -41,18 +54,17 @@ class Validator
         'notEmpty' => 'This field is required',
         'alpha' => 'Must only contain characters (a-z, A-Z)',
         'alphaNumeric' => 'Must only contain characters (a-z, A-Z, 0-9)',
-        'between' => 'must be between {{minValue}} and {{maxValue}}',
+        'between' => 'Must be between {{minValue}} and {{maxValue}}',
         'minLength' => 'Must be a minimum of {{minValue}} characters',
         'maxLength' => 'Must be a maximum of {{maxValue}} characters',
         'min' => 'Must be a minimum of {{interval}}',
         'max' => 'Must be a maximum of {{interval}}',
-        'email' => 'Must be a valid email'
+        'email' => 'Must be a valid email',
+        'date' => 'Must be a valid date',
+        'decimals' => 'Must be {{decimals}} decimal places',
+        'uuid' => 'Must be a valid UUID',
+        'checked' => 'Must be checked',
     ];
-
-    /**
-     * @var string
-     */
-    protected $type;
 
     /**
      * @var bool
@@ -80,7 +92,6 @@ class Validator
      */
     public function __construct(string $type)
     {
-        $this->type = $type;
         $this->rules = new Rules\AllOf();
 
         try {
@@ -189,7 +200,7 @@ class Validator
             if ($this->required && !$this->rules->hasRule('NotEmpty')) {
                 $this->rules->addRule(new Rules\NotEmpty());
             }
-            
+
             $this->rules->assert($value);
         } catch (NestedValidationException $e) {
             $this->messages = array_values(

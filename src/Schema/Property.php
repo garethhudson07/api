@@ -23,6 +23,11 @@ use Closure;
  * @method Property min($minimum)
  * @method Property max($maximum)
  * @method Property email()
+ * @method Property nullable()
+ * @method Property date(string $format = 'Y-m-d')
+ * @method Property decimals(int $places)
+ * @method Property uuid()
+ * @method Property checked()
  */
 class Property
 {
@@ -36,6 +41,9 @@ class Property
      */
     protected $validator;
 
+    /**
+     * @var mixed
+     */
     protected $accepts;
 
     /**
@@ -83,7 +91,7 @@ class Property
      * @param $arg
      * @return $this
      */
-    public function accepts($arg)
+    public function accepts($arg): Property
     {
         if ($arg instanceof Closure) {
             $this->accepts = new schema();
