@@ -51,21 +51,26 @@ class Validator
      * @const array
      */
     protected const MESSAGE_TEMPLATES = [
-        'type' => 'Must be of type {{type}}',
-        'notEmpty' => 'This field is required',
-        'alpha' => 'Must only contain characters (a-z, A-Z)',
-        'alphaNumeric' => 'Must only contain characters (a-z, A-Z, 0-9)',
-        'between' => 'Must be between {{minValue}} and {{maxValue}}',
-        'minLength' => 'Must be a minimum of {{minValue}} characters',
-        'maxLength' => 'Must be a maximum of {{maxValue}} characters',
-        'min' => 'Must be a minimum of {{interval}}',
-        'max' => 'Must be a maximum of {{interval}}',
-        'email' => 'Must be a valid email',
-        'date' => 'Must be a valid date',
-        'decimals' => 'Must be {{decimals}} decimal places',
-        'uuid' => 'Must be a valid UUID',
-        'checked' => 'Must be checked',
+        'type' => 'must be of type {{type}}',
+        'notEmpty' => 'required',
+        'alpha' => 'must only contain characters (a-z, A-Z)',
+        'alphaNumeric' => 'must only contain characters (a-z, A-Z, 0-9)',
+        'between' => 'must be between {{minValue}} and {{maxValue}}',
+        'minLength' => 'must be a minimum of {{minValue}} characters',
+        'maxLength' => 'must be a maximum of {{maxValue}} characters',
+        'min' => 'must be a minimum of {{interval}}',
+        'max' => 'must be a maximum of {{interval}}',
+        'email' => 'must be a valid email',
+        'date' => 'must be a valid date',
+        'decimals' => 'must be {{decimals}} decimal places',
+        'uuid' => 'must be a valid UUID',
+        'checked' => 'must be checked',
     ];
+
+    /**
+     * @var string
+     */
+    protected $type;
 
     /**
      * @var bool
@@ -88,13 +93,8 @@ class Validator
      */
     public function __construct(string $type)
     {
+        $this->type = $type;
         $this->rules = new Rules\AllOf();
-
-        try {
-            $this->rules->addRule(new Rules\Type($type));
-        } catch (ComponentException $e) {
-            // Ignore unknown validation types
-        }
     }
 
     /**
@@ -194,6 +194,13 @@ class Validator
             }
 
             $this->rules->assert($value);
+
+            // Only validate the type if all other validation rules have passed
+            try {
+                (new Rules\AllOf())->addRule(new Rules\Type($this->type))->assert($value);
+            } catch (ComponentException $e) {
+                // Ignore unknown validation types
+            }
         } catch (NestedValidationException $e) {
             $this->messages = array_values(
                 array_filter($e->getMessages($this::MESSAGE_TEMPLATES))
