@@ -58,11 +58,6 @@ class Validator
     /**
      * @var bool
      */
-    protected $required = false;
-
-    /**
-     * @var bool
-     */
     protected $nullable = false;
 
     /**
@@ -96,7 +91,7 @@ class Validator
      */
     public function required(): self
     {
-        $this->required = true;
+        $this->rules->addRule(new Rules\NotEmpty());
 
         return $this;
     }
@@ -187,14 +182,10 @@ class Validator
                 return true;
             }
 
-            if ($this->required && !$this->rules->hasRule('NotEmpty')) {
-                $this->rules->addRule(new Rules\NotEmpty());
-            }
-
             $this->rules->assert($value);
         } catch (NestedValidationException $e) {
             $this->messages = array_values(
-                array_filter($e->findMessages($this::MESSAGE_TEMPLATES))
+                array_filter($e->getMessages($this::MESSAGE_TEMPLATES))
             );
 
             return false;
