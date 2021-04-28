@@ -5,6 +5,7 @@ namespace Api\Schema;
 use Api\Schema\Validation\Aggregate as ValidatorAggregate;
 use Api\Schema\Validation\ValidationException;
 use Api\Schema\Validation\Factory as ValidatorFactory;
+use Closure;
 
 /**
  * Class Schema
@@ -62,6 +63,20 @@ class Schema
         }
 
         return $validator;
+    }
+
+    /**
+     * @param $condition
+     * @param Closure $callback
+     * @return $this
+     */
+    public function when($condition, Closure $callback): self
+    {
+        if ($condition) {
+            $callback($this);
+        }
+
+        return $this;
     }
 
     /**
