@@ -17,6 +17,7 @@ class Validator
      */
     protected const LOCAL_RULES = [
         'required',
+        'nullable',
         'minLength',
         'maxLength',
     ];
