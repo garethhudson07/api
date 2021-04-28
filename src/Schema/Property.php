@@ -106,6 +106,20 @@ class Property
     }
 
     /**
+     * @param bool $condition
+     * @param Closure $callback
+     * @return $this
+     */
+    public function when(bool $condition, Closure $callback): self
+    {
+        if ($condition) {
+            $callback($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param $name
      * @param $arguments
      * @return self
