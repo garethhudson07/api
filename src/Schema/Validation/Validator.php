@@ -17,6 +17,7 @@ class Validator
      */
     protected const LOCAL_RULES = [
         'required',
+        'nullable',
         'minLength',
         'maxLength'
     ];
@@ -189,7 +190,7 @@ class Validator
             if ($this->required && !$this->rules->hasRule('NotEmpty')) {
                 $this->rules->addRule(new Rules\NotEmpty());
             }
-            
+
             $this->rules->assert($value);
         } catch (NestedValidationException $e) {
             $this->messages = array_values(
