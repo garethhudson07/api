@@ -78,9 +78,14 @@ class Validator
     protected $type;
 
     /**
-     * @var Rules\AllOf
+     * @var array
      */
-    protected $rules;
+    protected $rules = [];
+
+    /**
+     * @var bool
+     */
+    protected $required = false;
 
     /**
      * @var bool
@@ -104,7 +109,6 @@ class Validator
     public function __construct(string $type)
     {
         $this->type = $type;
-        $this->rules = new Rules\AllOf();
     }
 
     /**
@@ -112,9 +116,7 @@ class Validator
      */
     public function required(): self
     {
-        $this->rules->addRule(
-            (new Rules\NotEmpty())->setTemplate($this::MESSAGE_TEMPLATES['required'])
-        );
+        $this->required = true;
 
         return $this;
     }
@@ -155,12 +157,10 @@ class Validator
     public function minLength(int $length, ?Closure $callback = null): self
     {
         try {
-            $this->rules->addRule(
-                $this->makeRule(
-                    'minLength',
-                    'Length',
-                    array_filter([$length, $callback])
-                )
+            $this->rules[] = $this->makeRule(
+                'minLength',
+                'Length',
+                array_filter([$length, $callback])
             );
         } catch (ComponentException $e) {
             // Ignore invalid length rules
@@ -177,12 +177,10 @@ class Validator
     public function maxLength(int $length, ?Closure $callback = null): self
     {
         try {
-            $this->rules->addRule(
-                $this->makeRule(
-                    'maxLength',
-                    'Length',
-                    array_merge([null, $length], array_filter([$callback]))
-                )
+            $this->rules[] = $this->makeRule(
+                'maxLength',
+                'Length',
+                array_merge([null, $length], array_filter([$callback]))
             );
         } catch (ComponentException $e) {
             // Ignore invalid length rules
@@ -199,9 +197,7 @@ class Validator
     public function __call(string $name, array $arguments): self
     {
         if ($this->hasRule($name)) {
-            $this->rules->addRule(
-                $this->makeRule($name, $this::RULE_MAP[$name], $arguments)
-            );
+            $this->rules[] = $this->makeRule($name, $this::RULE_MAP[$name], $arguments);
         }
 
         return $this;
@@ -246,19 +242,38 @@ class Validator
      */
     public function run($value): bool
     {
+        // Validate required in isolation as we don't want additional
+        // errors if the attribute is missing altogether
+        if ($this->required && !$this->assert(
+            new Rules\AllOf((new Rules\NotEmpty())->setTemplate($this::MESSAGE_TEMPLATES['required'])),
+            $value
+        )) {
+            return false;
+        }
+
+        $rules = new Rules\AllOf(...$this->rules);
+
         try {
-            $rules = new Rules\AllOf(...$this->rules->getRules());
+            $rules->addRule(new Rules\Type($this->type));
+        } catch (ComponentException $e) {
+            // Ignore unknown validation types
+        }
 
-            try {
-                $rules->addRule(new Rules\Type($this->type));
-            } catch (ComponentException $e) {
-                // Ignore unknown validation types
-            }
+        if ($this->nullable) {
+            $rules = (new Rules\Nullable($rules));
+        }
 
-            if ($this->nullable) {
-                $rules = (new Rules\Nullable($rules));
-            }
+        return $this->assert($rules, $value);
+    }
 
+    /**
+     * @param $rules
+     * @param $value
+     * @return bool
+     */
+    protected function assert($rules, $value): bool
+    {
+        try {
             $rules->assert($value);
         } catch (NestedValidationException $e) {
             $this->messages = array_values(
