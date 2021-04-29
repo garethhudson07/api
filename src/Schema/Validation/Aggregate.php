@@ -25,6 +25,10 @@ class Aggregate extends Collection
         $this->messages = [];
 
         foreach ($this->items as $key => $validator) {
+            if (!array_key_exists($key, $input) && $validator->isSometimes()) {
+                continue;
+            }
+
             $value = $input[$key] ?? null;
 
             // TODO move camel casing to dedicated representation class
