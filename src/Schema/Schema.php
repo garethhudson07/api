@@ -43,8 +43,6 @@ class Schema
 
         // TODO move camel casing to representation class
         if (!$validator->run($input)) {
-            var_dump($validator->getMessages());
-
             throw (new ValidationException('The supplied resource is invalid.'))->data([
                 'errorMessages' => $validator->getMessages()
             ]);
