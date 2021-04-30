@@ -68,6 +68,14 @@ class Property
     }
 
     /**
+     * @return Validator
+     */
+    public function getValidator()
+    {
+        return $this->validator;
+    }
+
+    /**
      * @return mixed
      */
     public function getAccepts()
