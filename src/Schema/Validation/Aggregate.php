@@ -29,6 +29,8 @@ class Aggregate extends Collection
                 continue;
             }
 
+            $validator->callHook('before', $input);
+
             $value = $input[$key] ?? null;
 
             // TODO move camel casing to dedicated representation class

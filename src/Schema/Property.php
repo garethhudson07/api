@@ -98,6 +98,17 @@ class Property
     }
 
     /**
+     * @param Closure $callback
+     * @return $this
+     */
+    public function beforeValidation(Closure $callback): self
+    {
+        $this->validator->before($callback);
+
+        return $this;
+    }
+
+    /**
      * @param $arg
      * @return $this
      */

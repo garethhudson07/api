@@ -103,6 +103,13 @@ class Validator
     protected $messages = [];
 
     /**
+     * @var array
+     */
+    protected $hooks = [
+        'before' => null
+    ];
+
+    /**
      * Validator constructor.
      * @param string $type
      */
@@ -292,5 +299,32 @@ class Validator
     public function getMessages(): array
     {
         return $this->messages;
+    }
+
+    /**
+     * @param Closure $callback
+     * @return $this
+     */
+    public function before(Closure $callback): self
+    {
+        $this->hooks['before'] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param $data
+     * @return $this
+     */
+    public function callHook(string $name, $data):self
+    {
+        if (!$this->hooks[$name]) {
+            return $this;
+        }
+
+        $this->hooks[$name]($this, $data);
+
+        return $this;
     }
 }
