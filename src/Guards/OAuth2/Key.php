@@ -71,6 +71,14 @@ class Key implements KeyContract
     }
 
     /**
+     * @return bool
+     */
+    public function ready(): bool
+    {
+        return $this->clientId !== null;
+    }
+
+    /**
      * @return $this
      */
     public function handle(): KeyContract

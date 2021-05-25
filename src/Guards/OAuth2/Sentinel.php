@@ -39,15 +39,26 @@ class Sentinel implements SentinelContract
     }
 
     /**
+     * @return $this
+     * @throws AuthException
+     */
+    protected function prepare(): self
+    {
+        if (!$this->key->ready()) {
+            $this->key->handle();
+        }
+
+        return $this;
+    }
+
+    /**
      * @param Pipeline $pipeline
      * @return $this
      * @throws Exception
      */
     public function protect(Pipeline $pipeline): SentinelContract
     {
-        $this->key->handle();
-
-        $this->checkPipeline($pipeline);
+        $this->prepare()->checkPipeline($pipeline);
 
         if ($this->request->getMethod() === 'GET') {
             $this->checkRelations(
@@ -80,6 +91,8 @@ class Sentinel implements SentinelContract
      */
     public function verify(string $operation, string $resource)
     {
+        $this->prepare();
+
         $scopes = $this->key->getScopes();
 
         if ($scopes === null || !$scopes->can($operation, $resource)) {
