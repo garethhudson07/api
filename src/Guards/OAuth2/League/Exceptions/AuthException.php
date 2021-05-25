@@ -37,6 +37,6 @@ class AuthException extends ApiException implements ApiExceptionInterface
      */
     public function prepareResponse(ResponseInterface $response): ResponseInterface
     {
-        return $this->baseException->generateHttpResponse($response);
+        return $this->baseException ? $this->baseException->generateHttpResponse($response) : parent::prepareResponse($response);
     }
 }
