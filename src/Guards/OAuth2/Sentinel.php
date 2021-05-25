@@ -78,7 +78,7 @@ class Sentinel implements SentinelContract
      * @param string $resource
      * @throws Exception
      */
-    protected function verify(string $operation, string $resource)
+    public function verify(string $operation, string $resource)
     {
         $scopes = $this->key->getScopes();
 
