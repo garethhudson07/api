@@ -317,14 +317,23 @@ class Validator
      * @param $data
      * @return $this
      */
-    public function callHook(string $name, $data):self
+    public function callHook(string $name, $data): self
     {
-        if (!$this->hooks[$name]) {
+        if (!$this->hasHook($name)) {
             return $this;
         }
 
         $this->hooks[$name]($this, $data);
 
         return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasHook(string $name): bool
+    {
+        return $this->hooks[$name] !== null;
     }
 }

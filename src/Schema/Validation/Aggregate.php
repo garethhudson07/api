@@ -29,7 +29,12 @@ class Aggregate extends Collection
                 continue;
             }
 
-            $validator->callHook('before', $input);
+            if ($validator->hasHook('before')) {
+                // We need a clone of our validator object so that different collection items of the same time
+                // can have individual validation rules
+                $validator = clone $validator;
+                $validator->callHook('before', $input);
+            }
 
             $value = $input[$key] ?? null;
 
