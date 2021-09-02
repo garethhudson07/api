@@ -23,10 +23,29 @@ class Schema extends BaseSchema
 
     /**
      * Schema constructor.
+     * @param Table $table
      */
-    public function __construct()
+    public function __construct(Table $table)
     {
-        $this->table = new Table();
+        $this->table = $table;
+
+        $this->mapTable();;
+    }
+
+    /**
+     *
+     */
+    protected function mapTable(): void
+    {
+        foreach ($this->table->getColumns() as $column) {
+            $property = new Property(
+                $column->getName(),
+                ValidatorFactory::make($column->getType()),
+                $column
+            );
+
+            $this->addProperty($property);
+        }
     }
 
     /**

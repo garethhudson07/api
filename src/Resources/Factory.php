@@ -10,6 +10,7 @@ use Api\Resources\Relations\Factory as RelationsFactory;
 use Api\Repositories\Stitch\Resource as StitchRepository;
 use Api\Specs\Contracts\Representation;
 use Closure;
+use Stitch\DBAL\Schema\Table;
 use Stitch\Model;
 
 class Factory
@@ -29,7 +30,7 @@ class Factory
     /**
      * @return Registry
      */
-    public function registry()
+    public function registry(): Registry
     {
         if (!$this->registry) {
             $this->registry = new Registry($this->kernel->getContainer(), $this);
@@ -39,28 +40,24 @@ class Factory
     }
 
     /**
-     * @param Closure $callback
-     * @param RepositoryContract|null $repository
+     * @param mixed ...$arguments
      * @return Collectable
      */
-    public function collectable(Closure $callback, ?RepositoryContract $repository = null): Collectable
+    public function collectable(...$arguments): Collectable
     {
-        $container = $this->kernel->getContainer();
-
-        if ($repository) {
-            $schema = $this->schema($callback);
-        } else {
-            $schema = $this->stitchSchema($callback);
-
+        if ($arguments[0] instanceof Closure) {
+            $schema = $this->stitchSchema($arguments[0]);
             $repository = new StitchRepository(
                 new Model($schema->getTable())
             );
+        } else {
+            list($schema, $repository) = $arguments;
         }
 
         return new Collectable(
             $schema,
             $repository,
-            $this->relationsFactory->registry($container),
+            $this->relationsFactory->registry($this->kernel->getContainer()),
             $this->kernel->resolve(Representation::class),
             $this->kernel->getEmitter()->extend()
         );
@@ -77,7 +74,7 @@ class Factory
      * @param Closure $callback
      * @return Schema
      */
-    protected function schema(Closure $callback): Schema
+    public function schema(Closure $callback): Schema
     {
         $schema = new Schema();
 
@@ -90,9 +87,9 @@ class Factory
      * @param Closure $callback
      * @return StitchSchema
      */
-    protected function stitchSchema(Closure $callback): StitchSchema
+    public function stitchSchema(Closure $callback): StitchSchema
     {
-        $schema = new StitchSchema();
+        $schema = new StitchSchema(new Table());
 
         $callback($schema);
 

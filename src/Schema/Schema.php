@@ -100,6 +100,15 @@ class Schema
     }
 
     /**
+     * @param string $name
+     * @return mixed|null
+     */
+    public function __get(string $name)
+    {
+        return $this->getProperty($name);
+    }
+
+    /**
      * @param $property
      * @return $this
      */
