@@ -49,7 +49,7 @@ class Query
 
         return (new static(
             $parser,
-            $segments[count($segments) - 1]
+            $segments[count($segments) - 1] ?? ''
         ))->parseRelations($params[$config->get('relationsKey')] ?? '')
             ->parseFields($params[$config->get('fieldsKey')] ?? '')
             ->parseFilters($params[$config->get('filtersKey')] ?? '')
