@@ -2,15 +2,14 @@
 
 namespace Api\Specs\JsonApi;
 
-use Api\Specs\Contracts\Representation as RepresentationContract;
 use Api\Queries\Relation as RequestRelation;
 use Api\Queries\Relations as RequestRelations;
+use Api\Specs\Contracts\Representation as RepresentationContract;
 use Api\Support\Str;
 use Neomerx\JsonApi\Encoder\Encoder;
 use Neomerx\JsonApi\Schema\Arr as ArrSchema;
 use Neomerx\JsonApi\Wrappers\Arr;
 use Psr\Http\Message\ServerRequestInterface;
-use function utf8_encode;
 
 /**
  * Class JsonApi
@@ -37,20 +36,17 @@ class Representation implements RepresentationContract
      * @param string $name
      * @param ServerRequestInterface $request
      * @param array $collection
-     * @return mixed|string
+     * @return string|null
      */
-    public function forCollection(string $name, ServerRequestInterface $request, array $collection)
+    public function forCollection(string $name, ServerRequestInterface $request, array $collection): ?string
     {
-        if($query = $request->getAttribute('query')) {
+        if ($query = $request->getAttribute('query')) {
             $this->encoder->withIncludedPaths(
                 $this->collapseRelations($query->relations())
             );
         }
 
-        return $this->encoder->encodeCollectionArray(
-            $name,
-            $this->prepare($collection)
-        );
+        return $this->prepare($this->encoder->encodeCollectionArray($name, $collection));
     }
 
     /**
@@ -65,60 +61,31 @@ class Representation implements RepresentationContract
             /** @var RequestRelation $relation */
             if ($relation->getRelations()->count()) {
                 $collapsed = array_merge($collapsed, array_map(function ($subRelation) use ($relation) {
-                    return Str::camel($relation->getName()) . '.' . $subRelation;
+                    return $relation->getName() . '.' . $subRelation;
                 }, $this->collapseRelations($relation->getRelations())));
 
                 continue;
             }
 
-            $collapsed[] = Str::camel($relation->getName());
+            $collapsed[] = $relation->getName();
         }
 
         return $collapsed;
     }
 
-
-
     /**
      * @param mixed $data
-     * @return mixed
+     * @return string|null
      */
-    protected function prepare($data)
+    protected function prepare($data): ?string
     {
-//        $data = $this->encodeUtf8($data);
+        if (is_string($data)) {
+            $data = json_decode($data, true);
+        }
+
         $data = $this->camelKeys($data);
 
-        return $data;
-    }
-
-    /**
-     * @param $string
-     * @return string|string[]|null
-     */
-    protected function unicode2html($string) {
-        return preg_replace_callback('/[\x{80}-\x{10FFFF}]/u', function ($m) {
-            $char = current($m);
-            $utf = iconv('UTF-8', 'UCS-4', $char);
-            return sprintf("&#x%s;", ltrim(strtoupper(bin2hex($utf)), "0"));
-        }, $string);
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     * @noinspection PhpUnused
-     */
-    protected function encodeUtf8(array $data): array
-    {
-        return array_map(function ($datum) {
-            if (is_array($datum)) {
-                return $this->encodeUtf8($datum);
-            }
-            if (!is_string($datum)) {
-                return $datum;
-            }
-            return $this->unicode2html(utf8_encode($datum));
-        }, $data);
+        return json_encode($data) ?: null;
     }
 
     /**
@@ -147,19 +114,16 @@ class Representation implements RepresentationContract
      * @param string $name
      * @param ServerRequestInterface $request
      * @param array $item
-     * @return mixed|string
+     * @return string|null
      */
-    public function forSingleton(string $name, ServerRequestInterface $request, array $item)
+    public function forSingleton(string $name, ServerRequestInterface $request, array $item): ?string
     {
-        if($query = $request->getAttribute('query')) {
+        if ($query = $request->getAttribute('query')) {
             $this->encoder->withIncludedPaths(
                 $this->collapseRelations($query->relations())
             );
         }
 
-        return $this->encoder->encodeSingletonArray(
-            $name,
-            $this->prepare($item)
-        );
+        return $this->prepare($this->encoder->encodeSingletonArray($name, $item));
     }
 }
