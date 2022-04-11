@@ -218,6 +218,11 @@ class Resource
             return null;
         }
 
+        // return $this->representation->record(
+//              $pipe->getEntity()->getName(),
+        //      $this->transformer->record($record)
+        //);
+
         return $this->representation->forSingleton(
             $pipe->getEntity()->getName(),
             $request,

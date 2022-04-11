@@ -3,8 +3,10 @@
 namespace Api\Result\Contracts;
 
 use ArrayAccess;
+use Countable;
+use IteratorAggregate;
 
-interface Record extends ArrayAccess
+interface Set extends ArrayAccess, IteratorAggregate, Countable
 {
     public function transform(): array;
 }

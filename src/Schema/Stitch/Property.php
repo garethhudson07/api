@@ -30,6 +30,17 @@ class Property extends BaseProperty
     }
 
     /**
+     * @param string $name
+     * @return $this
+     */
+    public function column(string $name): self
+    {
+        $this->column->rename($name);
+
+        return $this;
+    }
+
+    /**
      * @return Column
      */
     public function getColumn(): Column

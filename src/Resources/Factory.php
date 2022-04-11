@@ -2,7 +2,6 @@
 
 namespace Api\Resources;
 
-use Api\Repositories\Contracts\Resource as RepositoryContract;
 use Api\Schema\Schema;
 use Api\Schema\Stitch\Schema as StitchSchema;
 use Api\Kernel;
@@ -10,7 +9,6 @@ use Api\Resources\Relations\Factory as RelationsFactory;
 use Api\Repositories\Stitch\Resource as StitchRepository;
 use Api\Specs\Contracts\Representation;
 use Closure;
-use Stitch\DBAL\Schema\Table;
 use Stitch\Model;
 
 class Factory
@@ -89,7 +87,7 @@ class Factory
      */
     public function stitchSchema(Closure $callback): StitchSchema
     {
-        $schema = new StitchSchema(new Table());
+        $schema = new StitchSchema();
 
         $callback($schema);
 
