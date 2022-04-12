@@ -39,4 +39,16 @@ class Aggregate extends Map
     {
         $callback($this->items[$name]);
     }
+
+    /**
+     * @param mixed $key
+     * @param mixed $value
+     * @return static
+     */
+    public function put(mixed $key, mixed $value): static
+    {
+        $this->offsetSet($key, $value);
+
+        return $this;
+    }
 }

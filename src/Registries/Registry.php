@@ -35,7 +35,7 @@ class Registry extends Aggregate
     {
         $binding = (new Binding($this))->value($value);
 
-        $this->offsetSet($key, $binding);
+        $this->put($key, $binding);
 
         // The supplied key may have been null, provide the binding object the actual key
         $binding->key(
@@ -87,5 +87,17 @@ class Registry extends Aggregate
         }
 
         return $this->container->get($value);
+    }
+
+    /**
+     * @param mixed $key
+     * @param mixed $value
+     * @return static
+     */
+    public function put(mixed $key, mixed $value): static
+    {
+        $this->offsetSet($key, $value);
+
+        return $this;
     }
 }
