@@ -2,10 +2,10 @@
 
 namespace Api\Config;
 
-use Api\Collection;
+use Aggregate\Map;
 use Closure;
 
-class Aggregate extends Collection
+class Aggregate extends Map
 {
     /**
      * @param Aggregate $aggregate
@@ -14,7 +14,7 @@ class Aggregate extends Collection
     public function inherit(Aggregate $aggregate)
     {
         foreach ($aggregate as $name => $config) {
-            $this->put(
+            $this->set(
                 $name,
                 $config->extend()
             );

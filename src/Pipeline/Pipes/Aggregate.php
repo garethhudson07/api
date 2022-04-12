@@ -2,31 +2,15 @@
 
 namespace Api\Pipeline\Pipes;
 
-use Api\Collection;
+use Aggregate\Set;
 
-class Aggregate extends Collection
+class Aggregate extends Set
 {
-    /**
-     * @return mixed|null
-     */
-    public function last()
-    {
-        return $this->items[count($this->items) - 1] ?? null;
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function penultimate()
-    {
-        return $this->items[count($this->items) - 2] ?? null;
-    }
-
     /**
      * @param Pipe $pipe
      * @return array
      */
-    public function before(Pipe $pipe)
+    public function beforePipe(Pipe $pipe)
     {
         return array_slice($this->items, 0, array_search($pipe, $this->items));
     }
@@ -35,7 +19,7 @@ class Aggregate extends Collection
      * @param Pipe $pipe
      * @return array
      */
-    public function after(Pipe $pipe)
+    public function afterPipe(Pipe $pipe)
     {
         return array_slice($this->items, array_search($pipe, $this->items) + 1);
     }

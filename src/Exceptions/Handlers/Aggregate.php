@@ -2,11 +2,11 @@
 
 namespace Api\Exceptions\Handlers;
 
-use Api\Collection;
+use Aggregate\Set;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
-class Aggregate extends Collection
+class Aggregate extends Set
 {
     /**
      * @return Aggregate

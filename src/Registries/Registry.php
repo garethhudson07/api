@@ -2,7 +2,7 @@
 
 namespace Api\Registries;
 
-use Api\Collection;
+use Aggregate\Aggregate;
 use Api\Container;
 use Closure;
 
@@ -10,7 +10,7 @@ use Closure;
  * Class Registry
  * @package Api
  */
-class Registry extends Collection
+class Registry extends Aggregate
 {
     /**
      * @var Container
@@ -53,7 +53,7 @@ class Registry extends Collection
      */
     public function offsetGet($offset)
     {
-        if ($this->has($offset)) {
+        if ($this->offsetExists($offset)) {
             $item = $this->items[$offset];
 
             if ($item instanceof Binding) {

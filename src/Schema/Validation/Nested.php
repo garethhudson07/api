@@ -10,10 +10,6 @@ abstract class Nested
 
     protected $messages = [];
 
-    /**
-     * Collection constructor.
-     * @param $baseValidator
-     */
     public function __construct($baseValidator)
     {
         $this->baseValidator = $baseValidator;

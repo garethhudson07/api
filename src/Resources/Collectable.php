@@ -12,7 +12,7 @@ use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Class Collection
+ * Class Collectable
  * @package Api\Resources
  */
 class Collectable extends Resource

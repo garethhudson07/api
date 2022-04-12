@@ -7,7 +7,7 @@ use Api\Container;
 use Closure;
 
 /**
- * Class Collection
+ * Class Registry
  * @package Api\Resources\Relations
  */
 class Registry extends BaseRegistry

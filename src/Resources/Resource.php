@@ -25,7 +25,7 @@ class Resource
     protected $schema;
 
     /**
-     * @var Resource
+     * @var RepositoryInterface
      */
     protected $repository;
 
@@ -45,7 +45,7 @@ class Resource
     protected $emitter;
 
     /**
-     * @var array
+     * @var Endpoints
      */
     protected $endpoints;
 
@@ -179,7 +179,7 @@ class Resource
      */
     public function getRelation(string $name): ?Relation
     {
-        return $this->relations->get($name);
+        return $this->relations->offsetGet($name);
     }
 
     /**
