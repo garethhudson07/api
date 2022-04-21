@@ -5,7 +5,7 @@ namespace Api\Repositories\Contracts;
 use Api\Pipeline\Pipes\Pipe;
 use Psr\Http\Message\ServerRequestInterface;
 use Api\Result\Stitch\Record as ResultRecord;
-use Api\Result\Stitch\Collection as ResultSet;
+use Api\Result\Stitch\Set as ResultSet;
 
 /**
  * Interface Repository

@@ -6,7 +6,7 @@ use Api\Pipeline\Pipes\Pipe;
 use Api\Repositories\Contracts\Resource as RepositoryInterface;
 use Api\Repositories\Stitch\Bridge\QueryResolver;
 use Api\Repositories\Stitch\Bridge\RelationshipResolver;
-use Api\Result\Stitch\Collection as ResultSet;
+use Api\Result\Stitch\Set as ResultSet;
 use Api\Result\Stitch\Record as ResultRecord;
 use Exception;
 use Stitch\Model;

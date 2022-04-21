@@ -51,7 +51,7 @@ class Registry extends Aggregate
      * @param mixed $offset
      * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         if ($this->offsetExists($offset)) {
             $item = $this->items[$offset];
@@ -64,6 +64,15 @@ class Registry extends Aggregate
         }
 
         return null;
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function get(string $name): mixed
+    {
+        return $this->offsetGet($name);
     }
 
     /**
