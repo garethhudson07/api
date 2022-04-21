@@ -11,6 +11,7 @@ use Api\Resources\Relations\Relation;
 use Api\Schema\Schema;
 use Api\Specs\Contracts\Representations\Factory as RepresentationFactoryInterface;
 use Api\Result\Contracts\Record as ResultRecordInterface;
+use Api\Transformers\Contracts\Transformer as TransformerInterface;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -63,9 +64,10 @@ class Resource
      * @param RepositoryInterface $repository
      * @param Relations $relations
      * @param RepresentationFactoryInterface $representationFactory
+     * @param TransformerInterface $transformer
      * @param EmitterInterface $emitter
      */
-    public function __construct(Schema $schema, RepositoryInterface $repository, Relations $relations, RepresentationFactoryInterface $representationFactory, $transformer, EmitterInterface $emitter)
+    public function __construct(Schema $schema, RepositoryInterface $repository, Relations $relations, RepresentationFactoryInterface $representationFactory, TransformerInterface $transformer, EmitterInterface $emitter)
     {
         $this->schema = $schema;
         $this->repository = $repository;

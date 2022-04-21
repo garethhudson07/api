@@ -7,6 +7,7 @@ use Api\Resources\Relations\Registry as Relations;
 use Api\Schema\Schema;
 use Api\Repositories\Contracts\Resource as RepositoryInterface;
 use Api\Specs\Contracts\Representations\Factory as RepresentationFactoryInterface;
+use Api\Transformers\Contracts\Transformer as TransformerInterface;
 use Api\Events\Contracts\Emitter as EmitterInterface;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,9 +24,10 @@ class Collectable extends Resource
      * @param RepositoryInterface $repository
      * @param Relations $relations
      * @param RepresentationFactoryInterface $representationFactory
+     * @param TransformerInterface $transformer
      * @param EmitterInterface $emitter
      */
-    public function __construct(Schema $schema, RepositoryInterface $repository, Relations $relations, RepresentationFactoryInterface $representationFactory, $transformer, EmitterInterface $emitter)
+    public function __construct(Schema $schema, RepositoryInterface $repository, Relations $relations, RepresentationFactoryInterface $representationFactory, TransformerInterface $transformer, EmitterInterface $emitter)
     {
         parent::__construct($schema, $repository, $relations, $representationFactory, $transformer, $emitter);
 

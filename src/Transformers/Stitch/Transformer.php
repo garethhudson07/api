@@ -2,9 +2,10 @@
 
 namespace Api\Transformers\Stitch;
 
+use Api\Transformers\Contracts\Transformer as Contract;
 use Api\Result\Contracts\Record;
 
-class Transformer
+class Transformer implements Contract
 {
     protected $schema;
 
