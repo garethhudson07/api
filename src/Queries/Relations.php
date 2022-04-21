@@ -2,9 +2,9 @@
 
 namespace Api\Queries;
 
-use Api\Collection;
+use Aggregate\Set;
 
-class Relations extends Collection
+class Relations extends Set
 {
     /**
      * @param string $name

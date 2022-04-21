@@ -155,7 +155,7 @@ class Pipeline implements PipelineInterface
      */
     public function before(Pipe $pipe)
     {
-        return $this->pipes->before($pipe);
+        return $this->pipes->beforePipe($pipe);
     }
 
     /**
@@ -164,7 +164,7 @@ class Pipeline implements PipelineInterface
      */
     public function after(Pipe $pipe)
     {
-        return $this->pipes->after($pipe);
+        return $this->pipes->afterPipe($pipe);
     }
 
     /**

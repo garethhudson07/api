@@ -2,11 +2,14 @@
 
 namespace Api\Repositories\Stitch\Bridge;
 
-use Api\Repositories\Contracts\Record as RecordInterface;
+use Aggregate\Contracts\Arrayable;
 use Stitch\Result\Record as ResultRecord;
 
-class Record implements RecordInterface
+class Record implements Arrayable
 {
+    /**
+     * @var ResultRecord
+     */
     protected $resultRecord;
 
     public function __construct(ResultRecord $resultRecord)
@@ -14,13 +17,19 @@ class Record implements RecordInterface
         $this->resultRecord = $resultRecord;
     }
 
-    public function getId()
+    /**
+     * @return array
+     */
+    public function toArray(): array
     {
-
+        return $this->resultRecord->toArray();
     }
 
-    public function getAttributes($author): iterable
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize(): mixed
     {
-        return $this->resultRecord->getData();
+        return $this->resultRecord->toArray();
     }
 }

@@ -4,7 +4,7 @@ namespace Api\Resources;
 
 
 /**
- * Class Collection
+ * Class Singleton
  * @package Api\Resources
  */
 class Singleton extends Resource

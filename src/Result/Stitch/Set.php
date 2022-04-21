@@ -3,10 +3,10 @@
 
 namespace Api\Result\Stitch;
 
-use Api\Collection as BaseCollection;
+use Aggregate\Set as BaseSet;
 use Stitch\Result\Set as StitchResultSet;
 
-class Collection extends BaseCollection
+class Set extends BaseSet
 {
     /**
      * @param StitchResultSet $resultSet

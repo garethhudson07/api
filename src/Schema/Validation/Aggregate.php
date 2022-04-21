@@ -2,14 +2,14 @@
 
 namespace Api\Schema\Validation;
 
-use Api\Collection;
+use Aggregate\Map;
 use Api\Support\Str;
 
 /**
  * Class Aggregate
  * @package Api\Schema\Validation
  */
-class Aggregate extends Collection
+class Aggregate extends Map
 {
     /**
      * @var array

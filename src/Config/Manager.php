@@ -2,7 +2,7 @@
 
 namespace Api\Config;
 
-use Api\Collection;
+use Aggregate\Map;
 use Exception;
 
 class Manager
@@ -20,7 +20,7 @@ class Manager
      */
     public function __construct()
     {
-        $this->stores = new Collection();
+        $this->stores = new Map();
     }
 
     /**
@@ -32,7 +32,7 @@ class Manager
      */
     public function add(string $name, Store $store)
     {
-        $this->stores->put($name, $store);
+        $this->stores->set($name, $store);
 
         return $this;
     }
@@ -80,7 +80,7 @@ class Manager
     }
 
     /**
-     * Dertermine the name of the enabled service
+     * Determine the name of the enabled service
      *
      * @return mixed
      */
@@ -163,7 +163,7 @@ class Manager
             $store = $this->service($using);
         } else {
             $store = $this->parent->service($using)->extend();
-            $this->stores->put($using, $store);
+            $this->stores->set($using, $store);
         }
 
         $store->set($key, $value);

@@ -2,10 +2,10 @@
 
 namespace Api\Config;
 
-use Api\Collection;
+use Aggregate\Map;
 use Closure;
 
-class Aggregate extends Collection
+class Aggregate extends Map
 {
     /**
      * @param Aggregate $aggregate
@@ -14,7 +14,7 @@ class Aggregate extends Collection
     public function inherit(Aggregate $aggregate)
     {
         foreach ($aggregate as $name => $config) {
-            $this->put(
+            $this->set(
                 $name,
                 $config->extend()
             );
@@ -38,5 +38,17 @@ class Aggregate extends Collection
     public function configure(string $name, Closure $callback)
     {
         $callback($this->items[$name]);
+    }
+
+    /**
+     * @param mixed $key
+     * @param mixed $value
+     * @return static
+     */
+    public function put(mixed $key, mixed $value): static
+    {
+        $this->offsetSet($key, $value);
+
+        return $this;
     }
 }
