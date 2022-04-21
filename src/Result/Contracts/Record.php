@@ -2,9 +2,11 @@
 
 namespace Api\Result\Contracts;
 
-use ArrayAccess;
-
-interface Record extends ArrayAccess
+interface Record
 {
-    public function transform(): array;
+    public function getRelations(): iterable;
+
+    public function getAttributes(): array;
+
+    public function getAttribute(string $key): mixed;
 }

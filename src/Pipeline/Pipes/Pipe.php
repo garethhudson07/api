@@ -23,7 +23,7 @@ class Pipe
 
     protected $scope;
 
-    protected $data = [];
+    protected $result = [];
 
     protected $operation;
 
@@ -131,9 +131,9 @@ class Pipe
     /**
      * @return array
      */
-    public function getData()
+    public function getResult()
     {
-        return $this->data;
+        return $this->result;
     }
 
     /**
@@ -168,9 +168,9 @@ class Pipe
      */
     public function call()
     {
-        $this->data = $this->getResource()->{$this->method}(...$this->arguments);
+        $this->result = $this->getResource()->{$this->method}(...$this->arguments);
 
-        if (is_null($this->data)) {
+        if (is_null($this->result)) {
             throw new NotFoundException('Resource does not exist');
         }
 

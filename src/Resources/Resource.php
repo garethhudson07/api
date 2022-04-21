@@ -9,7 +9,8 @@ use Api\Repositories\Contracts\Resource as RepositoryInterface;
 use Api\Resources\Relations\Registry as Relations;
 use Api\Resources\Relations\Relation;
 use Api\Schema\Schema;
-use Api\Specs\Contracts\Representation;
+use Api\Specs\Contracts\Representations\Factory as RepresentationFactoryInterface;
+use Api\Result\Contracts\Record as ResultRecordInterface;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -35,9 +36,11 @@ class Resource
     protected $relations;
 
     /**
-     * @var Representation
+     * @var RepresentationFactoryInterface
      */
-    protected $representation;
+    protected $representationFactory;
+
+    protected $transformer;
 
     /**
      * @var EmitterInterface
@@ -59,15 +62,16 @@ class Resource
      * @param Schema $schema
      * @param RepositoryInterface $repository
      * @param Relations $relations
-     * @param Representation $representation
+     * @param RepresentationFactoryInterface $representationFactory
      * @param EmitterInterface $emitter
      */
-    public function __construct(Schema $schema, RepositoryInterface $repository, Relations $relations, Representation $representation, EmitterInterface $emitter)
+    public function __construct(Schema $schema, RepositoryInterface $repository, Relations $relations, RepresentationFactoryInterface $representationFactory, $transformer, EmitterInterface $emitter)
     {
         $this->schema = $schema;
         $this->repository = $repository;
         $this->relations = $relations;
-        $this->representation = $representation;
+        $this->representationFactory = $representationFactory;
+        $this->transformer = $transformer;
         $this->emitter = $emitter;
         $this->endpoints = new Endpoints();
     }
@@ -218,16 +222,7 @@ class Resource
             return null;
         }
 
-        // return $this->representation->record(
-//              $pipe->getEntity()->getName(),
-        //      $this->transformer->record($record)
-        //);
-
-        return $this->representation->forSingleton(
-            $pipe->getEntity()->getName(),
-            $request,
-            $record
-        );
+        return $this->represent($request, $record);
     }
 
     /**
@@ -260,10 +255,43 @@ class Resource
 
         $this->emitCrudEvent('updated', compact('record'));
 
-        return $this->representation->forSingleton(
+        return $this->representationFactory->forSingleton(
             $pipe->getEntity()->getName(),
             $request,
             $record
+        );
+    }
+
+    public function createRepresentation($entity)
+    {
+        if ($entity instanceof ResultRecordInterface) {
+            $representation = $this->representationFactory->record($this->getName())->setAttributes(
+                $this->transformer->transform($entity)
+            );
+
+            foreach ($entity->getRelations() as $key => $relation) {
+                $representation->addRelation(
+                    $key,
+                    $this->getRelation($key)->createRepresentation($relation)
+                );
+            }
+
+            return $representation;
+        }
+
+        $representation = [];
+
+        foreach ($entity as $record) {
+            $representation[] = $this->createRepresentation($record);
+        }
+
+        return $representation;
+    }
+
+    protected function represent(ServerRequestInterface $request, $entity)
+    {
+        return $this->representationFactory->encoder($request)->encode(
+            $this->createRepresentation($entity)
         );
     }
 }

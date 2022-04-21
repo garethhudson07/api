@@ -6,7 +6,7 @@ use Api\Pipeline\Pipes\Pipe;
 use Api\Resources\Relations\Registry as Relations;
 use Api\Schema\Schema;
 use Api\Repositories\Contracts\Resource as RepositoryInterface;
-use Api\Specs\Contracts\Representation;
+use Api\Specs\Contracts\Representations\Factory as RepresentationFactoryInterface;
 use Api\Events\Contracts\Emitter as EmitterInterface;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,12 +22,12 @@ class Collectable extends Resource
      * @param Schema $schema
      * @param RepositoryInterface $repository
      * @param Relations $relations
-     * @param Representation $representation
+     * @param RepresentationFactoryInterface $representationFactory
      * @param EmitterInterface $emitter
      */
-    public function __construct(Schema $schema, RepositoryInterface $repository, Relations $relations, Representation $representation, EmitterInterface $emitter)
+    public function __construct(Schema $schema, RepositoryInterface $repository, Relations $relations, RepresentationFactoryInterface $representationFactory, $transformer, EmitterInterface $emitter)
     {
-        parent::__construct($schema, $repository, $relations, $representation, $emitter);
+        parent::__construct($schema, $repository, $relations, $representationFactory, $transformer, $emitter);
 
         $this->endpoints->add(
             'index',
@@ -49,8 +49,7 @@ class Collectable extends Resource
         $this->endpoints->verify('index');
         $this->emitCrudEvent('readingMany', compact('pipe','request'));
 
-        return $this->representation->forCollection(
-            $pipe->getEntity()->getName(),
+        return $this->represent(
             $request,
             $this->repository->getCollection($pipe, $request)
         );
@@ -72,11 +71,7 @@ class Collectable extends Resource
 
         $this->emitCrudEvent('created', compact('record'));
 
-        return $this->representation->forSingleton(
-            $pipe->getEntity()->getName(),
-            $request,
-            $record
-        );
+        return $this->represent($request, $record);
     }
 
     /**

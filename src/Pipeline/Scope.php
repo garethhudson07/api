@@ -35,6 +35,6 @@ class Scope
      */
     public function getValue()
     {
-        return $this->ancestor->getData()[$this->relation->getLocalKey()] ?? null;
+        return $this->ancestor->getResult()->getAttribute($this->relation->getLocalKey());
     }
 }

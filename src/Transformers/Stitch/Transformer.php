@@ -2,6 +2,8 @@
 
 namespace Api\Transformers\Stitch;
 
+use Api\Result\Contracts\Record;
+
 class Transformer
 {
     protected $schema;
@@ -12,19 +14,16 @@ class Transformer
     }
 
     /**
+     * @param Record $record
      * @return array
      */
-    public function record($record): array
+    public function transform(Record $record): array
     {
-        $raw = $record->getData();
+        $attributes = $record->getAttributes();
         $transformed = [];
 
         foreach ($this->schema->getProperties() as $property) {
-            $transformed[$property->getName()] = $raw[$property->getColumn->getName()] ?? null;
-
-            foreach ($record->getRelations() as $name => $relation) {
-                $transformed[$name] = $relation->transform();
-            }
+            $transformed[$property->getName()] = $attributes[$property->getColumn()->getName()] ?? null;
         }
 
         return $transformed;

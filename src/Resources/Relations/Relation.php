@@ -178,6 +178,11 @@ abstract class Relation
         return ($this->localKey && $this->foreignKey);
     }
 
+    public function createRepresentation($entity)
+    {
+        return $this->getForeignResource()->createRepresentation($entity);
+    }
+
     /**
      * @return mixed
      */

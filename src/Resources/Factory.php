@@ -7,7 +7,8 @@ use Api\Schema\Stitch\Schema as StitchSchema;
 use Api\Kernel;
 use Api\Resources\Relations\Factory as RelationsFactory;
 use Api\Repositories\Stitch\Resource as StitchRepository;
-use Api\Specs\Contracts\Representation;
+use Api\Transformers\Stitch\Transformer as StitchTransformer;
+use Api\Specs\Contracts\Representations\Factory as RepresentationFactoryInterface;
 use Closure;
 use Stitch\Model;
 
@@ -45,18 +46,20 @@ class Factory
     {
         if ($arguments[0] instanceof Closure) {
             $schema = $this->stitchSchema($arguments[0]);
+            $transformer = new StitchTransformer($schema);
             $repository = new StitchRepository(
                 new Model($schema->getTable())
             );
         } else {
-            list($schema, $repository) = $arguments;
+            list($schema, $repository, $transformer) = $arguments;
         }
 
         return new Collectable(
             $schema,
             $repository,
             $this->relationsFactory->registry($this->kernel->getContainer()),
-            $this->kernel->resolve(Representation::class),
+            $this->kernel->resolve(RepresentationFactoryInterface::class),
+            $transformer,
             $this->kernel->getEmitter()->extend()
         );
     }

@@ -49,11 +49,6 @@ class Property
     protected $accepts;
 
     /**
-     * @var array
-     */
-    protected array $aliases = [];
-
-    /**
      * Property constructor.
      * @param string $name
      * @param $validator
@@ -143,27 +138,6 @@ class Property
         }
 
         return $this;
-    }
-
-    /**
-     * @param string $key
-     * @param string $alias
-     * @return $this
-     */
-    public function alias(string $key, string $alias): self
-    {
-        $this->aliases[$key] = $alias;
-
-        return $this;
-    }
-
-    /**
-     * @param string $key
-     * @return string
-     */
-    public function getAlias(string $key): string
-    {
-        return $this->aliases[$key];
     }
 
     /**

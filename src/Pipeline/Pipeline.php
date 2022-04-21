@@ -193,7 +193,7 @@ class Pipeline implements PipelineInterface
     public function prepareResponse()
     {
         $pipe = $this->call()->last();
-        $data = $pipe->getData();
+        $data = $pipe->getResult();
 
         if ($data) {
             $this->response->getBody()->write($data);
