@@ -4,8 +4,7 @@ namespace Api\Repositories\Contracts;
 
 use Api\Pipeline\Pipes\Pipe;
 use Psr\Http\Message\ServerRequestInterface;
-use Api\Result\Stitch\Record as ResultRecord;
-use Api\Result\Stitch\Set as ResultSet;
+use Api\Result\Contracts\Record as ResultRecordInterface;
 
 /**
  * Interface Repository
@@ -15,41 +14,41 @@ interface Resource
 {
     /**
      * @param Pipe $pipe
-     * @return ResultRecord|null
+     * @return ResultRecordInterface|null
      */
-    public function getByKey(Pipe $pipe): ?ResultRecord;
+    public function getByKey(Pipe $pipe): ?ResultRecordInterface;
 
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return ResultSet
+     * @return iterable
      */
-    public function getCollection(Pipe $pipe, ServerRequestInterface $request): ResultSet;
+    public function getCollection(Pipe $pipe, ServerRequestInterface $request): iterable;
 
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return ResultRecord|null
+     * @return ResultRecordInterface|null
      */
-    public function getRecord(Pipe $pipe, ServerRequestInterface $request): ?ResultRecord;
+    public function getRecord(Pipe $pipe, ServerRequestInterface $request): ?ResultRecordInterface;
 
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return ResultRecord
+     * @return ResultRecordInterface
      */
-    public function create(Pipe $pipe, ServerRequestInterface $request): ResultRecord;
+    public function create(Pipe $pipe, ServerRequestInterface $request): ResultRecordInterface;
 
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return ResultRecord
+     * @return ResultRecordInterface
      */
-    public function update(Pipe $pipe, ServerRequestInterface $request): ResultRecord;
+    public function update(Pipe $pipe, ServerRequestInterface $request): ResultRecordInterface;
 
     /**
      * @param Pipe $pipe
-     * @return ResultRecord
+     * @return ResultRecordInterface
      */
-    public function delete(Pipe $pipe): ResultRecord;
+    public function delete(Pipe $pipe): ResultRecordInterface;
 }
