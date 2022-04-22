@@ -76,7 +76,7 @@ class Resource implements RepositoryInterface
     {
         $this->associateRelationships($pipe, $request);
 
-        return (new ResultSet($pipe->getResource()->getName()))->build(
+        return (new ResultSet())->build(
             (new QueryResolver(
                 $this->model,
                 $pipe
