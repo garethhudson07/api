@@ -224,7 +224,7 @@ class Resource
             return null;
         }
 
-        return $this->represent($request, $record);
+        return $this->represent($record);
     }
 
     /**
