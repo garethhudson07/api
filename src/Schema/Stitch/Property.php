@@ -19,12 +19,13 @@ class Property extends BaseProperty
     /**
      * Property constructor.
      * @param string $name
+     * @param string $type
      * @param $validator
      * @param Column $column
      */
-    public function __construct(string $name, $validator, Column $column)
+    public function __construct(string $name, string $type, $validator, Column $column)
     {
-        parent::__construct($name, $validator);
+        parent::__construct($name, $type, $validator);
 
         $this->column = $column;
     }

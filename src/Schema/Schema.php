@@ -135,11 +135,13 @@ class Schema
     /**
      * @param string $name
      * @param string $type
+     * @return Property
      */
     protected function makeProperty(string $name, string $type)
     {
         return new Property(
             $name,
+            $type,
             ValidatorFactory::make($type)
         );
     }

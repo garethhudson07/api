@@ -39,6 +39,11 @@ class Property
     protected string $name;
 
     /**
+     * @var string
+     */
+    protected string $type;
+
+    /**
      * @var Validator
      */
     protected Validator $validator;
@@ -51,11 +56,13 @@ class Property
     /**
      * Property constructor.
      * @param string $name
+     * @param string $type
      * @param $validator
      */
-    public function __construct(string $name, $validator)
+    public function __construct(string $name, string $type, $validator)
     {
         $this->name = $name;
+        $this->type = $type;
         $this->validator = $validator;
     }
 
@@ -65,6 +72,14 @@ class Property
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
     }
 
     /**

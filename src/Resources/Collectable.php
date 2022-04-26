@@ -52,7 +52,6 @@ class Collectable extends Resource
         $this->emitCrudEvent('readingMany', compact('pipe','request'));
 
         return $this->represent(
-            $request,
             $this->repository->getCollection($pipe, $request)
         );
     }
@@ -73,7 +72,7 @@ class Collectable extends Resource
 
         $this->emitCrudEvent('created', compact('record'));
 
-        return $this->represent($request, $record);
+        return $this->represent($record);
     }
 
     /**

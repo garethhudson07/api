@@ -257,11 +257,7 @@ class Resource
 
         $this->emitCrudEvent('updated', compact('record'));
 
-        return $this->representationFactory->forSingleton(
-            $pipe->getEntity()->getName(),
-            $request,
-            $record
-        );
+        return $this->represent($record);
     }
 
     public function createRepresentation($entity)
@@ -290,9 +286,9 @@ class Resource
         return $representation;
     }
 
-    protected function represent(ServerRequestInterface $request, $entity)
+    protected function represent($entity)
     {
-        return $this->representationFactory->encoder($request)->encode(
+        return $this->representationFactory->encoder()->encode(
             $this->createRepresentation($entity)
         );
     }

@@ -80,6 +80,7 @@ class Schema extends BaseSchema
     {
         return new Property(
             $name,
+            $type,
             ValidatorFactory::make($type),
             new Column($this->table, $name, $type)
         );

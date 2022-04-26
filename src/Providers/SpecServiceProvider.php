@@ -60,12 +60,14 @@ class SpecServiceProvider extends AbstractServiceProvider
      */
     protected function bindJsonApi()
     {
-        $this->getContainer()->share(RepresentationFactoryInterface::class, function ()
+        $container = $this->getContainer();
+
+        $container->share(RepresentationFactoryInterface::class, function () use ($container)
         {
-            return new JsonApiRepresentationFactory();
+            return new JsonApiRepresentationFactory($container->get('request.instance'));
         });
 
-        $this->getContainer()->share(ParserInterface::class, function ()
+        $container->share(ParserInterface::class, function ()
         {
             return new JsonApiParser();
         });

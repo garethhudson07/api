@@ -171,15 +171,14 @@ class Api
 
             if ($key) {
                 $key->handle();
-                $user = $key->getUser();
+                $user = $key->getUser()->getAttributes();
+                $representationFactory = $this->kernel->resolve('representationFactory');
 
                 unset($user['password']);
 
                 return $this->kernel->resolve('response.factory')->json(
-                    $this->kernel->resolve('representation')->forSingleton(
-                        'user',
-                        $this->kernel->resolve('request.instance'),
-                        $user
+                    $representationFactory->encoder($this->kernel->resolve('request.instance'))->encode(
+                        $representationFactory->record('user')->setAttributes($user)
                     )
                 );
             }
