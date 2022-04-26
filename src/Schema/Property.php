@@ -44,9 +44,9 @@ class Property
     protected string $type;
 
     /**
-     * @var Validator
+     * @var Validator|NestedValidator
      */
-    protected Validator $validator;
+    protected Validator|NestedValidator $validator;
 
     /**
      * @var mixed
@@ -59,7 +59,7 @@ class Property
      * @param string $type
      * @param $validator
      */
-    public function __construct(string $name, string $type, $validator)
+    public function __construct(string $name, string $type, Validator|NestedValidator $validator)
     {
         $this->name = $name;
         $this->type = $type;
@@ -83,9 +83,9 @@ class Property
     }
 
     /**
-     * @return Validator
+     * @return Validator|NestedValidator
      */
-    public function getValidator()
+    public function getValidator(): Validator|NestedValidator
     {
         return $this->validator;
     }
@@ -101,7 +101,7 @@ class Property
     /**
      * @return NestedValidator|Validator
      */
-    public function resolveValidator()
+    public function resolveValidator(): Validator|NestedValidator
     {
         if ($this->validator instanceof NestedValidator && $this->accepts) {
             $this->validator->childValidator(

@@ -177,7 +177,7 @@ class Api
                 unset($user['password']);
 
                 return $this->kernel->resolve('response.factory')->json(
-                    $representationFactory->encoder($this->kernel->resolve('request.instance'))->encode(
+                    $representationFactory->encoder()->encode(
                         $representationFactory->record('user')->setAttributes($user)
                     )
                 );

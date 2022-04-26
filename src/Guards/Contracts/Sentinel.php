@@ -3,6 +3,7 @@
 namespace Api\Guards\Contracts;
 
 use Api\Pipeline\Pipeline;
+use Api\Result\Contracts\Record;
 
 /**
  * Interface Sentinel
@@ -17,9 +18,9 @@ interface Sentinel
     public function protect(Pipeline $pipeline): Sentinel;
 
     /**
-     * @return mixed
+     * @return Record|null
      */
-    public function getUser();
+    public function getUser(): ?Record;
 
     /**
      * @return mixed

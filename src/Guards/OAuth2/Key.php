@@ -7,6 +7,7 @@ use Api\Guards\OAuth2\League\Exceptions\AuthException;
 use Api\Guards\OAuth2\Scopes\Collection as Scopes;
 use Api\Guards\OAuth2\Scopes\Scope;
 use Api\Repositories\Contracts\User as UserRepositoryInterface;
+use Api\Result\Contracts\Record;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\ResourceServer;
 use Psr\Http\Message\ServerRequestInterface;
@@ -110,9 +111,9 @@ class Key implements KeyContract
     }
 
     /**
-     * @return array|null
+     * @return Record|null
      */
-    public function getUser(): ?array
+    public function getUser(): ?Record
     {
         if (!$this->userId) {
             return null;
