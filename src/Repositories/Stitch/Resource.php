@@ -109,7 +109,7 @@ class Resource implements RepositoryInterface
      */
     public function create(Pipe $pipe, ServerRequestInterface $request): ResultRecord
     {
-        new ResultRecord(
+        return new ResultRecord(
             $this->model->record(
                 $request->getParsedBody()['data']['attributes'] ?? []
             )->save()
