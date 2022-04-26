@@ -2,13 +2,15 @@
 
 namespace Api\Repositories\Contracts;
 
+use Api\Result\Contracts\Record;
+
 interface User
 {
     /**
      * @param string $id
-     * @return array|null
+     * @return Record|null
      */
-    public function getById(string $id): ?array;
+    public function getById(string $id): ?Record;
 
     /**
      * @param string $username

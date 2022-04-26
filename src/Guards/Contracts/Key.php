@@ -3,6 +3,7 @@
 namespace Api\Guards\Contracts;
 
 use Api\Guards\OAuth2\Scopes\Collection;
+use Api\Result\Contracts\Record;
 
 /**
  * Interface Key
@@ -16,9 +17,9 @@ interface Key
     public function handle(): self;
 
     /**
-     * @return array|null
+     * @return Record|null
      */
-    public function getUser(): ?array;
+    public function getUser(): ?Record;
 
     /**
      * @return string|int|null

@@ -171,7 +171,7 @@ class Api
 
             if ($key) {
                 $key->handle();
-                $user = $key->getUser();
+                $user = $key->getUser()->getAttributes();
 
                 unset($user['password']);
 

@@ -8,6 +8,7 @@ use Api\Guards\OAuth2\League\Exceptions\AuthException;
 use Api\Pipeline\Pipeline;
 use Api\Queries\Relations as QueryRelations;
 use Api\Resources\Resource;
+use Api\Result\Contracts\Record;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -138,9 +139,9 @@ class Sentinel implements SentinelContract
     }
 
     /**
-     * @return array|mixed|null
+     * @return Record|null
      */
-    public function getUser(): ?array
+    public function getUser(): ?Record
     {
         return $this->key->getUser();
     }
