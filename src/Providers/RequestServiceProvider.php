@@ -56,15 +56,7 @@ class RequestServiceProvider extends AbstractServiceProvider implements Bootable
      * from this one, it must be from a bootable service provider like
      * this one, otherwise they will be ignored.
      */
-    public function boot()
-    {
-        $container = $this->getContainer();
-
-        $container->inflector(ServerRequestInterface::class, function (ServerRequestInterface $request) use ($container)
-        {
-            return $container->get('request.factory')->prepare($request);
-        });
-    }
+    public function boot() {}
 
     /**
      * This is where the magic happens, within the method you can
@@ -83,7 +75,9 @@ class RequestServiceProvider extends AbstractServiceProvider implements Bootable
 
         $container->share(ServerRequestInterface::class, function () use ($container)
         {
-            return $container->get('request.factory')->make();
+            $factory = $container->get('request.factory');
+
+            return $factory->prepare($factory->make());
         });
     }
 }

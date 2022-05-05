@@ -2,16 +2,33 @@
 
 namespace Api\Specs\JsonApi;
 
+use Api\Queries\Condition;
+use Api\Queries\Expression;
 use Api\Specs\Contracts\Parser as ParserContract;
 use Api\Queries\Order;
 use Api\Queries\Relation;
 use Api\Queries\Relations;
-use Api\Support\Str;
-use Oilstone\RsqlParser\Expression;
+use Oilstone\RsqlParser\Exceptions\Exception as RsqlException;
+use Oilstone\RsqlParser\Expression as RsqlExpression;
 use Oilstone\RsqlParser\Parser as RsqlParser;
 
 class Parser implements ParserContract
 {
+
+    protected $relations;
+
+    protected $filters;
+
+    public function parse($request, $config)
+    {
+        $params = $request->getQueryParams();
+
+        $this->parseRelations($params[$config->get('relationsKey')] ?? '');
+        $this->parseFilters($params[$config->get('filtersKey')] ?? '');
+
+        var_dump($this->filters->getItems()[0]);
+    }
+
     /**
      * @param string $input
      * @return array
@@ -36,22 +53,20 @@ class Parser implements ParserContract
      */
     public function fields(string $input): array
     {
-        return array_map([Str::class, 'snake'], $this->list($input));
+        return $this->list($input);
     }
 
     /**
      * @param string $input
-     * @return Relations
+     * @return void
      */
-    public function relations(string $input): Relations
+    public function parseRelations(string $input): void
     {
-        $relations = new Relations();
+        $this->relations = new Relations();
 
         foreach ($this->list($input) as $item) {
-            $relations->push($this->relation($item));
+            $this->relations->push($this->relation($item));
         }
-
-        return $relations;
     }
 
     /**
@@ -75,34 +90,49 @@ class Parser implements ParserContract
 
     /**
      * @param string $input
-     * @return \Oilstone\RsqlParser\Expression
-     * @throws \Oilstone\RsqlParser\Exceptions\InvalidQueryStringException
+     * @return void
      */
-    public function filters(string $input)
+    public function parseFilters(string $input): void
     {
-        return $this->transformFilterColumns(
-            RsqlParser::parse($input)
-        );
+        try {
+            $this->filters = $this->replaceRsqlExpression(
+                RsqlParser::parse($input)
+            );
+        } catch (RsqlException $e) {}
     }
 
     /**
-     * @param Expression $expression
+     * @param RsqlExpression $rsqlExpression
      * @return Expression
      */
-    protected function transformFilterColumns(Expression $expression)
+    protected function replaceRsqlExpression(RsqlExpression $rsqlExpression): Expression
     {
-        foreach ($expression as $item) {
+        $expression = new Expression();
+
+        foreach ($rsqlExpression as $item) {
             $constraint = $item['constraint'];
 
-            if ($constraint instanceof Expression) {
-                $this->transformFilterColumns($constraint);
-            } else {
-                $hierarchy = $this->hierarchy($constraint->getColumn());
-                $hierarchy[] = Str::snake(array_pop($hierarchy));
-
-                $constraint->setColumn(
-                    implode('.', $hierarchy)
+            if ($constraint instanceof RsqlExpression) {
+                $expression->add(
+                    $item['operator'],
+                    $this->replaceRsqlExpression($constraint)
                 );
+            } else {
+                $condition = new Condition();
+                $path = $constraint->getColumn();
+                $pieces = explode('.', $path, 2);
+
+                if (count($pieces) > 1) {
+                    $condition->setRelation(
+                        $this->relations->pull(array_shift($pieces))
+                    );
+                }
+
+                $condition->setProperty($pieces[0])
+                    ->setOperator($constraint->getOperator()->toSql())
+                    ->setValue($constraint->getValue());
+
+                $expression->add($item['operator'], $condition);
             }
         }
 
@@ -117,7 +147,7 @@ class Parser implements ParserContract
     {
         $sort = [];
 
-        foreach (Parser::list($input) as $item) {
+        foreach ($this->list($input) as $item) {
             $sort[] = $this->order($item);
         }
 
@@ -141,9 +171,7 @@ class Parser implements ParserContract
             $input = substr($input, 1);
         }
 
-        return (new Order())->setProperty(
-            Str::snake($input)
-        )->setDirection($direction);
+        return (new Order())->setProperty($input)->setDirection($direction);
     }
 
     /**

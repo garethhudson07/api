@@ -47,6 +47,10 @@ class Query
         $segments = $request->getAttribute('segments');
         $params = $request->getQueryParams();
 
+        $parser->parse($request, $config);
+
+        exit;
+
         return (new static(
             $parser,
             $segments[count($segments) - 1] ?? ''

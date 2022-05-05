@@ -2,9 +2,9 @@
 
 namespace Api\Repositories\Stitch\Bridge;
 
-use Oilstone\RsqlParser\Expression;
 use Stitch\Queries\Query as BaseQuery;
 use Api\Queries\Relations as RequestRelations;
+use Api\Queries\Expression;
 use Stitch\Result\Record as ResultRecord;
 use Stitch\Result\Set;
 
@@ -103,7 +103,7 @@ class Query
      */
     public function where(Expression $expression): self
     {
-        return $this->applyRsqlExpression($this->baseQuery, $expression);
+        return $this->applyExpression($this->baseQuery, $expression);
     }
 
     /**
@@ -150,22 +150,22 @@ class Query
      * @param Expression $expression
      * @return self
      */
-    protected function applyRsqlExpression($query, Expression $expression): self
+    protected function applyExpression($query, Expression $expression): self
     {
-        foreach ($expression as $item) {
+        foreach ($expression->getItems() as $item) {
             $method = $item['operator'] === 'OR' ? 'orWhere' : 'where';
             $constraint = $item['constraint'];
 
             if ($constraint instanceof Expression) {
                 $query->{$method}(function ($query) use ($constraint)
                 {
-                    $this->applyRsqlExpression($query, $constraint);
+                    $this->applyExpression($query, $constraint);
                 });
             } else {
-                $operator = $constraint->getOperator()->toSql();
+                $operator = $constraint->getOperator();
 
                 $query->{$method}(
-                    $constraint->getColumn(),
+                    $constraint->getProperty(),
                     $this->resolveConstraintOperator($operator),
                     $this->resolveConstraintValue($operator, $constraint->getValue())
                 );
