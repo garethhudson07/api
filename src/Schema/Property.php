@@ -199,7 +199,7 @@ class Property
      * @param string $name
      * @return mixed|null
      */
-    public function __get(string $name): mixed|null
+    public function __get(string $name): mixed
     {
         return $this->meta[$name] ?? null;
     }
