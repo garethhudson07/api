@@ -180,7 +180,7 @@ abstract class Relation
 
     public function createRepresentation($entity)
     {
-        return $this->getForeignResource()->createRepresentation($entity);
+        return $this->getForeignResource()?->createRepresentation($entity);
     }
 
     /**
