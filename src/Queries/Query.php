@@ -46,7 +46,7 @@ class Query
      */
     public static function extract(ParserInterface $parser, ServerRequestInterface $request, Manager $config)
     {
-        $segments = $request->getAttribute('segments');
+        $segments = $request->getAttribute('segments') ?? [];
         $params = $request->getQueryParams();
 
         return (new static(
