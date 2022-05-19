@@ -4,6 +4,7 @@
 namespace Api\Specs\JsonApi\Representations;
 
 use Api\Specs\Contracts\Representations\Record as RepresentationsRecord;
+use Api\Support\Str;
 
 class Record implements RepresentationsRecord
 {
@@ -78,7 +79,7 @@ class Record implements RepresentationsRecord
      */
     public function addRelation(string $name, mixed $relation): static
     {
-        $this->relations[$name] = $relation;
+        $this->relations[Str::camel($name)] = $relation;
 
         return $this;
     }
