@@ -63,33 +63,30 @@ class Factory implements FactoryInterface
      */
     public function prepare(ServerRequestInterface $request): ServerRequestInterface
     {
-        $request = $request->withAttribute('segments', Parser::segments($request->getUri()->getPath()));
+        $request = $request
+            ->withAttribute('segments', Parser::segments($request->getUri()->getPath()))
+            ->withAttribute(
+                'query',
+                Query::extract(
+                    $this->container->get('request.parser'),
+                    $request,
+                    $this->specConfig
+                )
+            );
 
-        switch ($request->getMethod()) {
-            case 'GET':
-                $request = $request->withAttribute(
-                    'query',
-                    Query::extract(
-                        $this->container->get('request.parser'),
-                        $request,
-                        $this->specConfig
-                    )
-                );
-                break;
+        if ($request->getMethod() !== 'GET') {
+            $body = json_decode(
+                file_get_contents("php://input"),
+                true
+            ) ?: [];
 
-            default:
-                $body = json_decode(
-                    file_get_contents("php://input"),
-                    true
-                ) ?: [];
+            if (array_key_exists('data', $body) && array_key_exists('attributes', $body['data'])) {
+                $body['data']['attributes'] = $this->container->get('request.parser')->attributes($body['data']['attributes']);
+            }
 
-                if (array_key_exists('data', $body) && array_key_exists('attributes', $body['data'])) {
-                    $body['data']['attributes'] = $this->container->get('request.parser')->attributes($body['data']['attributes']);
-                }
-
-                if (($request->getServerParams()['CONTENT_TYPE'] ?? null) === 'application/vnd.api+json') {
-                    $request = $request->withParsedBody($body);
-                }
+            if (($request->getServerParams()['CONTENT_TYPE'] ?? null) === 'application/vnd.api+json') {
+                $request = $request->withParsedBody($body);
+            }
         }
 
         return $request;

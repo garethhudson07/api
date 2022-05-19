@@ -6,7 +6,7 @@ namespace Api\Specs\JsonApi\Representations;
 use Neomerx\JsonApi\Encoder\Encoder as BaseEncoder;
 use Psr\Http\Message\ServerRequestInterface;
 use Api\Queries\Relations as RequestRelations;
-
+use Api\Support\Str;
 
 class Encoder
 {
@@ -38,7 +38,7 @@ class Encoder
                 continue;
             }
 
-            $collapsed[] = $relation->getName();
+            $collapsed[] = Str::camel($relation->getName());
         }
 
         return $collapsed;
