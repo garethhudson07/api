@@ -41,7 +41,7 @@ class Resource implements RepositoryInterface
         RelationshipResolver::associate(
             $this->model,
             $pipe->getResource(),
-            $request->getAttribute('query')->relations()
+            $request->getAttribute('parsedQuery')->relations()
         );
     }
 

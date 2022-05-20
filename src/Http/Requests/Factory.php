@@ -66,7 +66,7 @@ class Factory implements FactoryInterface
         $request = $request
             ->withAttribute('segments', Parser::segments($request->getUri()->getPath()))
             ->withAttribute(
-                'query',
+                'parsedQuery',
                 Query::extract(
                     $this->container->get('request.parser'),
                     $request,
