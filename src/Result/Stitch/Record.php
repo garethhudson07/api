@@ -29,6 +29,11 @@ class Record implements Contract
         $output = [];
 
         foreach ($this->entity->getRelations() as $key => $relation) {
+            if (is_null($relation)) {
+                $relation[$key] = null;
+                continue;
+            }
+
             $output[$key] = $relation instanceof StitchResultSet ? (new Set())->build($relation) : new static($relation);
         }
 
