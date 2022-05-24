@@ -32,7 +32,7 @@ class Encoder
         foreach ($relations as $relation) {
             if ($relation->getRelations()->count()) {
                 $collapsed = array_merge($collapsed, array_map(function ($subRelation) use ($relation) {
-                    return "{$relation->getName()}.$subRelation";
+                    return Str::camel($relation->getName()) . '.' . $subRelation;
                 }, $this->collapseRelations($relation->getRelations())));
 
                 continue;
