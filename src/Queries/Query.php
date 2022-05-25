@@ -9,8 +9,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class Query
 {
-    protected $parser;
-
     protected $type;
 
     protected $relations;
@@ -30,9 +28,8 @@ class Query
      * @param ParserInterface $parser
      * @param string $type
      */
-    public function __construct(ParserInterface $parser, string $type)
+    public function __construct(string $type)
     {
-        $this->parser = $parser;
         $this->type = $type;
     }
 
@@ -45,11 +42,17 @@ class Query
     public static function extract(ParserInterface $parser, ServerRequestInterface $request, Manager $config)
     {
         $segments = $request->getAttribute('segments');
-        $params = $request->getQueryParams();
+        $instance = new static($segments[count($segments) - 1] ?? '');
 
-        $parser->parse($request, $config);
+        $parser->parse($instance, $request, $config);
+
+        return $instance;
+
+        var_dump($instance);
 
         exit;
+
+        return $instance;
 
         return (new static(
             $parser,
@@ -188,6 +191,17 @@ class Query
         $this->setOffset(
             intval($input)
         );
+
+        return $this;
+    }
+
+    /**
+     * @param Relations $relations
+     * @return $this
+     */
+    public function setRelations(Relations $relations): static
+    {
+        $this->relations = $relations;
 
         return $this;
     }

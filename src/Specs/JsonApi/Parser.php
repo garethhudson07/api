@@ -14,19 +14,19 @@ use Oilstone\RsqlParser\Parser as RsqlParser;
 
 class Parser implements ParserContract
 {
-
     protected $relations;
 
     protected $filters;
 
-    public function parse($request, $config)
+    public function parse($query, $request, $config)
     {
         $params = $request->getQueryParams();
 
         $this->parseRelations($params[$config->get('relationsKey')] ?? '');
         $this->parseFilters($params[$config->get('filtersKey')] ?? '');
 
-        var_dump($this->filters->getItems()[0]);
+        $query->setRelations($this->relations)
+            ->setFilters($this->filters);
     }
 
     /**
