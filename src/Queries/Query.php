@@ -23,6 +23,8 @@ class Query
 
     protected $offset;
 
+    protected $search;
+
     /**
      * Query constructor.
      * @param ParserInterface $parser
@@ -54,6 +56,9 @@ class Query
 
         return $instance;
 
+        $segments = $request->getAttribute('segments') ?? [];
+        $params = $request->getQueryParams();
+
         return (new static(
             $parser,
             $segments[count($segments) - 1] ?? ''
@@ -62,7 +67,8 @@ class Query
             ->parseFilters($params[$config->get('filtersKey')] ?? '')
             ->parseSort($params[$config->get('sortKey')] ?? '')
             ->parseLimit($params[$config->get('limitKey')] ?? '')
-            ->parseOffset($params[$config->get('offsetKey')] ?? '');
+            ->parseOffset($params[$config->get('offsetKey')] ?? '')
+            ->parseSearch($params[$config->get('searchKey')] ?? '');
     }
 
     /**
@@ -202,6 +208,15 @@ class Query
     public function setRelations(Relations $relations): static
     {
         $this->relations = $relations;
+    }
+
+    /**
+     * @param $input
+     * @return $this
+     */
+    public function parseSearch($input)
+    {
+        $this->setSearch((string) $input);
 
         return $this;
     }
@@ -307,5 +322,24 @@ class Query
     public function offset()
     {
         return $this->offset;
+    }
+
+    /**
+     * @param $search
+     * @return $this
+     */
+    public function setSearch($search)
+    {
+        $this->search = $search;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function search()
+    {
+        return $this->search;
     }
 }

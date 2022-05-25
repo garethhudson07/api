@@ -6,7 +6,7 @@ namespace Api\Specs\JsonApi\Representations;
 use Neomerx\JsonApi\Encoder\Encoder as BaseEncoder;
 use Psr\Http\Message\ServerRequestInterface;
 use Api\Queries\Relations as RequestRelations;
-
+use Api\Support\Str;
 
 class Encoder
 {
@@ -17,7 +17,7 @@ class Encoder
         $this->baseEncoder = BaseEncoder::instance([
             Record::class => Schema::class
         ])->withIncludedPaths(
-            $this->collapseRelations($request->getAttribute('query')->relations())
+            $this->collapseRelations($request->getAttribute('parsedQuery')->relations())
         );
     }
 
@@ -32,13 +32,13 @@ class Encoder
         foreach ($relations as $relation) {
             if ($relation->getRelations()->count()) {
                 $collapsed = array_merge($collapsed, array_map(function ($subRelation) use ($relation) {
-                    return "{$relation->getName()}.$subRelation";
+                    return Str::camel($relation->getName()) . '.' . $subRelation;
                 }, $this->collapseRelations($relation->getRelations())));
 
                 continue;
             }
 
-            $collapsed[] = $relation->getName();
+            $collapsed[] = Str::camel($relation->getName());
         }
 
         return $collapsed;

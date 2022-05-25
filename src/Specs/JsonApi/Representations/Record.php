@@ -3,50 +3,83 @@
 
 namespace Api\Specs\JsonApi\Representations;
 
+use Api\Specs\Contracts\Representations\Record as RepresentationsRecord;
+use Api\Support\Str;
 
-class Record
+class Record implements RepresentationsRecord
 {
+    /**
+     * @var string
+     */
     protected string $type;
 
+    /**
+     * @var array
+     */
     protected array $attributes = [];
 
-    protected $relations = [];
+    /**
+     * @var array
+     */
+    protected array $relations = [];
 
     public function __construct(string $type)
     {
         $this->type = $type;
     }
 
-    public function getType()
+    /**
+     * @return string
+     */
+    public function getType(): string
     {
         return $this->type;
     }
 
-    public function getAttribute(string $key)
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function getAttribute(string $key): mixed
     {
         return $this->attributes[$key] ?? null;
     }
 
-    public function getAttributes()
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
 
-    public function setAttributes(array $attributes)
+    /**
+     * @param array $attributes
+     * @return static
+     */
+    public function setAttributes(array $attributes): static
     {
         $this->attributes = $attributes;
 
         return $this;
     }
 
-    public function getRelations()
+    /**
+     * @return array
+     */
+    public function getRelations(): array
     {
         return $this->relations;
     }
 
-    public function addRelation(string $name, $relation)
+    /**
+     * @param string $name
+     * @param mixed $relation
+     * @return static
+     */
+    public function addRelation(string $name, mixed $relation): static
     {
-        $this->relations[$name] = $relation;
+        $this->relations[Str::camel($name)] = $relation;
 
         return $this;
     }

@@ -17,13 +17,15 @@ class Factory
             'filtersKey',
             'sortKey',
             'offsetKey',
-            'limitKey'
+            'limitKey',
+            'searchKey',
         )
             ->relationsKey('include')
             ->fieldsKey('fields')
             ->filtersKey('filter')
             ->sortKey('sort')
             ->offsetKey('offset')
-            ->limitKey('limit');
+            ->limitKey('limit')
+            ->searchKey('search');
     }
 }

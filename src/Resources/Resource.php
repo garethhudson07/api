@@ -270,7 +270,7 @@ class Resource
             foreach ($entity->getRelations() as $key => $relation) {
                 $representation->addRelation(
                     $key,
-                    $this->getRelation($key)->createRepresentation($relation)
+                    $this->getRelation($key)?->createRepresentation($relation)
                 );
             }
 

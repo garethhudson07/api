@@ -54,6 +54,11 @@ class Property
     protected $accepts;
 
     /**
+     * @var array
+     */
+    protected array $meta = [];
+
+    /**
      * Property constructor.
      * @param string $name
      * @param string $type
@@ -156,6 +161,27 @@ class Property
     }
 
     /**
+     * @param string $name
+     * @param mixed $value
+     * @return self
+     */
+    public function meta(string $name, mixed $value): self
+    {
+        $this->meta[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasMeta(string $name): bool
+    {
+        return array_key_exists($name, $this->meta);
+    }
+
+    /**
      * @param $name
      * @param $arguments
      * @return self
@@ -167,5 +193,14 @@ class Property
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return mixed|null
+     */
+    public function __get(string $name): mixed
+    {
+        return $this->meta[$name] ?? null;
     }
 }

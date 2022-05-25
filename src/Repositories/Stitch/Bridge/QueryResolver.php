@@ -69,14 +69,15 @@ class QueryResolver
      */
     public function resolve(BaseQuery $baseQuery, ServerRequestInterface $request): Query
     {
-        $parsedQuery = $request->getAttribute('query');
+        $parsedQuery = $request->getAttribute('parsedQuery');
 
         return (new Query($baseQuery))->include($parsedQuery->relations())
             ->select($parsedQuery->fields())
             ->where($parsedQuery->filters())
             ->orderBy($parsedQuery->sort())
             ->limit($parsedQuery->limit())
-            ->offset($parsedQuery->offset());
+            ->offset($parsedQuery->offset())
+            ->search($parsedQuery->search());
     }
 
     /**
