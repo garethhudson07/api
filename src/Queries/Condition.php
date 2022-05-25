@@ -73,11 +73,22 @@ class Condition
     }
 
     /**
-     * @return Relation
+     * @return Relation|null
      */
-    public function getRelation(): Relation
+    public function getRelation(): ?Relation
     {
         return $this->relation;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return implode(
+            '.',
+            array_filter([$this->relation?->path(), $this->property]),
+        );
     }
 
     /**

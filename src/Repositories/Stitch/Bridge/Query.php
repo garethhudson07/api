@@ -179,7 +179,7 @@ class Query
                 $operator = $constraint->getOperator();
 
                 $query->{$method}(
-                    $constraint->getProperty(),
+                    $constraint->getPath(),
                     $this->resolveConstraintOperator($operator),
                     $this->resolveConstraintValue($operator, $constraint->getValue())
                 );

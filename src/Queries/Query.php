@@ -50,25 +50,23 @@ class Query
 
         return $instance;
 
-        var_dump($instance);
-
-        exit;
-
-        return $instance;
-
-        $segments = $request->getAttribute('segments') ?? [];
-        $params = $request->getQueryParams();
-
-        return (new static(
-            $parser,
-            $segments[count($segments) - 1] ?? ''
-        ))->parseRelations($params[$config->get('relationsKey')] ?? '')
-            ->parseFields($params[$config->get('fieldsKey')] ?? '')
-            ->parseFilters($params[$config->get('filtersKey')] ?? '')
-            ->parseSort($params[$config->get('sortKey')] ?? '')
-            ->parseLimit($params[$config->get('limitKey')] ?? '')
-            ->parseOffset($params[$config->get('offsetKey')] ?? '')
-            ->parseSearch($params[$config->get('searchKey')] ?? '');
+//        exit;
+//
+//        return $instance;
+//
+//        $segments = $request->getAttribute('segments') ?? [];
+//        $params = $request->getQueryParams();
+//
+//        return (new static(
+//            $parser,
+//            $segments[count($segments) - 1] ?? ''
+//        ))->parseRelations($params[$config->get('relationsKey')] ?? '')
+//            ->parseFields($params[$config->get('fieldsKey')] ?? '')
+//            ->parseFilters($params[$config->get('filtersKey')] ?? '')
+//            ->parseSort($params[$config->get('sortKey')] ?? '')
+//            ->parseLimit($params[$config->get('limitKey')] ?? '')
+//            ->parseOffset($params[$config->get('offsetKey')] ?? '')
+//            ->parseSearch($params[$config->get('searchKey')] ?? '');
     }
 
     /**
@@ -208,6 +206,8 @@ class Query
     public function setRelations(Relations $relations): static
     {
         $this->relations = $relations;
+
+        return $this;
     }
 
     /**

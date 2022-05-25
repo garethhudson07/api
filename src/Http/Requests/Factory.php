@@ -63,16 +63,14 @@ class Factory implements FactoryInterface
      */
     public function prepare(ServerRequestInterface $request): ServerRequestInterface
     {
-        $request = $request
-            ->withAttribute('segments', Parser::segments($request->getUri()->getPath()))
-            ->withAttribute(
-                'parsedQuery',
-                Query::extract(
-                    $this->container->get('request.parser'),
-                    $request,
-                    $this->specConfig
-                )
-            );
+        $request = $request->withAttribute('segments', Parser::segments($request->getUri()->getPath()));
+        $request = $request->withAttribute(
+            'parsedQuery',
+            Query::extract(
+                $this->container->get('request.parser'),
+                $request,
+                $this->specConfig
+        ));
 
         if ($request->getMethod() !== 'GET') {
             $body = json_decode(
