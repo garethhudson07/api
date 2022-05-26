@@ -3,21 +3,22 @@
 namespace Api\Queries;
 
 use Api\Config\Manager;
-use Closure;
+use Api\Schema\Schema;
 use Api\Specs\Contracts\Parser as ParserInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Api\Resources\Resource;
 
 class Query
 {
-    protected $type;
+    protected string $type = '';
 
-    protected $relations;
+    protected Relations $relations;
 
-    protected $fields = [];
+    protected array $fields = [];
 
-    protected $filters;
+    protected Expression $filters;
 
-    protected $sort = [];
+    protected array $sort = [];
 
     protected $limit;
 
@@ -27,12 +28,13 @@ class Query
 
     /**
      * Query constructor.
-     * @param ParserInterface $parser
      * @param string $type
      */
     public function __construct(string $type)
     {
         $this->type = $type;
+        $this->relations = new Relations();
+        $this->filters = new Expression();
     }
 
     /**
@@ -41,190 +43,39 @@ class Query
      * @param Manager $config
      * @return Query
      */
-    public static function extract(ParserInterface $parser, ServerRequestInterface $request, Manager $config)
+    public static function extract(ParserInterface $parser, ServerRequestInterface $request, Manager $config): Query
     {
         $segments = $request->getAttribute('segments');
         $instance = new static($segments[count($segments) - 1] ?? '');
 
-        $parser->parse($instance, $request, $config);
+        $parser->setQuery($instance)->parse($request, $config);
 
         return $instance;
-
-//        exit;
-//
-//        return $instance;
-//
-//        $segments = $request->getAttribute('segments') ?? [];
-//        $params = $request->getQueryParams();
-//
-//        return (new static(
-//            $parser,
-//            $segments[count($segments) - 1] ?? ''
-//        ))->parseRelations($params[$config->get('relationsKey')] ?? '')
-//            ->parseFields($params[$config->get('fieldsKey')] ?? '')
-//            ->parseFilters($params[$config->get('filtersKey')] ?? '')
-//            ->parseSort($params[$config->get('sortKey')] ?? '')
-//            ->parseLimit($params[$config->get('limitKey')] ?? '')
-//            ->parseOffset($params[$config->get('offsetKey')] ?? '')
-//            ->parseSearch($params[$config->get('searchKey')] ?? '');
     }
 
     /**
-     * @param array $items
-     * @param Closure $callback
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param Relation $relation
      * @return $this
      */
-    protected function apply(array $items, Closure $callback)
+    public function addRelation(Relation $relation): static
     {
-        foreach ($items as $name => $value) {
-            if ($name === $this->type) {
-                $callback($this, $value);
-
-                foreach ($this->relations->collapse() as $relation) {
-                    if ($relation->getName() === $this->type) {
-                        $callback($relation, $value);
-                    }
-                }
-
-                continue;
-            }
-
-            if ($relation = $this->relations->pull($name)) {
-                $callback($relation, $value);
-            }
-        }
+        $this->relations->push($relation);
 
         return $this;
     }
 
     /**
-     * @param $input
-     * @return $this
+     * @return Relations
      */
-    public function parseFields($input)
-    {
-        if (is_array($input)) {
-            $this->apply($input, function ($instance, $value)
-            {
-                $instance->setFields(
-                    $this->parser->fields($value)
-                );
-            });
-
-            return $this;
-        }
-
-        return $this->setFields(
-            $this->parser->fields($input)
-        );
-    }
-
-    /**
-     * @param $input
-     * @return $this|Query
-     * @throws \Oilstone\RsqlParser\Exceptions\InvalidQueryStringException
-     */
-    public function parseFilters($input)
-    {
-        return $this->setFilters(
-            $this->parser->filters($input)
-        );
-    }
-
-    /**
-     * @param string $input
-     * @return $this
-     */
-    public function parseRelations(string $input)
-    {
-        $this->relations = $this->parser->relations($input);
-
-        return $this;
-    }
-
-    /**
-     * @param $input
-     * @return $this
-     */
-    public function parseSort($input)
-    {
-        if (is_array($input)) {
-            $this->apply($input, function ($instance, $value)
-            {
-                $instance->setSort(
-                    $this->parser->sort($value)
-                );
-            });
-
-            return $this;
-        }
-
-        return $this->setSort(
-            $this->parser->sort($input)
-        );
-    }
-
-    /**
-     * @param $input
-     * @return $this
-     */
-    public function parseLimit($input)
-    {
-        if (is_array($input)) {
-            $this->apply($input, function ($instance, $value)
-            {
-                $instance->setLimit(
-                    intval($value)
-                );
-            });
-
-            return $this;
-        }
-
-        return $this->setLimit(
-            intval($input)
-        );
-    }
-
-    /**
-     * @param $input
-     * @return $this
-     */
-    public function parseOffset($input)
-    {
-        $this->setOffset(
-            intval($input)
-        );
-
-        return $this;
-    }
-
-    /**
-     * @param Relations $relations
-     * @return $this
-     */
-    public function setRelations(Relations $relations): static
-    {
-        $this->relations = $relations;
-
-        return $this;
-    }
-
-    /**
-     * @param $input
-     * @return $this
-     */
-    public function parseSearch($input)
-    {
-        $this->setSearch((string) $input);
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function relations()
+    public function relations(): Relations
     {
         return $this->relations;
     }
@@ -233,7 +84,7 @@ class Query
      * @param array $fields
      * @return $this
      */
-    public function setFields(array $fields)
+    public function setFields(array $fields): static
     {
         $this->fields = $fields;
 
@@ -252,7 +103,7 @@ class Query
      * @param $filters
      * @return $this
      */
-    public function setFilters($filters)
+    public function setFilters($filters): static
     {
         $this->filters = $filters;
 
@@ -260,9 +111,9 @@ class Query
     }
 
     /**
-     * @return mixed
+     * @return Expression
      */
-    public function filters()
+    public function filters(): Expression
     {
         return $this->filters;
     }
@@ -271,7 +122,7 @@ class Query
      * @param array $sort
      * @return $this
      */
-    public function setSort(array $sort)
+    public function setSort(array $sort): static
     {
         $this->sort = $sort;
 
@@ -279,9 +130,9 @@ class Query
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function sort()
+    public function sort(): array
     {
         return $this->sort;
     }
@@ -290,7 +141,7 @@ class Query
      * @param $limit
      * @return $this
      */
-    public function setLimit($limit)
+    public function setLimit($limit): static
     {
         $this->limit = $limit;
 
@@ -298,9 +149,9 @@ class Query
     }
 
     /**
-     * @return $this
+     * @return int|null
      */
-    public function limit()
+    public function limit(): ?int
     {
         return $this->limit;
     }
@@ -309,7 +160,7 @@ class Query
      * @param $offset
      * @return $this
      */
-    public function setOffset($offset)
+    public function setOffset($offset): static
     {
         $this->offset = $offset;
 
@@ -317,9 +168,9 @@ class Query
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function offset()
+    public function offset(): ?int
     {
         return $this->offset;
     }
@@ -328,7 +179,7 @@ class Query
      * @param $search
      * @return $this
      */
-    public function setSearch($search)
+    public function setSearch($search): static
     {
         $this->search = $search;
 
@@ -336,10 +187,82 @@ class Query
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function search()
+    public function search(): ?string
     {
         return $this->search;
+    }
+
+    /**
+     * @param Resource $resource
+     * @return $this
+     */
+    public function resolve(Resource $resource): static
+    {
+        return $this->resolveExpressionProperties($resource, $this->filters)
+            ->resolveRelationResources($resource);
+    }
+
+    /**
+     * @param Resource $resource
+     * @param Expression $expression
+     * @return $this
+     */
+    protected function resolveExpressionProperties(Resource $resource, Expression $expression): static
+    {
+        foreach ($expression->getItems() as $item) {
+            $constraint = $item['constraint'];
+
+            if ($constraint instanceof Expression) {
+                $this->resolveExpressionProperties($resource, $constraint);
+            } else {
+                $constraint->setProperty(
+                    $this->getSchemaByPath($resource, $constraint->getPath())->getProperty(
+                        $constraint->getPropertyName()
+                    )
+                );
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Resource $resource
+     * @param string $path
+     * @return Schema
+     */
+    protected function getSchemaByPath(Resource $resource, string $path): Schema
+    {
+        $pieces = explode('.', $path);
+
+        if (count($pieces) === 1) {
+            return $resource->getSchema();
+        }
+
+        $relation = array_shift($pieces);
+
+        return $this->getSchemaByPath(
+            $resource->getRelation($relation)->getLocalResource(),
+            implode('.', $pieces)
+        );
+    }
+
+    /**
+     * @param Resource $resource
+     * @return $this
+     */
+    protected function resolveRelationResources(Resource $resource): static
+    {
+        foreach ($this->relations as $relation) {
+            $relation->setResource(
+                $resource->getRelation(
+                    $relation->getName()
+                )->getLocalResource()
+            );
+        }
+
+        return $this;
     }
 }

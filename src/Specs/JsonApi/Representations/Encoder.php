@@ -44,7 +44,11 @@ class Encoder
         return $collapsed;
     }
 
-    public function encode($data)
+    /**
+     * @param $data
+     * @return string
+     */
+    public function encode($data): string
     {
         return $this->baseEncoder->encodeData($data);
     }

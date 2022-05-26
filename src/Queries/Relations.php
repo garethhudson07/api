@@ -8,18 +8,33 @@ class Relations extends Set
 {
     /**
      * @param string $name
-     * @return null
+     * @return Relation|null
      */
-    public function pull(string $name)
+    public function get(string $name): ?Relation
     {
         foreach ($this->items as $item) {
             if ($item->getName() === $name) {
                 return $item;
             }
+        }
 
-            if ($relation = $item->pullRelation($name)) {
-                return $relation;
+        return null;
+    }
+
+    /**
+     * @param string $path
+     * @return Relation|null
+     */
+    public function pull(string $path): ?Relation
+    {
+        $pieces = explode('.', $path);
+
+        if ($relation = $this->get($pieces[0])) {
+            if (count($pieces) > 1) {
+                return $relation->pullRelation($pieces[1]);
             }
+
+            return $relation;
         }
 
         return null;
@@ -28,7 +43,7 @@ class Relations extends Set
     /**
      * @return array
      */
-    public function collapse()
+    public function collapse(): array
     {
         $items = $this->items;
 

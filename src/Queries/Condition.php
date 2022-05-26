@@ -2,6 +2,8 @@
 
 namespace Api\Queries;
 
+use Api\Schema\Property;
+
 /**
  * Class Condition
  * @package Stitch\DBAL\Builders
@@ -13,10 +15,12 @@ class Condition
      */
     protected Relation $relation;
 
+    protected $property;
+
     /**
      * @var string
      */
-    protected string $property = '';
+    protected string $propertyName = '';
 
     /**
      * @var string
@@ -40,12 +44,23 @@ class Condition
     }
 
     /**
-     * @param string $property
+     * @param Property $property
      * @return $this
      */
-    public function setProperty(string $property): static
+    public function setProperty(Property $property): static
     {
         $this->property = $property;
+
+        return $this;
+    }
+
+    /**
+     * @param string $propertyName
+     * @return $this
+     */
+    public function setPropertyName(string $propertyName): static
+    {
+        $this->propertyName = $propertyName;
 
         return $this;
     }
@@ -87,8 +102,24 @@ class Condition
     {
         return implode(
             '.',
-            array_filter([$this->relation?->path(), $this->property]),
+            array_filter([$this->getPathPrefix(), $this->propertyName]),
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function getPathPrefix(): string
+    {
+        return $this->relation?->path() ?? '';
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPropertyName()
+    {
+        return $this->propertyName;
     }
 
     /**

@@ -66,7 +66,7 @@ class Collectable extends Resource
     {
         $this->endpoints->verify('create');
         $this->emitCrudEvent('creating', compact('pipe','request'));
-        $this->schema->validate($request->getParsedBody()['data']['attributes'] ?? []);
+        $this->schema->validate($request->getParsedBody());
 
         $record = $this->repository->create($pipe, $request);
 

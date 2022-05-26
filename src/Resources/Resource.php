@@ -9,6 +9,7 @@ use Api\Repositories\Contracts\Resource as RepositoryInterface;
 use Api\Resources\Relations\Registry as Relations;
 use Api\Resources\Relations\Relation;
 use Api\Schema\Schema;
+use Api\Schema\Validation\ValidationException;
 use Api\Specs\Contracts\Representations\Factory as RepresentationFactoryInterface;
 use Api\Result\Contracts\Record as ResultRecordInterface;
 use Api\Transformers\Contracts\Transformer as TransformerInterface;
@@ -92,6 +93,14 @@ class Resource
     public function getRepository()
     {
         return $this->repository;
+    }
+
+    /**
+     * @return TransformerInterface
+     */
+    public function getTransformer(): TransformerInterface
+    {
+        return $this->transformer;
     }
 
     /**
@@ -212,10 +221,10 @@ class Resource
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return mixed
+     * @return string|null
      * @throws Exception
      */
-    public function getRecord(Pipe $pipe, ServerRequestInterface $request)
+    public function getRecord(Pipe $pipe, ServerRequestInterface $request): ?string
     {
         $this->endpoints->verify('show');
         $this->emitCrudEvent('readingOne', compact('pipe', 'request'));
@@ -244,14 +253,14 @@ class Resource
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return mixed
-     * @throws Exception
+     * @return string
+     * @throws ValidationException
      */
-    public function update(Pipe $pipe, ServerRequestInterface $request)
+    public function update(Pipe $pipe, ServerRequestInterface $request): string
     {
         $this->endpoints->verify('update');
         $this->emitCrudEvent('updating', compact('pipe', 'request'));
-        $this->schema->validate($request->getParsedBody()['data']['attributes'] ?? []);
+        $this->schema->validate($request->getParsedBody());
 
         $record = $this->repository->update($pipe, $request);
 
@@ -260,6 +269,10 @@ class Resource
         return $this->represent($record);
     }
 
+    /**
+     * @param $entity
+     * @return array
+     */
     public function createRepresentation($entity)
     {
         if ($entity instanceof ResultRecordInterface) {
@@ -286,7 +299,11 @@ class Resource
         return $representation;
     }
 
-    protected function represent($entity)
+    /**
+     * @param $entity
+     * @return string
+     */
+    protected function represent($entity): string
     {
         return $this->representationFactory->encoder()->encode(
             $this->createRepresentation($entity)

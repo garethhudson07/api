@@ -2,29 +2,30 @@
 
 namespace Api\Queries;
 
+use Api\Resources\Resource as Resource;
+
 /**
  * Class Relation
  * @package Api\Http\Requests
  */
 class Relation
 {
-    /**
-     * @var
-     */
-    protected $name;
+    protected string $name = '';
+
+    protected $resource;
 
     protected $parent;
 
-    protected $path;
+    protected string $path = '';
 
-    protected $fields = [];
+    protected array $fields = [];
 
     /**
-     * @var array
+     * @var Relations
      */
-    protected $relations;
+    protected Relations $relations;
 
-    protected $sort = [];
+    protected array $sort = [];
 
     protected $limit;
 
@@ -42,7 +43,7 @@ class Relation
      * @param Relation $parent
      * @return $this
      */
-    public function setParent(Relation $parent)
+    public function setParent(Relation $parent): static
     {
         $this->parent = $parent;
 
@@ -50,9 +51,9 @@ class Relation
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function path()
+    public function path(): string
     {
         if ($this->path) {
             return $this->path;
@@ -71,7 +72,7 @@ class Relation
      * @param Relation $relation
      * @return $this
      */
-    public function addRelation(Relation $relation)
+    public function addRelation(Relation $relation): static
     {
         $this->relations[] = $relation;
 
@@ -79,12 +80,12 @@ class Relation
     }
 
     /**
-     * @param string $name
-     * @return null
+     * @param string $path
+     * @return Relation|null
      */
-    public function pullRelation(string $name)
+    public function pullRelation(string $path): ?Relation
     {
-        return $this->relations->pull($name);
+        return $this->relations->pull($path);
     }
 
     /**
@@ -107,7 +108,7 @@ class Relation
      * @param array $fields
      * @return $this
      */
-    public function setFields(array $fields)
+    public function setFields(array $fields): static
     {
         $this->fields = $fields;
 
@@ -115,34 +116,18 @@ class Relation
     }
 
     /**
-     * @return array
+     * @return Relations
      */
-    public function getRelations()
+    public function getRelations(): Relations
     {
         return $this->relations;
-    }
-
-    /**
-     * @param array $relations
-     */
-    public function setRelations(array $relations)
-    {
-        $this->relations = $relations;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasRelations()
-    {
-        return $this->relations->count() > 0;
     }
 
     /**
      * @param int $limit
      * @return $this
      */
-    public function setLimit(int $limit)
+    public function setLimit(int $limit): static
     {
         $this->limit = $limit;
 
@@ -150,9 +135,9 @@ class Relation
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function getLimit()
+    public function getLimit(): ?int
     {
         return $this->limit;
     }
@@ -161,7 +146,7 @@ class Relation
      * @param array $sort
      * @return $this
      */
-    public function setSort(array $sort)
+    public function setSort(array $sort): static
     {
         $this->sort = $sort;
 
@@ -169,10 +154,29 @@ class Relation
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getSort()
+    public function getSort(): array
     {
         return $this->sort;
+    }
+
+    /**
+     * @param Resource $resource
+     * @return $this
+     */
+    public function setResource(Resource $resource): static
+    {
+        $this->resource = $resource;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getResource()
+    {
+        return $this->resource;
     }
 }

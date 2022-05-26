@@ -4,29 +4,72 @@ namespace Api\Specs\JsonApi;
 
 use Api\Queries\Condition;
 use Api\Queries\Expression;
+use Api\Queries\Query;
 use Api\Specs\Contracts\Parser as ParserContract;
 use Api\Queries\Order;
 use Api\Queries\Relation;
-use Api\Queries\Relations;
 use Oilstone\RsqlParser\Exceptions\Exception as RsqlException;
 use Oilstone\RsqlParser\Expression as RsqlExpression;
 use Oilstone\RsqlParser\Parser as RsqlParser;
+use Closure;
 
 class Parser implements ParserContract
 {
-    protected $relations;
+    protected Query $query;
 
-    protected $filters;
+    /**
+     * @param Query $query
+     * @return $this
+     */
+    public function setQuery(Query $query): static
+    {
+        $this->query = $query;
 
-    public function parse($query, $request, $config)
+        return $this;
+    }
+
+    public function parse($request, $config)
     {
         $params = $request->getQueryParams();
 
-        $this->parseRelations($params[$config->get('relationsKey')] ?? '');
-        $this->parseFilters($params[$config->get('filtersKey')] ?? '');
+        $this->parseRelations($params[$config->get('relationsKey')] ?? '')
+            ->parseFilters($params[$config->get('filtersKey')] ?? '')
+            ->parseFields($params[$config->get('fieldsKey')] ?? '')
+            ->parseSort($params[$config->get('sortKey')] ?? '')
+            ->parseLimit($params[$config->get('limitKey')] ?? '')
+            ->parseOffset($params[$config->get('offsetKey')] ?? '')
+            ->parseSearch($params[$config->get('searchKey')] ?? '');
+    }
 
-        $query->setRelations($this->relations)
-            ->setFilters($this->filters);
+    /**
+     * @param array $items
+     * @param Closure $callback
+     * @return $this
+     */
+    protected function apply(array $items, Closure $callback): static
+    {
+        $type = $this->query->getType();
+        $relations = $this->query->relations();
+
+        foreach ($items as $name => $value) {
+            if ($name === $type) {
+                $callback($this, $value);
+
+                foreach ($this->query->relations()->collapse() as $relation) {
+                    if ($relation->getName() === $type) {
+                        $callback($relation, $value);
+                    }
+                }
+
+                continue;
+            }
+
+            if ($relation = $relations->get($name)) {
+                $callback($relation, $value);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -40,33 +83,25 @@ class Parser implements ParserContract
 
     /**
      * @param string $input
+     * @param int $limit
      * @return array
      */
-    public function hierarchy(string $input): array
+    public function hierarchy(string $input, int $limit = PHP_INT_MAX): array
     {
-        return explode('.', $input);
+        return explode('.', $input, $limit);
     }
 
     /**
      * @param string $input
-     * @return array
+     * @return $this
      */
-    public function fields(string $input): array
+    public function parseRelations(string $input): static
     {
-        return $this->list($input);
-    }
-
-    /**
-     * @param string $input
-     * @return void
-     */
-    public function parseRelations(string $input): void
-    {
-        $this->relations = new Relations();
-
         foreach ($this->list($input) as $item) {
-            $this->relations->push($this->relation($item));
+            $this->query->addRelation($this->relation($item));
         }
+
+        return $this;
     }
 
     /**
@@ -75,7 +110,7 @@ class Parser implements ParserContract
      */
     public function relation(string $input): Relation
     {
-        $pieces = explode('.', $input, 2);
+        $pieces = $this->hierarchy($input, 2);
         $name = array_shift($pieces);
         $instance = (new Relation($name));
 
@@ -90,45 +125,49 @@ class Parser implements ParserContract
 
     /**
      * @param string $input
-     * @return void
+     * @return $this
      */
-    public function parseFilters(string $input): void
+    public function parseFilters(string $input): static
     {
         try {
-            $this->filters = $this->replaceRsqlExpression(
-                RsqlParser::parse($input)
+            $this->query->setFilters(
+                $this->replaceRsqlExpression(
+                    $this->query->filters(),
+                    RsqlParser::parse($input)
+                )
             );
         } catch (RsqlException $e) {}
+
+        return $this;
     }
 
     /**
+     * @param Expression $expression
      * @param RsqlExpression $rsqlExpression
      * @return Expression
      */
-    protected function replaceRsqlExpression(RsqlExpression $rsqlExpression): Expression
+    protected function replaceRsqlExpression(Expression $expression, RsqlExpression $rsqlExpression): Expression
     {
-        $expression = new Expression();
-
         foreach ($rsqlExpression as $item) {
             $constraint = $item['constraint'];
 
             if ($constraint instanceof RsqlExpression) {
                 $expression->add(
                     $item['operator'],
-                    $this->replaceRsqlExpression($constraint)
+                    $this->replaceRsqlExpression(new Expression(), $constraint)
                 );
             } else {
                 $condition = new Condition();
-                $path = $constraint->getColumn();
-                $pieces = explode('.', $path, 2);
+                $pieces = $this->hierarchy($constraint->getColumn());
+                $propertyName = array_pop($pieces);
 
-                if (count($pieces) > 1) {
+                if (count($pieces)) {
                     $condition->setRelation(
-                        $this->relations->pull(array_shift($pieces))
+                        $this->query->relations()->pull(implode('.', $pieces))
                     );
                 }
 
-                $condition->setProperty($pieces[0])
+                $condition->setPropertyName($propertyName)
                     ->setOperator($constraint->getOperator()->toSql())
                     ->setValue($constraint->getValue());
 
@@ -137,6 +176,54 @@ class Parser implements ParserContract
         }
 
         return $expression;
+    }
+
+    /**
+     * @param $input
+     * @return $this
+     */
+    public function parseFields($input): static
+    {
+        if (is_array($input)) {
+            $this->apply($input, function ($instance, $value)
+            {
+                $instance->setFields(
+                    $this->list($value)
+                );
+            });
+
+            return $this;
+        }
+
+        $this->query->setFields(
+            $this->list($input)
+        );
+
+        return $this;
+    }
+
+    /**
+     * @param $input
+     * @return $this
+     */
+    public function parseSort($input): static
+    {
+        if (is_array($input)) {
+            $this->apply($input, function ($instance, $value)
+            {
+                $instance->setSort(
+                    $this->sort($value)
+                );
+            });
+
+            return $this;
+        }
+
+        $this->query->setSort(
+            $this->sort($input)
+        );
+
+        return $this;
     }
 
     /**
@@ -175,26 +262,63 @@ class Parser implements ParserContract
     }
 
     /**
+     * @param $input
+     * @return $this
+     */
+    public function parseLimit($input): static
+    {
+        if (is_array($input)) {
+            $this->apply($input, function ($instance, $value)
+            {
+                $instance->setLimit(
+                    intval($value)
+                );
+            });
+
+            return $this;
+        }
+
+        $this->query->setLimit(
+            intval($input)
+        );
+
+        return $this;
+    }
+
+    /**
+     * @param $input
+     * @return $this
+     */
+    public function parseOffset($input): static
+    {
+        $this->query->setOffset(
+            intval($input)
+        );
+
+        return $this;
+    }
+
+    /**
+     * @param $input
+     * @return $this
+     */
+    public function parseSearch($input): static
+    {
+        $this->query->setSearch((string) $input);
+
+        return $this;
+    }
+
+    /**
      * @param array $input
      * @return array
      */
     public function attributes(array $input): array
     {
-        $output = [];
-
-        foreach ($input as $key => $value) {
-            if (!is_integer($key)) {
-                $key = Str::snake($key);
-            }
-
-            if (is_array($value)) {
-                $output[$key] = $this->attributes($value);
-                continue;
-            }
-
-            $output[$key] = $value;
+        if (array_key_exists('data', $input) && array_key_exists('attributes', $input['data'])) {
+            return $input['data']['attributes'];
         }
 
-        return $output;
+        return [];
     }
 }

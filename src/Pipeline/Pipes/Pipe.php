@@ -165,8 +165,9 @@ class Pipe
 
     /**
      * @return $this
+     * @throws NotFoundException
      */
-    public function call()
+    public function call(): static
     {
         $this->result = $this->getResource()->{$this->method}(...$this->arguments);
 
@@ -180,7 +181,7 @@ class Pipe
     /**
      * @return array
      */
-    public function ancestors()
+    public function ancestors(): array
     {
         return $this->pipeline->before($this);
     }
@@ -222,6 +223,8 @@ class Pipe
         $this->method = $httpMethod === 'GET'
             ? 'get' . ($this->hasKey() ? 'Record' : 'Collection')
             : $this::OPERATION_MAP[$httpMethod];
+
+        $this->request->getAttribute('parsedQuery')->resolve($this->entity);
 
         return $this;
     }

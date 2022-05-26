@@ -29,4 +29,19 @@ class Transformer implements Contract
 
         return $transformed;
     }
+
+    /**
+     * @param array $attributes
+     * @return array
+     */
+    public function reverse(array $attributes): array
+    {
+        $transformed = [];
+
+        foreach ($this->schema->getProperties() as $property) {
+            $transformed[$property->getColumn()->getName()] = $attributes[$property->getName()] ?? null;
+        }
+
+        return $transformed;
+    }
 }

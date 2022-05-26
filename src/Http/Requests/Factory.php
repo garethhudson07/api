@@ -63,11 +63,12 @@ class Factory implements FactoryInterface
      */
     public function prepare(ServerRequestInterface $request): ServerRequestInterface
     {
+        $parser = $this->container->get('request.parser');
         $request = $request->withAttribute('segments', Parser::segments($request->getUri()->getPath()));
         $request = $request->withAttribute(
             'parsedQuery',
             Query::extract(
-                $this->container->get('request.parser'),
+                $parser,
                 $request,
                 $this->specConfig
         ));
@@ -78,12 +79,10 @@ class Factory implements FactoryInterface
                 true
             ) ?: [];
 
-            if (array_key_exists('data', $body) && array_key_exists('attributes', $body['data'])) {
-                $body['data']['attributes'] = $this->container->get('request.parser')->attributes($body['data']['attributes']);
-            }
-
             if (($request->getServerParams()['CONTENT_TYPE'] ?? null) === 'application/vnd.api+json') {
-                $request = $request->withParsedBody($body);
+                $request = $request->withParsedBody(
+                    $parser->attributes($body)
+                );
             }
         }
 
