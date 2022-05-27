@@ -13,7 +13,7 @@ class Condition
     /**
      * @var Relation
      */
-    protected Relation $relation;
+    protected ?Relation $relation = null;
 
     protected $property;
 
