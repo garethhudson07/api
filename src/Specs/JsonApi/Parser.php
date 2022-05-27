@@ -53,7 +53,7 @@ class Parser implements ParserContract
 
         foreach ($items as $name => $value) {
             if ($name === $type) {
-                $callback($this, $value);
+                $callback($this->query, $value);
 
                 foreach ($this->query->relations()->collapse() as $relation) {
                     if ($relation->getName() === $type) {
