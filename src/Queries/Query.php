@@ -220,7 +220,7 @@ class Query
                 $property = $this->getSchemaByPath($resource, $constraint->getPath())->getProperty(
                     $constraint->getPropertyName()
                 );
-                
+
                 if ($property) {
                     $constraint->setProperty($property);
                 }
@@ -258,11 +258,13 @@ class Query
     protected function resolveRelationResources(Resource $resource): static
     {
         foreach ($this->relations as $relation) {
-            $relation->setResource(
-                $resource->getRelation(
-                    $relation->getName()
-                )->getLocalResource()
-            );
+            $related = $resource->getRelation(
+                $relation->getName()
+            )?->getLocalResource();
+
+            if ($related) {
+                $relation->setResource($related);
+            }
         }
 
         return $this;
