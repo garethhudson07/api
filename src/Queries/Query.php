@@ -217,11 +217,13 @@ class Query
             if ($constraint instanceof Expression) {
                 $this->resolveExpressionProperties($resource, $constraint);
             } else {
-                $constraint->setProperty(
-                    $this->getSchemaByPath($resource, $constraint->getPath())->getProperty(
-                        $constraint->getPropertyName()
-                    )
+                $property = $this->getSchemaByPath($resource, $constraint->getPath())->getProperty(
+                    $constraint->getPropertyName()
                 );
+                
+                if ($property) {
+                    $constraint->setProperty($property);
+                }
             }
         }
 
