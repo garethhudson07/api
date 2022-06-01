@@ -70,12 +70,12 @@ class Query
 
             $this->baseQuery->select(...array_map(function ($field)
             {
-                $this->resolvePath($field->getPath());
+                $this->resolvePropertyPath($field->getPath());
             }, $relation->getFields()));
 
             foreach ($relation->getSort() as $order) {
                 $this->baseQuery->orderBy(
-                    $this->resolvePath($order->getPath()),
+                    $this->resolvePropertyPath($order->getPath()),
                     $order->getDirection()
                 );
             }
@@ -97,7 +97,7 @@ class Query
         if ($fields) {
             $this->baseQuery->select(...array_map(function ($field)
             {
-                return $this->resolvePath($field->getPath());
+                return $this->resolvePropertyPath($field->getPath());
             }, $fields));
         }
 
@@ -121,7 +121,7 @@ class Query
     {
         foreach ($orders as $order) {
             $this->baseQuery->orderBy(
-                $this->resolvePath($order->getPath()),
+                $this->resolvePropertyPath($order->getPath()),
                 $order->getDirection()
             );
         }
@@ -189,7 +189,7 @@ class Query
                 $operator = $constraint->getOperator();
 
                 $query->{$method}(
-                    $this->resolvePath($constraint->getPath()),
+                    $this->resolvePropertyPath($constraint->getPath()),
                     $this->resolveConstraintOperator($operator),
                     $this->resolveConstraintValue($operator, $constraint->getValue())
                 );
@@ -203,11 +203,13 @@ class Query
      * @param Path $path
      * @return string
      */
-    protected function resolvePath(Path $path): string
+    protected function resolvePropertyPath(Path $path): string
     {
+        $property = $path->getEntity();
+
         return implode(
             '.',
-            array_filter([$path->prefix()->implode(), $path->getEntity()->getColumn()->getName()])
+            array_filter([$path->prefix()->implode(), $property?->getColumn()?->getName() ?? $property->getPropertyName()])
         );
     }
 
