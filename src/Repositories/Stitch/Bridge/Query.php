@@ -181,7 +181,7 @@ class Query
                 $query->{$method}(
                     implode(
                         '.',
-                        array_filter([$constraint->getPathPrefix(), $constraint->getProperty()->getColumn()->getName()])
+                        array_filter([$constraint->getPathPrefix(), $constraint->getProperty()?->getColumn()?->getName() ?? $constraint->getPropertyName()])
                     ),
                     $this->resolveConstraintOperator($operator),
                     $this->resolveConstraintValue($operator, $constraint->getValue())
