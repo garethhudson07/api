@@ -9,7 +9,7 @@ use Api\Queries\Paths\Path;
  * Class Order
  * @package Api\Http\Requests
  */
-class Order
+class Field
 {
     protected Path $path;
 
@@ -17,11 +17,6 @@ class Order
      * @var string
      */
     protected string $propertyName = '';
-
-    /**
-     * @var string
-     */
-    protected string $direction = '';
 
     /**
      * Condition constructor.
@@ -57,25 +52,6 @@ class Order
     public function setPropertyName(string $propertyName): static
     {
         $this->propertyName = $propertyName;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDirection(): string
-    {
-        return $this->direction;
-    }
-
-    /**
-     * @param string $direction
-     * @return $this
-     */
-    public function setDirection(string $direction): static
-    {
-        $this->direction = $direction;
 
         return $this;
     }

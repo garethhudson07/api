@@ -4,6 +4,7 @@ namespace Api\Specs\JsonApi;
 
 use Api\Queries\Condition;
 use Api\Queries\Expression;
+use Api\Queries\Field;
 use Api\Queries\Query;
 use Api\Specs\Contracts\Parser as ParserContract;
 use Api\Queries\Order;
@@ -76,7 +77,7 @@ class Parser implements ParserContract
      * @param string $input
      * @return array
      */
-    public function list(string $input): array
+    protected function list(string $input): array
     {
         return array_filter(explode(',', $input));
     }
@@ -86,7 +87,7 @@ class Parser implements ParserContract
      * @param int $limit
      * @return array
      */
-    public function hierarchy(string $input, int $limit = PHP_INT_MAX): array
+    protected function hierarchy(string $input, int $limit = PHP_INT_MAX): array
     {
         return explode('.', $input, $limit);
     }
@@ -95,7 +96,7 @@ class Parser implements ParserContract
      * @param string $input
      * @return $this
      */
-    public function parseRelations(string $input): static
+    protected function parseRelations(string $input): static
     {
         foreach ($this->list($input) as $item) {
             $this->query->addRelation($this->relation($item));
@@ -108,7 +109,7 @@ class Parser implements ParserContract
      * @param string $input
      * @return Relation
      */
-    public function relation(string $input): Relation
+    protected function relation(string $input): Relation
     {
         $pieces = $this->hierarchy($input, 2);
         $name = array_shift($pieces);
@@ -127,16 +128,17 @@ class Parser implements ParserContract
      * @param string $input
      * @return $this
      */
-    public function parseFilters(string $input): static
+    protected function parseFilters(string $input): static
     {
         try {
             $this->query->setFilters(
                 $this->replaceRsqlExpression(
-                    $this->query->filters(),
+                    $this->query->getFilters(),
                     RsqlParser::parse($input)
                 )
             );
-        } catch (RsqlException $e) {}
+        } catch (RsqlException $e) {
+        }
 
         return $this;
     }
@@ -182,22 +184,33 @@ class Parser implements ParserContract
      * @param $input
      * @return $this
      */
-    public function parseFields($input): static
+    protected function parseFields($input): static
     {
         if (is_array($input)) {
-            $this->apply($input, function ($instance, $value)
-            {
-                $instance->setFields(
-                    $this->list($value)
-                );
+            $this->apply($input, function ($instance, $value) {
+                $this->fillFields($instance, $value);
             });
 
             return $this;
         }
 
-        $this->query->setFields(
-            $this->list($input)
-        );
+        $this->fillFields($this->query, $input);
+
+        return $this;
+    }
+
+    /**
+     * @param $instance
+     * @param string $input
+     * @return static
+     */
+    protected function fillFields($instance, string $input): static
+    {
+        foreach ($this->list($input) as $item) {
+            $instance->addField(
+                (new Field())->setPropertyName($item)
+            );
+        }
 
         return $this;
     }
@@ -206,46 +219,41 @@ class Parser implements ParserContract
      * @param $input
      * @return $this
      */
-    public function parseSort($input): static
+    protected function parseSort($input): static
     {
         if (is_array($input)) {
             $this->apply($input, function ($instance, $value)
             {
-                $instance->setSort(
-                    $this->sort($value)
-                );
+                $this->fillOrders($instance, $value);
             });
 
             return $this;
         }
 
-        $this->query->setSort(
-            $this->sort($input)
-        );
+        $this->fillOrders($this->query, $input);
+
+        return $this;
+    }
+
+    /**
+     * @param $instance
+     * @param string $input
+     * @return $this
+     */
+    protected function fillOrders($instance, string $input): static
+    {
+        foreach ($this->list($input) as $item) {
+            $instance->addOrder($this->order($item));
+        }
 
         return $this;
     }
 
     /**
      * @param string $input
-     * @return array
-     */
-    public function sort(string $input): array
-    {
-        $sort = [];
-
-        foreach ($this->list($input) as $item) {
-            $sort[] = $this->order($item);
-        }
-
-        return $sort;
-    }
-
-    /**
-     * @param string $input
      * @return Order
      */
-    public function order(string $input): Order
+    protected function order(string $input): Order
     {
         $direction = 'ASC';
         $operator = substr($input, 0, 1);
@@ -258,14 +266,14 @@ class Parser implements ParserContract
             $input = substr($input, 1);
         }
 
-        return (new Order())->setProperty($input)->setDirection($direction);
+        return (new Order())->setPropertyName($input)->setDirection($direction);
     }
 
     /**
      * @param $input
      * @return $this
      */
-    public function parseLimit($input): static
+    protected function parseLimit($input): static
     {
         if (is_array($input)) {
             $this->apply($input, function ($instance, $value)
@@ -289,7 +297,7 @@ class Parser implements ParserContract
      * @param $input
      * @return $this
      */
-    public function parseOffset($input): static
+    protected function parseOffset($input): static
     {
         $this->query->setOffset(
             intval($input)
@@ -302,7 +310,7 @@ class Parser implements ParserContract
      * @param $input
      * @return $this
      */
-    public function parseSearch($input): static
+    protected function parseSearch($input): static
     {
         $this->query->setSearch((string) $input);
 

@@ -72,12 +72,12 @@ class QueryResolver
         $parsedQuery = $request->getAttribute('parsedQuery');
 
         return (new Query($baseQuery))->include($parsedQuery->relations())
-            ->select($parsedQuery->fields())
-            ->where($parsedQuery->filters())
-            ->orderBy($parsedQuery->sort())
-            ->limit($parsedQuery->limit())
-            ->offset($parsedQuery->offset())
-            ->search($parsedQuery->search());
+            ->select($parsedQuery->getFields())
+            ->where($parsedQuery->getFilters())
+            ->orderBy($parsedQuery->getSort())
+            ->limit($parsedQuery->getLimit())
+            ->offset($parsedQuery->getOffset())
+            ->search($parsedQuery->getSearch());
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Api\Repositories\Stitch\Bridge;
 
+use Api\Queries\Paths\Path;
 use Stitch\Queries\Query as BaseQuery;
 use Api\Queries\Relations as RequestRelations;
 use Api\Queries\Expression;
@@ -62,18 +63,21 @@ class Query
     public function include(RequestRelations $relations): self
     {
         foreach ($relations->collapse() as $relation) {
-            $path = $relation->path();
+            $path = $relation->getPath();
             $limit = $relation->getLimit();
 
-            $this->baseQuery->with($relation->path());
+            $this->baseQuery->with($path);
 
-            $this->baseQuery->select(...array_map(function ($field) use ($path)
+            $this->baseQuery->select(...array_map(function ($field)
             {
-                return "$path.$field";
+                $this->resolvePath($field->getPath());
             }, $relation->getFields()));
 
             foreach ($relation->getSort() as $order) {
-                $this->baseQuery->orderBy("$path.{$order->getProperty()}", $order->getDirection());
+                $this->baseQuery->orderBy(
+                    $this->resolvePath($order->getPath()),
+                    $order->getDirection()
+                );
             }
 
             if ($limit !== NULL) {
@@ -91,7 +95,10 @@ class Query
     public function select(array $fields): self
     {
         if ($fields) {
-            $this->baseQuery->select(...$fields);
+            $this->baseQuery->select(...array_map(function ($field)
+            {
+                return $this->resolvePath($field->getPath());
+            }, $fields));
         }
 
         return $this;
@@ -113,7 +120,10 @@ class Query
     public function orderBy(array $orders): self
     {
         foreach ($orders as $order) {
-            $this->baseQuery->orderBy($order->getProperty(), $order->getDirection());
+            $this->baseQuery->orderBy(
+                $this->resolvePath($order->getPath()),
+                $order->getDirection()
+            );
         }
 
         return $this;
@@ -179,10 +189,7 @@ class Query
                 $operator = $constraint->getOperator();
 
                 $query->{$method}(
-                    implode(
-                        '.',
-                        array_filter([$constraint->getPathPrefix(), $constraint->getProperty()->getColumn()->getName()])
-                    ),
+                    $this->resolvePath($constraint->getPath()),
                     $this->resolveConstraintOperator($operator),
                     $this->resolveConstraintValue($operator, $constraint->getValue())
                 );
@@ -190,6 +197,18 @@ class Query
         }
 
         return $this;
+    }
+
+    /**
+     * @param Path $path
+     * @return string
+     */
+    protected function resolvePath(Path $path): string
+    {
+        return implode(
+            '.',
+            array_filter([$path->prefix()->implode(), $path->getEntity()->getColumn()->getName()])
+        );
     }
 
     /**

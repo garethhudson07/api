@@ -4,19 +4,17 @@ namespace Api\Queries;
 
 use Api\Resources\Resource as Resource;
 
+use Api\Queries\Paths\Path;
+
 /**
  * Class Relation
  * @package Api\Http\Requests
  */
 class Relation
 {
+    protected Path $path;
+
     protected string $name = '';
-
-    protected $resource;
-
-    protected $parent;
-
-    protected string $path = '';
 
     protected array $fields = [];
 
@@ -36,6 +34,7 @@ class Relation
     public function __construct(string $name)
     {
         $this->name = $name;
+        $this->path = new Path();
         $this->relations = new Relations();
     }
 
@@ -45,27 +44,17 @@ class Relation
      */
     public function setParent(Relation $parent): static
     {
-        $this->parent = $parent;
+        $this->path->setRelation($parent);
 
         return $this;
     }
 
     /**
-     * @return string
+     * @return Path
      */
-    public function path(): string
+    public function getPath(): Path
     {
-        if ($this->path) {
-            return $this->path;
-        }
-
-        if($this->parent) {
-            $this->path = "{$this->parent->path()}.{$this->name}";
-
-            return $this->path;
-        }
-
-        return $this->name;
+        return $this->path;
     }
 
     /**
@@ -105,12 +94,12 @@ class Relation
     }
 
     /**
-     * @param array $fields
+     * @param Field $field
      * @return $this
      */
-    public function setFields(array $fields): static
+    public function addField(Field $field): static
     {
-        $this->fields = $fields;
+        $this->fields[] = $field;
 
         return $this;
     }
@@ -143,12 +132,12 @@ class Relation
     }
 
     /**
-     * @param array $sort
+     * @param Order $order
      * @return $this
      */
-    public function setSort(array $sort): static
+    public function addOrder(Order $order): static
     {
-        $this->sort = $sort;
+        $this->sort[] = $order;
 
         return $this;
     }
@@ -167,16 +156,8 @@ class Relation
      */
     public function setResource(Resource $resource): static
     {
-        $this->resource = $resource;
+        $this->path->setEntity($resource);
 
         return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getResource()
-    {
-        return $this->resource;
     }
 }

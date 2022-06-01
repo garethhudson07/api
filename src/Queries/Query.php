@@ -7,6 +7,7 @@ use Api\Schema\Schema;
 use Api\Specs\Contracts\Parser as ParserInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Api\Resources\Resource;
+use Api\Queries\Paths\Path;
 
 class Query
 {
@@ -81,12 +82,12 @@ class Query
     }
 
     /**
-     * @param array $fields
+     * @param Field $field
      * @return $this
      */
-    public function setFields(array $fields): static
+    public function addField(Field $field): static
     {
-        $this->fields = $fields;
+        $this->fields[] = $field;
 
         return $this;
     }
@@ -94,7 +95,7 @@ class Query
     /**
      * @return array
      */
-    public function fields(): array
+    public function getFields(): array
     {
         return $this->fields;
     }
@@ -113,18 +114,18 @@ class Query
     /**
      * @return Expression
      */
-    public function filters(): Expression
+    public function getFilters(): Expression
     {
         return $this->filters;
     }
 
     /**
-     * @param array $sort
+     * @param Order $order
      * @return $this
      */
-    public function setSort(array $sort): static
+    public function addOrder(Order $order): static
     {
-        $this->sort = $sort;
+        $this->sort[] = $order;
 
         return $this;
     }
@@ -132,7 +133,7 @@ class Query
     /**
      * @return array
      */
-    public function sort(): array
+    public function getSort(): array
     {
         return $this->sort;
     }
@@ -151,7 +152,7 @@ class Query
     /**
      * @return int|null
      */
-    public function limit(): ?int
+    public function getLimit(): ?int
     {
         return $this->limit;
     }
@@ -170,7 +171,7 @@ class Query
     /**
      * @return int|null
      */
-    public function offset(): ?int
+    public function getOffset(): ?int
     {
         return $this->offset;
     }
@@ -189,7 +190,7 @@ class Query
     /**
      * @return string|null
      */
-    public function search(): ?string
+    public function getSearch(): ?string
     {
         return $this->search;
     }
@@ -200,8 +201,30 @@ class Query
      */
     public function resolve(Resource $resource): static
     {
-        return $this->resolveExpressionProperties($resource, $this->filters)
-            ->resolveRelationResources($resource);
+        return $this->resolveProperties($resource, $this->fields)
+            ->resolveProperties($resource, $this->sort)
+            ->resolveRelations($resource, $this->relations)
+            ->resolveExpressionProperties($resource, $this->filters);
+    }
+
+    /**
+     * @param Resource $resource
+     * @param array $items
+     * @return $this
+     */
+    protected function resolveProperties(Resource $resource, array $items): static
+    {
+        foreach ($items as $item) {
+            $property = $this->getSchemaByPath($resource, $item->getPath())->getProperty(
+                $item->getPropertyName()
+            );
+
+            if ($property) {
+                $item->setProperty($property);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -220,7 +243,7 @@ class Query
                 $property = $this->getSchemaByPath($resource, $constraint->getPath())->getProperty(
                     $constraint->getPropertyName()
                 );
-                
+
                 if ($property) {
                     $constraint->setProperty($property);
                 }
@@ -232,39 +255,39 @@ class Query
 
     /**
      * @param Resource $resource
-     * @param string $path
-     * @return Schema
+     * @param Relations $relations
+     * @return $this
      */
-    protected function getSchemaByPath(Resource $resource, string $path): Schema
+    protected function resolveRelations(Resource $resource, Relations $relations): static
     {
-        $pieces = explode('.', $path);
+        foreach ($relations as $relation) {
+            if ($resourceRelation = $resource->getRelation($relation->getName())) {
+                $foreignResource = $resourceRelation->getForeignResource();
 
-        if (count($pieces) === 1) {
-            return $resource->getSchema();
+                $relation->setResource($foreignResource);
+                $this->resolveProperties($foreignResource, $relation->getFields())
+                    ->resolveProperties($foreignResource, $relation->getsort())
+                    ->resolveRelations($foreignResource, $relation->getRelations());
+            }
         }
 
-        $relation = array_shift($pieces);
-
-        return $this->getSchemaByPath(
-            $resource->getRelation($relation)->getLocalResource(),
-            implode('.', $pieces)
-        );
+        return $this;
     }
 
     /**
      * @param Resource $resource
-     * @return $this
+     * @param Path $path
+     * @return Schema
      */
-    protected function resolveRelationResources(Resource $resource): static
+    protected function getSchemaByPath(Resource $resource, Path $path): Schema
     {
-        foreach ($this->relations as $relation) {
-            $relation->setResource(
-                $resource->getRelation(
-                    $relation->getName()
-                )->getLocalResource()
+        if ($relation = $path->getRelation()) {
+            return $this->getSchemaByPath(
+                $resource->getRelation($relation->getName())->getLocalResource(),
+                $relation->getPath()
             );
         }
 
-        return $this;
+        return $resource->getSchema();
     }
 }

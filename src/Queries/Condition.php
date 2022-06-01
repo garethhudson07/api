@@ -3,6 +3,7 @@
 namespace Api\Queries;
 
 use Api\Schema\Property;
+use Api\Queries\Paths\Path;
 
 /**
  * Class Condition
@@ -10,12 +11,7 @@ use Api\Schema\Property;
  */
 class Condition
 {
-    /**
-     * @var Relation
-     */
-    protected ?Relation $relation = null;
-
-    protected $property;
+    protected Path $path;
 
     /**
      * @var string
@@ -33,12 +29,20 @@ class Condition
     protected $value;
 
     /**
+     * Condition constructor.
+     */
+    public function __construct()
+    {
+        $this->path = new Path();
+    }
+
+    /**
      * @param Relation $relation
      * @return $this
      */
     public function setRelation(Relation $relation): static
     {
-        $this->relation = $relation;
+        $this->path->setRelation($relation);
 
         return $this;
     }
@@ -49,7 +53,7 @@ class Condition
      */
     public function setProperty(Property $property): static
     {
-        $this->property = $property;
+        $this->path->setEntity($property);
 
         return $this;
     }
@@ -88,52 +92,25 @@ class Condition
     }
 
     /**
-     * @return Relation|null
+     * @return Path
      */
-    public function getRelation(): ?Relation
+    public function getPath(): Path
     {
-        return $this->relation;
+        return $this->path;
     }
 
     /**
      * @return string
      */
-    public function getPath(): string
-    {
-        return implode(
-            '.',
-            array_filter([$this->getPathPrefix(), $this->propertyName]),
-        );
-    }
-
-    /**
-     * @return string
-     */
-    public function getPathPrefix(): string
-    {
-        return $this->relation?->path() ?? '';
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPropertyName()
+    public function getPropertyName(): string
     {
         return $this->propertyName;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getProperty()
-    {
-        return $this->property;
-    }
-
-    /**
-     * @return mixed|string
-     */
-    public function getOperator()
+    public function getOperator(): string
     {
         return $this->operator;
     }
@@ -141,7 +118,7 @@ class Condition
     /**
      * @return mixed
      */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
