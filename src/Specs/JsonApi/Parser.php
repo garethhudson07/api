@@ -50,13 +50,13 @@ class Parser implements ParserContract
     protected function apply(array $items, Closure $callback): static
     {
         $type = $this->query->getType();
-        $relations = $this->query->relations();
+        $relations = $this->query->getRelations();
 
         foreach ($items as $name => $value) {
             if ($name === $type) {
                 $callback($this->query, $value);
 
-                foreach ($this->query->relations()->collapse() as $relation) {
+                foreach ($this->query->getRelations()->collapse() as $relation) {
                     if ($relation->getName() === $type) {
                         $callback($relation, $value);
                     }
@@ -165,7 +165,7 @@ class Parser implements ParserContract
 
                 if (count($pieces)) {
                     $condition->setRelation(
-                        $this->query->relations()->pull(implode('.', $pieces))
+                        $this->query->getRelations()->pull(implode('.', $pieces))
                     );
                 }
 

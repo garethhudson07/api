@@ -76,7 +76,7 @@ class Query
     /**
      * @return Relations
      */
-    public function relations(): Relations
+    public function getRelations(): Relations
     {
         return $this->relations;
     }

@@ -17,7 +17,7 @@ class Encoder
         $this->baseEncoder = BaseEncoder::instance([
             Record::class => Schema::class
         ])->withIncludedPaths(
-            $this->collapseRelations($request->getAttribute('parsedQuery')->relations())
+            $this->collapseRelations($request->getAttribute('parsedQuery')->getRelations())
         );
     }
 

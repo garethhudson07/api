@@ -64,7 +64,7 @@ class Sentinel implements SentinelContract
         if ($this->request->getMethod() === 'GET') {
             $this->checkRelations(
                 $pipeline->last()->getResource(),
-                $this->request->getAttribute('parsedQuery')->relations()
+                $this->request->getAttribute('parsedQuery')->getRelations()
             );
         }
 
