@@ -263,7 +263,7 @@ class Query
         foreach ($relations as $relation) {
             if ($resourceRelation = $resource->getRelation($relation->getName())) {
                 if ($foreignResource = $resourceRelation->getForeignResource()) {
-                    $relation->setResource($foreignResource);
+                    $relation->setResource($resourceRelation);
                     $this->resolveProperties($foreignResource, $relation->getFields())
                         ->resolveProperties($foreignResource, $relation->getsort())
                         ->resolveRelations($foreignResource, $relation->getRelations());

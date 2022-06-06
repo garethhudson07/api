@@ -2,8 +2,7 @@
 
 namespace Api\Queries;
 
-use Api\Resources\Resource as Resource;
-
+use Api\Resources\Relations\Relation as ResourceRelation;
 use Api\Queries\Paths\Path;
 
 /**
@@ -151,10 +150,10 @@ class Relation
     }
 
     /**
-     * @param Resource $resource
+     * @param ResourceRelation $resource
      * @return $this
      */
-    public function setResource(Resource $resource): static
+    public function setResource(ResourceRelation $resource): static
     {
         $this->path->setEntity($resource);
 
