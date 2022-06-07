@@ -3,6 +3,7 @@
 namespace Api\Schema\Stitch;
 
 use Api\Schema\Schema as BaseSchema;
+use Api\Schema\Property as BaseProperty;
 use Api\Schema\Validation\Factory as ValidatorFactory;
 use Stitch\DBAL\Schema\Column;
 use Stitch\DBAL\Schema\Table;
@@ -26,6 +27,8 @@ class Schema extends BaseSchema
      */
     public function __construct()
     {
+        parent::__construct();
+
         $this->table = new Table();
     }
 
@@ -60,23 +63,24 @@ class Schema extends BaseSchema
     }
 
     /**
-     * @param $property
-     * @return $this
+     * @param BaseProperty $property
+     * @return static
      */
-    public function addProperty($property): self
+    public function addProperty(BaseProperty $property): static
     {
-        parent::addProperty($property);
+        if ($property instanceof Property) {
+            $this->table->pushColumn($property->getColumn());
+        }
 
-        $this->table->pushColumn($property->getColumn());
-
-        return $this;
+        return parent::addProperty($property);
     }
 
     /**
      * @param string $name
      * @param string $type
+     * @return Property
      */
-    protected function makeProperty(string $name, string $type)
+    protected function makeProperty(string $name, string $type): Property
     {
         return new Property(
             $name,

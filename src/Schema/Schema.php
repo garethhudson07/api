@@ -20,9 +20,19 @@ use Closure;
 class Schema
 {
     /**
-     * @var array
+     * @var Property[]
      */
-    protected $properties = [];
+    protected array $properties = [];
+
+    /**
+     * @var KeyChain
+     */
+    protected KeyChain $keyChain;
+
+    public function __construct()
+    {
+        $this->keyChain = new KeyChain();
+    }
 
     /**
      * @return array
@@ -101,18 +111,18 @@ class Schema
 
     /**
      * @param string $name
-     * @return mixed|null
+     * @return Property|null
      */
-    public function __get(string $name)
+    public function __get(string $name): ?Property
     {
         return $this->getProperty($name);
     }
 
     /**
-     * @param $property
-     * @return $this
+     * @param Property $property
+     * @return static
      */
-    public function addProperty($property): self
+    public function addProperty(Property $property): static
     {
         $this->properties[$property->getName()] = $property;
 
@@ -121,9 +131,9 @@ class Schema
 
     /**
      * @param string $name
-     * @return $this
+     * @return static
      */
-    public function removeProperty(string $name): self
+    public function removeProperty(string $name): static
     {
         if (array_key_exists($name, $this->properties)) {
             unset($this->properties[$name]);
@@ -137,13 +147,13 @@ class Schema
      * @param string $type
      * @return Property
      */
-    protected function makeProperty(string $name, string $type)
+    protected function makeProperty(string $name, string $type): Property
     {
-        return new Property(
+        return (new Property(
             $name,
             $type,
             ValidatorFactory::make($type)
-        );
+        ))->setSchema($this);
     }
 
     /**
@@ -157,10 +167,45 @@ class Schema
 
     /**
      * @param string $name
-     * @return mixed|null
+     * @return Property|null
      */
-    public function getProperty(string $name)
+    public function getProperty(string $name): ?Property
     {
         return $this->properties[$name] ?? null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPrimary(): bool
+    {
+        return $this->keyChain->getPrimary() !== null;
+    }
+
+    /**
+     * @return Property|null
+     */
+    public function getPrimary(): ?Property
+    {
+        return $this->keyChain->getPrimary();
+    }
+
+    /**
+     * @return KeyChain
+     */
+    public function getKeyChain(): KeyChain
+    {
+        return $this->keyChain;
+    }
+
+    /**
+     * @param KeyChain $keyChain
+     * @return static
+     */
+    public function setKeyChain(KeyChain $keyChain): static
+    {
+        $this->keyChain = $keyChain;
+
+        return $this;
     }
 }

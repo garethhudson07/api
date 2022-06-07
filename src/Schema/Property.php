@@ -10,10 +10,6 @@ use Closure;
 /**
  * Class Property
  * @package Api\Schema
- * @method Property primary()
- * @method Property increments()
- * @method Property references(string $name)
- * @method Property on(string $table)
  * @method Property sometimes()
  * @method Property required()
  * @method Property minLength(int $minLength, ?Closure $configureRule = null)
@@ -51,12 +47,17 @@ class Property
     /**
      * @var mixed
      */
-    protected $accepts;
+    protected mixed $accepts = null;
 
     /**
      * @var array
      */
     protected array $meta = [];
+
+    /**
+     * @var Schema|null
+     */
+    protected ?Schema $schema = null;
 
     /**
      * Property constructor.
@@ -98,7 +99,7 @@ class Property
     /**
      * @return mixed
      */
-    public function getAccepts()
+    public function getAccepts(): mixed
     {
         return $this->accepts;
     }
@@ -119,9 +120,9 @@ class Property
 
     /**
      * @param Closure $callback
-     * @return $this
+     * @return static
      */
-    public function beforeValidation(Closure $callback): self
+    public function beforeValidation(Closure $callback): static
     {
         $this->validator->before($callback);
 
@@ -130,12 +131,13 @@ class Property
 
     /**
      * @param $arg
-     * @return $this
+     * @return static
      */
     public function accepts($arg): Property
     {
         if ($arg instanceof Closure) {
             $this->accepts = new schema();
+
             $arg($this->accepts);
 
             return $this;
@@ -149,9 +151,9 @@ class Property
     /**
      * @param $condition
      * @param Closure $callback
-     * @return $this
+     * @return static
      */
-    public function when($condition, Closure $callback): self
+    public function when($condition, Closure $callback): static
     {
         if ($condition) {
             $callback($this);
@@ -165,7 +167,7 @@ class Property
      * @param mixed $value
      * @return self
      */
-    public function meta(string $name, mixed $value): self
+    public function meta(string $name, mixed $value): static
     {
         $this->meta[$name] = $value;
 
@@ -181,12 +183,14 @@ class Property
         return array_key_exists($name, $this->meta);
     }
 
+
+
     /**
      * @param $name
      * @param $arguments
      * @return self
      */
-    public function __call($name, $arguments): self
+    public function __call($name, $arguments): static
     {
         if ($this->validator->hasRule($name)) {
             $this->validator->{$name}(...$arguments);
@@ -202,5 +206,36 @@ class Property
     public function __get(string $name): mixed
     {
         return $this->meta[$name] ?? null;
+    }
+
+    /**
+     * @return Schema|null
+     */
+    public function getSchema(): ?Schema
+    {
+        return $this->schema;
+    }
+
+    /**
+     * @param  Schema|null $schema
+     * @return  static
+     */
+    public function setSchema(Schema $schema): static
+    {
+        $this->schema = $schema;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function primary(): static
+    {
+        if ($this->schema) {
+            $this->schema->getKeyChain()->setPrimary($this);
+        }
+
+        return $this;
     }
 }
