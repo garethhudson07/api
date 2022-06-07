@@ -20,7 +20,7 @@ class Factory implements FactoryInterface
         $response = $this->psr7Response()->withBody($this->psr7Stream());
 
         if ($content) {
-            $response->getBody()->write($content);
+            $response->getBody()->write((string) $content);
         }
 
         return $response;

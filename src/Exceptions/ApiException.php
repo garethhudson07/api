@@ -61,9 +61,7 @@ class ApiException extends Exception implements ApiExceptionInterface
      */
     public function prepareResponse(ResponseInterface $response): ResponseInterface
     {
-        $response->getBody()->write(
-            $this->payload->toJson()
-        );
+        $response->getBody()->write((string) $this->payload->toJson());
 
         return $response->withStatus($this->status);
     }

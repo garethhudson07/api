@@ -5,6 +5,11 @@ namespace Api\Specs\Contracts;
 interface Encoder
 {
     /**
+     * @return mixed
+     */
+    public function getData(): mixed;
+
+    /**
      * @param mixed $data
      * @return static
      */

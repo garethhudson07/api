@@ -10,29 +10,6 @@ use Neomerx\JsonApi\Schema\BaseSchema;
 class Schema extends BaseSchema implements SchemaInterface
 {
     /**
-     * Get resource type.
-     *
-     *
-     * @return string
-     */
-    public function getType(): string
-    {
-        return 'any';
-    }
-
-    /**
-     * Get resource identity. Newly created objects without ID may return `null` to exclude it from encoder output.
-     *
-     * @param object $resource
-     *
-     * @return string|null
-     */
-    public function getId($resource): ?string
-    {
-        return $resource->getAttribute('id');
-    }
-
-    /**
      * Get resource attributes.
      *
      * @param mixed            $resource
@@ -42,7 +19,11 @@ class Schema extends BaseSchema implements SchemaInterface
      */
     public function getAttributes($resource, ContextInterface $context): iterable
     {
-        return $resource->getAttributes();
+        $attributes = $resource->getAttributes();
+
+        unset($attributes['id']);
+
+        return $attributes;
     }
 
     /**
@@ -64,6 +45,29 @@ class Schema extends BaseSchema implements SchemaInterface
         }
 
         return $relationships;
+    }
+
+    /**
+     * Get resource type.
+     *
+     *
+     * @return string
+     */
+    public function getType(): string
+    {
+        return 'any';
+    }
+
+    /**
+     * Get resource identity. Newly created objects without ID may return `null` to exclude it from encoder output.
+     *
+     * @param object $resource
+     *
+     * @return string|null
+     */
+    public function getId($resource): ?string
+    {
+        return $resource->getAttribute('id');
     }
 
     /**

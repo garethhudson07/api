@@ -196,7 +196,7 @@ class Pipeline implements PipelineInterface
         $data = $pipe->getResult();
 
         if ($data) {
-            $this->response->getBody()->write($data);
+            $this->response->getBody()->write((string) $data);
         }
 
         switch ($pipe->getOperation()) {
