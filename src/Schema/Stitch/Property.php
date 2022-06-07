@@ -52,6 +52,18 @@ class Property extends BaseProperty
     }
 
     /**
+     * @return static
+     */
+    public function primary(): static
+    {
+        parent::primary();
+
+        $this->column->primary();
+
+        return $this;
+    }
+
+    /**
      * @param $name
      * @param $arguments
      * @return static
