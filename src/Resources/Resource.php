@@ -226,10 +226,17 @@ class Resource
      */
     public function getRecord(Pipe $pipe, ServerRequestInterface $request): ?string
     {
-        $this->endpoints->verify('show');
-        $this->emitCrudEvent('readingOne', compact('pipe', 'request'));
+        $resource = $this;
 
-        if (!$record = $this->repository->getRecord($pipe, $request)) {
+        $this->endpoints->verify('show');
+
+        $this->emitCrudEvent('readingOne', compact('pipe', 'request', 'resource'));
+
+        $record = $this->repository->getRecord($pipe, $request);
+
+        $this->emitCrudEvent('readOne', compact('pipe', 'request', 'resource', 'record'));
+
+        if (!$record) {
             return null;
         }
 
@@ -258,13 +265,17 @@ class Resource
      */
     public function update(Pipe $pipe, ServerRequestInterface $request): string
     {
+        $resource = $this;
+
         $this->endpoints->verify('update');
-        $this->emitCrudEvent('updating', compact('pipe', 'request'));
+
+        $this->emitCrudEvent('updating', compact('pipe', 'request', 'resource'));
+
         $this->schema->validate($request->getParsedBody());
 
         $record = $this->repository->update($pipe, $request);
 
-        $this->emitCrudEvent('updated', compact('record'));
+        $this->emitCrudEvent('updated', compact('pipe', 'request', 'resource', 'record'));
 
         return $this->represent($record);
     }

@@ -48,12 +48,17 @@ class Collectable extends Resource
      */
     public function getCollection(Pipe $pipe, ServerRequestInterface $request)
     {
-        $this->endpoints->verify('index');
-        $this->emitCrudEvent('readingMany', compact('pipe','request'));
+        $resource = $this;
 
-        return $this->represent(
-            $this->repository->getCollection($pipe, $request)
-        );
+        $this->endpoints->verify('index');
+
+        $this->emitCrudEvent('readingMany', compact('pipe','request', 'resource'));
+
+        $collection = $this->repository->getCollection($pipe, $request);
+
+        $this->emitCrudEvent('readMany', compact('pipe','request', 'resource', 'collection'));
+
+        return $this->represent($collection);
     }
 
     /**
@@ -64,13 +69,17 @@ class Collectable extends Resource
      */
     public function create(Pipe $pipe, ServerRequestInterface $request)
     {
+        $resource = $this;
+
         $this->endpoints->verify('create');
-        $this->emitCrudEvent('creating', compact('pipe','request'));
+
+        $this->emitCrudEvent('creating', compact('pipe','request', 'resource'));
+
         $this->schema->validate($request->getParsedBody());
 
         $record = $this->repository->create($pipe, $request);
 
-        $this->emitCrudEvent('created', compact('record'));
+        $this->emitCrudEvent('created', compact('pipe','request', 'resource', 'record'));
 
         return $this->represent($record);
     }
@@ -82,12 +91,15 @@ class Collectable extends Resource
      */
     public function delete(Pipe $pipe): array
     {
+        $resource = $this;
+
         $this->endpoints->verify('delete');
-        $this->emitCrudEvent('deleting', compact('pipe'));
+
+        $this->emitCrudEvent('deleting', compact('pipe', 'resource'));
 
         $record = $this->repository->delete($pipe);
 
-        $this->emitCrudEvent('deleted', compact('record'));
+        $this->emitCrudEvent('deleted', compact('pipe', 'resource', 'record'));
 
         return [];
     }
