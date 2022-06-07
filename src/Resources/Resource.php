@@ -12,6 +12,7 @@ use Api\Schema\Schema;
 use Api\Schema\Validation\ValidationException;
 use Api\Specs\Contracts\Representations\Factory as RepresentationFactoryInterface;
 use Api\Result\Contracts\Record as ResultRecordInterface;
+use Api\Specs\Contracts\Encoder;
 use Api\Transformers\Contracts\Transformer as TransformerInterface;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
@@ -221,10 +222,10 @@ class Resource
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return string|null
+     * @return Encoder|null
      * @throws Exception
      */
-    public function getRecord(Pipe $pipe, ServerRequestInterface $request): ?string
+    public function getRecord(Pipe $pipe, ServerRequestInterface $request): ?Encoder
     {
         $resource = $this;
 
@@ -260,10 +261,10 @@ class Resource
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return string
+     * @return Encoder
      * @throws ValidationException
      */
-    public function update(Pipe $pipe, ServerRequestInterface $request): string
+    public function update(Pipe $pipe, ServerRequestInterface $request): Encoder
     {
         $resource = $this;
 
@@ -312,12 +313,10 @@ class Resource
 
     /**
      * @param $entity
-     * @return string
+     * @return Encoder
      */
-    protected function represent($entity): string
+    protected function represent($entity): Encoder
     {
-        return $this->representationFactory->encoder()->encode(
-            $this->createRepresentation($entity)
-        );
+        return $this->representationFactory->encoder()->setData($this->createRepresentation($entity));
     }
 }

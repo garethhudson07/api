@@ -6,14 +6,30 @@ namespace Api\Specs\JsonApi\Representations;
 use Neomerx\JsonApi\Encoder\Encoder as BaseEncoder;
 use Psr\Http\Message\ServerRequestInterface;
 use Api\Queries\Relations as RequestRelations;
+use Api\Specs\Contracts\Encoder as EncoderContract;
 use Api\Support\Str;
+use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 
-class Encoder
+class Encoder implements EncoderContract
 {
-    protected $baseEncoder;
+    /**
+     * @var EncoderInterface
+     */
+    protected EncoderInterface $baseEncoder;
 
-    public function __construct(ServerRequestInterface $request)
+    /**
+     * @var mixed
+     */
+    protected $data = null;
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param mixed $data
+     */
+    public function __construct(ServerRequestInterface $request, mixed $data = null)
     {
+        $this->data = $data;
+
         $this->baseEncoder = BaseEncoder::instance([
             Record::class => Schema::class
         ])->withIncludedPaths(
@@ -45,11 +61,38 @@ class Encoder
     }
 
     /**
-     * @param $data
+     * @param mixed $data
      * @return string
      */
-    public function encode($data): string
+    public function encode(mixed $data = null): string
     {
-        return $this->baseEncoder->encodeData($data);
+        return $this->baseEncoder->encodeData($data ?? $this->data);
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->encode($this->data);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData(): mixed
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param mixed $data
+     * @return static
+     */
+    public function setData(mixed $data): static
+    {
+        $this->data = $data;
+
+        return $this;
     }
 }

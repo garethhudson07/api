@@ -9,6 +9,7 @@ use Api\Repositories\Contracts\Resource as RepositoryInterface;
 use Api\Specs\Contracts\Representations\Factory as RepresentationFactoryInterface;
 use Api\Transformers\Contracts\Transformer as TransformerInterface;
 use Api\Events\Contracts\Emitter as EmitterInterface;
+use Api\Specs\Contracts\Encoder;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -43,10 +44,10 @@ class Collectable extends Resource
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return mixed
+     * @return Encoder
      * @throws Exception
      */
-    public function getCollection(Pipe $pipe, ServerRequestInterface $request)
+    public function getCollection(Pipe $pipe, ServerRequestInterface $request): Encoder
     {
         $resource = $this;
 
@@ -64,10 +65,10 @@ class Collectable extends Resource
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return mixed
+     * @return Encoder
      * @throws Exception
      */
-    public function create(Pipe $pipe, ServerRequestInterface $request)
+    public function create(Pipe $pipe, ServerRequestInterface $request): Encoder
     {
         $resource = $this;
 
@@ -86,10 +87,10 @@ class Collectable extends Resource
 
     /**
      * @param Pipe $pipe
-     * @return mixed
+     * @return Encoder
      * @throws Exception
      */
-    public function delete(Pipe $pipe): array
+    public function delete(Pipe $pipe): Encoder
     {
         $resource = $this;
 
@@ -101,6 +102,6 @@ class Collectable extends Resource
 
         $this->emitCrudEvent('deleted', compact('pipe', 'resource', 'record'));
 
-        return [];
+        return $this->represent([]);
     }
 }
