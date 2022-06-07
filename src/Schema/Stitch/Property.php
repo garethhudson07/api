@@ -54,9 +54,9 @@ class Property extends BaseProperty
     /**
      * @param $name
      * @param $arguments
-     * @return self
+     * @return static
      */
-    public function __call($name, $arguments): self
+    public function __call($name, $arguments): static
     {
         parent::__call($name, $arguments);
 
