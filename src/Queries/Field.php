@@ -63,4 +63,12 @@ class Field
     {
         return $this->path;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return (string) $this->getPath();
+    }
 }
