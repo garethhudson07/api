@@ -5,5 +5,8 @@ namespace Api\Exceptions;
 
 class NotFoundException extends ApiException
 {
-    protected $status = 404;
+    public function __construct(string $message)
+    {
+        parent::__construct($message, 400);
+    }
 }
