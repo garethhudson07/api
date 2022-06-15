@@ -163,10 +163,10 @@ class Parser implements ParserContract
                 $pieces = $this->hierarchy($constraint->getColumn());
                 $propertyName = array_pop($pieces);
 
-                if (count($pieces)) {
-                    $condition->setRelation(
-                        $this->query->getRelations()->pull(implode('.', $pieces))
-                    );
+                if (count($pieces) && $relation = $this->query->getRelations()->pull(implode('.', $pieces))) {
+                    $condition->setRelation($relation);
+                } else {
+                    $propertyName = $constraint->getColumn();
                 }
 
                 $condition->setPropertyName($propertyName)
