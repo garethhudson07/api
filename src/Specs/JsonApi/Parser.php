@@ -80,7 +80,7 @@ class Parser implements ParserContract
      */
     protected function list(string $input): array
     {
-        return array_filter(explode(',', $input));
+        return array_filter(preg_split('/\,(?![^(]*\))/', $input));
     }
 
     /**
