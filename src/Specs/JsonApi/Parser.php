@@ -2,6 +2,7 @@
 
 namespace Api\Specs\JsonApi;
 
+use Api\Exceptions\ApiException;
 use Api\Queries\Condition;
 use Api\Queries\Expression;
 use Api\Queries\Field;
@@ -138,6 +139,7 @@ class Parser implements ParserContract
                 )
             );
         } catch (RsqlException $e) {
+            throw new ApiException($e->getMessage(), $e->getCode(), $e);
         }
 
         return $this;
