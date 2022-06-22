@@ -325,10 +325,24 @@ class Parser implements ParserContract
      */
     public function attributes(array $input): array
     {
-        if (array_key_exists('data', $input) && array_key_exists('attributes', $input['data'])) {
-            return $input['data']['attributes'];
-        }
+        return $input['data']['attributes'] ?? [];
+    }
 
-        return [];
+    /**
+     * @param array $input
+     * @return mixed
+     */
+    public function id(array $input): mixed
+    {
+        return $input['data']['id'] ?? null;
+    }
+
+    /**
+     * @param array $input
+     * @return mixed
+     */
+    public function type(array $input): mixed
+    {
+        return $input['data']['type'] ?? null;
     }
 }

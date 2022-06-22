@@ -80,6 +80,9 @@ class Factory implements FactoryInterface
             ) ?: [];
 
             if (($request->getServerParams()['CONTENT_TYPE'] ?? null) === 'application/vnd.api+json') {
+                $request = $request->withAttribute('parsedId', $parser->id($body));
+                $request = $request->withAttribute('parsedType', $parser->type($body));
+
                 $request = $request->withParsedBody(
                     $parser->attributes($body)
                 );
