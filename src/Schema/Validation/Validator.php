@@ -252,8 +252,8 @@ class Validator
         // Validate required in isolation as we don't want additional
         // errors if the attribute is missing altogether
         if ($this->required && !$this->assert(
-            new Rules\AllOf((new Rules\NotEmpty())->setTemplate($this::MESSAGE_TEMPLATES['required'])),
-            $value
+            new Rules\AllOf((new Rules\NotOptional())->setTemplate($this::MESSAGE_TEMPLATES['required'])),
+            $this->type === 'string' ? trim($value) : $value
         )) {
             return false;
         }
