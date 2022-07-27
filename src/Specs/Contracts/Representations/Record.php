@@ -15,4 +15,12 @@ interface Record
     public function getRelations(): array;
 
     public function addRelation(string $name, mixed $relation): static;
+
+    public function getMetaData(string $key): mixed;
+
+    public function getMeta(): array;
+
+    public function setMetaData(string $key, mixed $value): static;
+
+    public function setMeta(array $meta): static;
 }

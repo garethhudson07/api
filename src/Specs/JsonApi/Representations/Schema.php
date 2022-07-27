@@ -93,4 +93,22 @@ class Schema extends BaseSchema implements SchemaInterface
     {
         return [];
     }
+
+    /**
+     * @param Record $resource
+     * @return bool
+     */
+    public function hasResourceMeta($resource): bool
+    {
+        return count($resource->getMeta()) > 0;
+    }
+
+    /**
+     * @param Record $resource
+     * @return mixed
+     */
+    public function getResourceMeta($resource)
+    {
+        return $resource->getMeta();
+    }
 }

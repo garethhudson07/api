@@ -23,6 +23,11 @@ class Record implements RepresentationsRecord
      */
     protected array $relations = [];
 
+    /**
+     * @var array
+     */
+    protected array $meta = [];
+
     public function __construct(string $type)
     {
         $this->type = $type;
@@ -80,6 +85,46 @@ class Record implements RepresentationsRecord
     public function addRelation(string $name, mixed $relation): static
     {
         $this->relations[Str::camel($name)] = $relation;
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function getMetaData(string $key): mixed
+    {
+        return $this->meta[$key] ?? null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMeta(): array
+    {
+        return $this->meta;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return static
+     */
+    public function setMetaData(string $key, mixed $value): static
+    {
+        $this->meta[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param array $meta
+     * @return static
+     */
+    public function setMeta(array $meta): static
+    {
+        $this->meta = $meta;
 
         return $this;
     }

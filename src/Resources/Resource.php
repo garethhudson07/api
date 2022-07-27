@@ -43,6 +43,9 @@ class Resource
      */
     protected $representationFactory;
 
+    /**
+     * @var TransformerInterface
+     */
     protected $transformer;
 
     /**
@@ -291,6 +294,8 @@ class Resource
             $representation = $this->representationFactory->record($this->getName())->setAttributes(
                 $this->transformer->transform($entity)
             );
+
+            $representation->setMeta($this->transformer->transformMetaData($entity));
 
             foreach ($entity->getRelations() as $key => $relation) {
                 $representation->addRelation(
