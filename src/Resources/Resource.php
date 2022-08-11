@@ -318,11 +318,17 @@ class Resource
     }
 
     /**
-     * @param $entity
+     * @param ResultRecordInterface|ResultCollectionInterface $entity
      * @return Encoder
      */
-    protected function represent($entity): Encoder
+    protected function represent(ResultRecordInterface|ResultCollectionInterface $entity): Encoder
     {
-        return $this->representationFactory->encoder()->setData($this->createRepresentation($entity));
+        $encoder = $this->representationFactory->encoder();
+
+        if ($entity instanceof ResultCollectionInterface && $entity->getMetaData()) {
+            $encoder->setMeta($entity->getMetaData());
+        }
+
+        return $encoder->setData($this->createRepresentation($entity));
     }
 }
