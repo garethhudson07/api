@@ -22,7 +22,7 @@ interface Resource
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return iterable
+     * @return ResultCollectionInterface
      */
     public function getCollection(Pipe $pipe, ServerRequestInterface $request): ResultCollectionInterface;
 
