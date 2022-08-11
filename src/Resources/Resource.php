@@ -323,6 +323,6 @@ class Resource
      */
     protected function represent($entity): Encoder
     {
-        return $this->representationFactory->encoder()->setData($this->createRepresentation($entity))->setMeta();
+        return $this->representationFactory->encoder()->setData($this->createRepresentation($entity));
     }
 }
