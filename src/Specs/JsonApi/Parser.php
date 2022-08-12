@@ -40,6 +40,7 @@ class Parser implements ParserContract
             ->parseSort($params[$config->get('sortKey')] ?? '')
             ->parseLimit($params[$config->get('limitKey')] ?? '')
             ->parseOffset($params[$config->get('offsetKey')] ?? '')
+            ->parsePage($params[$config->get('pageKey')] ?? '')
             ->parseSearch($params[$config->get('searchKey')] ?? '');
     }
 
@@ -302,6 +303,19 @@ class Parser implements ParserContract
     protected function parseOffset($input): static
     {
         $this->query->setOffset(
+            intval($input)
+        );
+
+        return $this;
+    }
+
+    /**
+     * @param $input
+     * @return $this
+     */
+    protected function parsePage($input): static
+    {
+        $this->query->setPage(
             intval($input)
         );
 

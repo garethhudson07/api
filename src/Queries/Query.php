@@ -25,6 +25,8 @@ class Query
 
     protected $offset;
 
+    protected $page;
+
     protected $search;
 
     /**
@@ -169,11 +171,30 @@ class Query
     }
 
     /**
+     * @param $page
+     * @return $this
+     */
+    public function setPage($page): static
+    {
+        $this->page = $page;
+
+        return $this;
+    }
+
+    /**
      * @return int|null
      */
     public function getOffset(): ?int
     {
         return $this->offset;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPage(): ?int
+    {
+        return $this->page;
     }
 
     /**
