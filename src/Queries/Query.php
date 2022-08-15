@@ -133,6 +133,17 @@ class Query
     }
 
     /**
+     * @param $sort
+     * @return $this
+     */
+    public function setSort(array $sort): static
+    {
+        $this->sort = $sort;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getSort(): array
