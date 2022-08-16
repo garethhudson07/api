@@ -53,7 +53,7 @@ class Factory
             );
         } else {
             if (!isset($arguments[2])) {
-                $transformer = new Transformer();
+                $arguments[2] = new Transformer();
             }
 
             list($schema, $repository, $transformer) = $arguments;
