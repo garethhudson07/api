@@ -9,6 +9,7 @@ use Api\Resources\Relations\Factory as RelationsFactory;
 use Api\Repositories\Stitch\Resource as StitchRepository;
 use Api\Transformers\Stitch\Transformer as StitchTransformer;
 use Api\Specs\Contracts\Representations\Factory as RepresentationFactoryInterface;
+use Api\Transformers\Transformer;
 use Closure;
 use Stitch\Model;
 
@@ -51,6 +52,10 @@ class Factory
                 new Model($schema->getTable())
             );
         } else {
+            if (!isset($arguments[2])) {
+                $transformer = new Transformer();
+            }
+
             list($schema, $repository, $transformer) = $arguments;
         }
 
