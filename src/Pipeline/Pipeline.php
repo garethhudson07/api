@@ -41,7 +41,7 @@ class Pipeline implements PipelineInterface
      * @param string $prefix
      * @return $this
      */
-    public function prefix(string $prefix)
+    public function prefix(string $prefix): Pipeline
     {
         $this->prefix = $prefix;
 
@@ -76,7 +76,7 @@ class Pipeline implements PipelineInterface
     /**
      * @return Pipe
      */
-    protected function newPipe()
+    public function newPipe(): Pipe
     {
         $pipe = $this->makePipe();
 
@@ -89,7 +89,7 @@ class Pipeline implements PipelineInterface
      * @param Registry $resources
      * @return Pipeline
      */
-    public function assemble(Registry $resources)
+    public function assemble(Registry $resources): Pipeline
     {
         /** @var Pipe $pipe */
         $pipe = null;
@@ -134,17 +134,17 @@ class Pipeline implements PipelineInterface
     }
 
     /**
-     * @return mixed|null
+     * @return Pipe|null
      */
-    public function last()
+    public function last(): ?Pipe
     {
         return $this->pipes->last();
     }
 
     /**
-     * @return mixed|null
+     * @return Pipe|null
      */
-    public function penultimate()
+    public function penultimate(): ?Pipe
     {
         return $this->pipes->penultimate();
     }
@@ -153,7 +153,7 @@ class Pipeline implements PipelineInterface
      * @param Pipe $pipe
      * @return array
      */
-    public function before(Pipe $pipe)
+    public function before(Pipe $pipe): array
     {
         return $this->pipes->beforePipe($pipe);
     }
@@ -162,7 +162,7 @@ class Pipeline implements PipelineInterface
      * @param Pipe $pipe
      * @return array
      */
-    public function after(Pipe $pipe)
+    public function after(Pipe $pipe): array
     {
         return $this->pipes->afterPipe($pipe);
     }
@@ -170,15 +170,15 @@ class Pipeline implements PipelineInterface
     /**
      * @return Pipes
      */
-    public function all()
+    public function all(): Pipes
     {
         return $this->pipes;
     }
 
     /**
-     * @return $this
+     * @return Pipeline
      */
-    public function call()
+    public function call(): Pipeline
     {
         foreach ($this->pipes as $pipe) {
             $pipe->call();
