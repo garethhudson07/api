@@ -129,7 +129,9 @@ class Resource implements RepositoryInterface
                 $this->model,
                 $pipe
             ))->byKey()->hydrate()->fill(
-                $pipe->getResource()->getTransformer()->reverse($request->getParsedBody())
+                $pipe->getResource()->getTransformer()->reverse(array_merge($request->getParsedBody(), [
+                    $this->model->getTable()->getPrimaryKey()->getName() => $pipe->getKey(),
+                ]))
             )->save()
         );
     }
