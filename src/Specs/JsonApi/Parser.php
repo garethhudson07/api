@@ -2,6 +2,7 @@
 
 namespace Api\Specs\JsonApi;
 
+use Api\Config\Manager;
 use Api\Exceptions\ApiException;
 use Api\Queries\Condition;
 use Api\Queries\Expression;
@@ -14,6 +15,7 @@ use Oilstone\RsqlParser\Exceptions\Exception as RsqlException;
 use Oilstone\RsqlParser\Expression as RsqlExpression;
 use Oilstone\RsqlParser\Parser as RsqlParser;
 use Closure;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Parser implements ParserContract
 {
@@ -30,7 +32,7 @@ class Parser implements ParserContract
         return $this;
     }
 
-    public function parse($request, $config)
+    public function parse(ServerRequestInterface $request, Manager $config): void
     {
         $params = $request->getQueryParams();
 

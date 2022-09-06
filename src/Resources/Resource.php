@@ -18,10 +18,6 @@ use Api\Transformers\Contracts\Transformer as TransformerInterface;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Class Resource
- * @package Api\Resources
- */
 class Resource
 {
     /**

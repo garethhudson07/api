@@ -8,6 +8,8 @@ use Api\Specs\Contracts\Parser as ParserInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Api\Resources\Resource;
 use Api\Queries\Paths\Path;
+use Api\Resources\Relations\Relation as ResourceRelation;
+use Api\Resources\Relations\Stitch\Has;
 
 class Query
 {
@@ -228,11 +230,19 @@ class Query
     }
 
     /**
-     * @param Resource $resource
+     * @param Resource|ResourceRelation $resource
      * @return $this
      */
-    public function resolve(Resource $resource): static
+    public function resolve(Resource|ResourceRelation $resource): static
     {
+        if ($resource instanceof Has) {
+            $resource = $resource->getForeignResource();
+        }
+
+        if ($resource instanceof ResourceRelation) {
+            $resource = $resource->getLocalResource();
+        }
+
         return $this->resolveProperties($resource, $this->fields)
             ->resolveProperties($resource, $this->sort)
             ->resolveRelations($resource, $this->relations)
@@ -297,7 +307,7 @@ class Query
                 if ($foreignResource = $resourceRelation->getForeignResource()) {
                     $relation->setResource($resourceRelation);
                     $this->resolveProperties($foreignResource, $relation->getFields())
-                        ->resolveProperties($foreignResource, $relation->getsort())
+                        ->resolveProperties($foreignResource, $relation->getSort())
                         ->resolveRelations($foreignResource, $relation->getRelations());
                 }
             }
@@ -315,7 +325,7 @@ class Query
     {
         if ($relation = $path->getRelation()) {
             return $this->getSchemaByPath(
-                $resource->getRelation($relation->getName())->getLocalResource(),
+                $resource->getRelation($relation->getName())->getForeignResource(),
                 $relation->getPath()
             );
         }
