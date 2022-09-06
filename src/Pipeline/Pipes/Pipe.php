@@ -179,11 +179,27 @@ class Pipe
     }
 
     /**
+     * @return Pipe|null
+     */
+    public function getAncestor(string $name): ?Pipe
+    {
+        return current(array_filter($this->ancestors(), fn($ancestor) => $ancestor->getEntity()->getName() === $name));
+    }
+
+    /**
      * @return array
      */
     public function ancestors(): array
     {
         return $this->pipeline->before($this);
+    }
+
+    /**
+     * @return Pipe|null
+     */
+    public function getDescendant(string $name): ?Pipe
+    {
+        return current(array_filter($this->descendants(), fn($descendant) => $descendant->getEntity()->getName() === $name));
     }
 
     /**
