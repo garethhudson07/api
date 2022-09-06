@@ -183,7 +183,7 @@ class Pipe
      */
     public function getAncestor(string $name): ?Pipe
     {
-        return current(array_filter($this->ancestors(), fn($ancestor) => $ancestor->getEntity()->getName() === $name));
+        return current(array_filter($this->ancestors(), fn($ancestor) => $ancestor->getEntity()->getName() === $name)) ?: null;
     }
 
     /**
@@ -199,7 +199,7 @@ class Pipe
      */
     public function getDescendant(string $name): ?Pipe
     {
-        return current(array_filter($this->descendants(), fn($descendant) => $descendant->getEntity()->getName() === $name));
+        return current(array_filter($this->descendants(), fn($descendant) => $descendant->getEntity()->getName() === $name)) ?: null;
     }
 
     /**
