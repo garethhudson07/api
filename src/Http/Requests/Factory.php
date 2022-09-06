@@ -2,6 +2,7 @@
 
 namespace Api\Http\Requests;
 
+use Aggregate\Map;
 use Api\Container;
 use Api\Http\Requests\Contracts\Factory as FactoryInterface;
 use Api\Config\Manager as ConfigManager;
@@ -71,7 +72,8 @@ class Factory implements FactoryInterface
                 $parser,
                 $request,
                 $this->specConfig
-        ));
+            )
+        );
 
         if ($request->getMethod() !== 'GET') {
             $body = json_decode(
@@ -80,12 +82,9 @@ class Factory implements FactoryInterface
             ) ?: [];
 
             if (($request->getServerParams()['CONTENT_TYPE'] ?? null) === 'application/vnd.api+json') {
-                $request = $request->withAttribute('parsedId', $parser->id($body));
-                $request = $request->withAttribute('parsedType', $parser->type($body));
-
-                $request = $request->withParsedBody(
-                    $parser->attributes($body)
-                );
+                $request = $request->withAttribute('parsedId', $parser->id($body))
+                    ->withAttribute('parsedType', $parser->type($body))
+                    ->withParsedBody((new Map())->fill($parser->attributes($body)));
             }
         }
 
