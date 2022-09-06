@@ -17,6 +17,15 @@ class Transformer implements Contract
     }
 
     /**
+     * @param array $attributes
+     * @return array
+     */
+    public function reverse(array $attributes): array
+    {
+        return $attributes;
+    }
+
+    /**
      * @param Record $record
      * @return array
      */
