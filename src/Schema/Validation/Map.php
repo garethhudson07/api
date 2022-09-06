@@ -7,10 +7,10 @@ use Aggregate\Map as AggregateMap;
 class Map extends Nested
 {
     /**
-     * @param $input
+     * @param AggregateMap|null $input
      * @return bool
      */
-    public function run(AggregateMap $input): bool
+    public function run(?AggregateMap $input): bool
     {
         $this->clearMessages();
 

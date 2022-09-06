@@ -2,7 +2,7 @@
 
 namespace Api\Schema\Validation;
 
-use Aggregate\Map as AggregateMap;
+use Aggregate\Map;
 
 abstract class Nested
 {
@@ -61,8 +61,8 @@ abstract class Nested
     }
 
     /**
-     * @param $input
+     * @param Map|null $input
      * @return bool
      */
-    abstract public function run(AggregateMap $input): bool;
+    abstract public function run(?Map $input): bool;
 }

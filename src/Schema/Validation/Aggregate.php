@@ -2,7 +2,7 @@
 
 namespace Api\Schema\Validation;
 
-use Aggregate\Map as AggregateMap;
+use Aggregate\Map;
 use Api\Support\Str;
 
 class Aggregate extends Map
@@ -13,15 +13,15 @@ class Aggregate extends Map
     protected $messages;
 
     /**
-     * @param AggregateMap $input
+     * @param Map|null $input
      * @return bool
      */
-    public function run(AggregateMap $input): bool
+    public function run(?Map $input): bool
     {
         $this->messages = [];
 
         foreach ($this->items as $key => $validator) {
-            if (!$input->has($key) && $validator->isSometimes()) {
+            if (!$input?->has($key) && $validator->isSometimes()) {
                 continue;
             }
 
@@ -32,7 +32,7 @@ class Aggregate extends Map
                 $validator->callHook('before', $input);
             }
 
-            $value = $input->get($key);
+            $value = $input?->get($key);
 
             // TODO move camel casing to dedicated representation class
             if (!$validator->run($value)) {
