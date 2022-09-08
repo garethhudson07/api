@@ -7,10 +7,10 @@ use Aggregate\Map;
 class Collection extends Nested
 {
     /**
-     * @param Map|null $input
+     * @param mixed $input
      * @return bool
      */
-    public function run(?Map $input): bool
+    public function run(mixed $input): bool
     {
         $this->clearMessages();
 
@@ -20,7 +20,11 @@ class Collection extends Nested
             return false;
         }
 
-        foreach ($input->toArray() as $key => $item) {
+        if ($input instanceof Map) {
+            $input = $input->toArray();
+        }
+
+        foreach ($input as $key => $item) {
             if (!$this->childValidator->run($item)) {
                 if (!array_key_exists('items', $this->messages)) {
                     $this->messages['items'] = [];

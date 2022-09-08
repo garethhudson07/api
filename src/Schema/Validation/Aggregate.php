@@ -13,15 +13,19 @@ class Aggregate extends Map
     protected $messages;
 
     /**
-     * @param Map|null $input
+     * @param mixed $input
      * @return bool
      */
-    public function run(?Map $input): bool
+    public function run(mixed $input): bool
     {
         $this->messages = [];
 
+        if ($input instanceof Map) {
+            $input = $input->toArray();
+        }
+
         foreach ($this->items as $key => $validator) {
-            if (!$input?->has($key) && $validator->isSometimes()) {
+            if (!array_key_exists($key, $input) && $validator->isSometimes()) {
                 continue;
             }
 
@@ -32,7 +36,7 @@ class Aggregate extends Map
                 $validator->callHook('before', $input);
             }
 
-            $value = $input?->get($key);
+            $value = $input[$key] ?? null;
 
             // TODO move camel casing to dedicated representation class
             if (!$validator->run($value)) {

@@ -2,15 +2,13 @@
 
 namespace Api\Schema\Validation;
 
-use Aggregate\Map as AggregateMap;
-
 class Map extends Nested
 {
     /**
-     * @param AggregateMap|null $input
+     * @param mixed $input
      * @return bool
      */
-    public function run(?AggregateMap $input): bool
+    public function run(mixed $input): bool
     {
         $this->clearMessages();
 

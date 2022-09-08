@@ -2,8 +2,6 @@
 
 namespace Api\Schema\Validation;
 
-use Aggregate\Map;
-
 abstract class Nested
 {
     protected $baseValidator;
@@ -61,8 +59,8 @@ abstract class Nested
     }
 
     /**
-     * @param Map|null $input
+     * @param mixed $input
      * @return bool
      */
-    abstract public function run(?Map $input): bool;
+    abstract public function run(mixed $input): bool;
 }
