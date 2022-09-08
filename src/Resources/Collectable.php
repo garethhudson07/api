@@ -102,6 +102,6 @@ class Collectable extends Resource
 
         $this->emitCrudEvent('deleted', compact('pipe', 'resource', 'record'));
 
-        return $this->represent([]);
+        return $this->representationFactory->encoder();
     }
 }
