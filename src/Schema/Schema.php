@@ -44,11 +44,11 @@ class Schema
     }
 
     /**
-     * @param Map $input
+     * @param mixed $input
      * @return bool
      * @throws ValidationException
      */
-    public function validate(Map $input): bool
+    public function validate(mixed $input): bool
     {
         $validator = $this->resolveValidator();
 
