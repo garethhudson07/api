@@ -3,6 +3,7 @@
 namespace Api\Repositories\Contracts;
 
 use Api\Pipeline\Pipes\Pipe;
+use Api\Result\Contracts\Collection as ResultCollectionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Api\Result\Contracts\Record as ResultRecordInterface;
 
@@ -21,9 +22,9 @@ interface Resource
     /**
      * @param Pipe $pipe
      * @param ServerRequestInterface $request
-     * @return iterable
+     * @return ResultCollectionInterface
      */
-    public function getCollection(Pipe $pipe, ServerRequestInterface $request): iterable;
+    public function getCollection(Pipe $pipe, ServerRequestInterface $request): ResultCollectionInterface;
 
     /**
      * @param Pipe $pipe

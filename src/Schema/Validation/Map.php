@@ -5,10 +5,10 @@ namespace Api\Schema\Validation;
 class Map extends Nested
 {
     /**
-     * @param $input
+     * @param mixed $input
      * @return bool
      */
-    public function run($input): bool
+    public function run(mixed $input): bool
     {
         $this->clearMessages();
 

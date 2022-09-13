@@ -11,16 +11,13 @@ use Api\Resources\Relations\Relation;
 use Api\Schema\Schema;
 use Api\Schema\Validation\ValidationException;
 use Api\Specs\Contracts\Representations\Factory as RepresentationFactoryInterface;
+use Api\Result\Contracts\Collection as ResultCollectionInterface;
 use Api\Result\Contracts\Record as ResultRecordInterface;
 use Api\Specs\Contracts\Encoder;
 use Api\Transformers\Contracts\Transformer as TransformerInterface;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Class Resource
- * @package Api\Resources
- */
 class Resource
 {
     /**
@@ -285,10 +282,10 @@ class Resource
     }
 
     /**
-     * @param $entity
-     * @return array
+     * @param ResultRecordInterface|ResultCollectionInterface $entity
+     * @return mixed
      */
-    public function createRepresentation($entity)
+    public function createRepresentation(ResultRecordInterface|ResultCollectionInterface $entity)
     {
         if ($entity instanceof ResultRecordInterface) {
             $representation = $this->representationFactory->record($this->getName())->setAttributes(
@@ -309,7 +306,7 @@ class Resource
 
         $representation = [];
 
-        foreach ($entity as $record) {
+        foreach ($entity->getItems() as $record) {
             $representation[] = $this->createRepresentation($record);
         }
 
@@ -317,11 +314,17 @@ class Resource
     }
 
     /**
-     * @param $entity
+     * @param ResultRecordInterface|ResultCollectionInterface $entity
      * @return Encoder
      */
-    protected function represent($entity): Encoder
+    protected function represent(ResultRecordInterface|ResultCollectionInterface $entity): Encoder
     {
-        return $this->representationFactory->encoder()->setData($this->createRepresentation($entity));
+        $encoder = $this->representationFactory->encoder();
+
+        if ($entity instanceof ResultCollectionInterface && $entity->getMetaData()) {
+            $encoder->setMeta($entity->getMetaData());
+        }
+
+        return $encoder->setData($this->createRepresentation($entity));
     }
 }

@@ -68,8 +68,7 @@ class Query
 
             $this->baseQuery->with($path);
 
-            $this->baseQuery->select(...array_map(function ($field)
-            {
+            $this->baseQuery->select(...array_map(function ($field) {
                 $this->resolvePropertyPath($field->getPath());
             }, $relation->getFields()));
 
@@ -95,8 +94,7 @@ class Query
     public function select(array $fields): self
     {
         if ($fields) {
-            $this->baseQuery->select(...array_map(function ($field)
-            {
+            $this->baseQuery->select(...array_map(function ($field) {
                 return $this->resolvePropertyPath($field->getPath());
             }, $fields));
         }
@@ -156,6 +154,19 @@ class Query
     }
 
     /**
+     * @param $page
+     * @return self
+     */
+    public function page($page, $limit): self
+    {
+        if ($page && $limit) {
+            $this->baseQuery->limit($limit)->offset($page * $limit);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param $search
      * @return self
      */
@@ -181,8 +192,7 @@ class Query
             $constraint = $item['constraint'];
 
             if ($constraint instanceof Expression) {
-                $query->{$method}(function ($query) use ($constraint)
-                {
+                $query->{$method}(function ($query) use ($constraint) {
                     $this->applyExpression($query, $constraint);
                 });
             } else {

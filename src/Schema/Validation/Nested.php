@@ -59,8 +59,8 @@ abstract class Nested
     }
 
     /**
-     * @param $input
+     * @param mixed $input
      * @return bool
      */
-    abstract public function run($input): bool;
+    abstract public function run(mixed $input): bool;
 }

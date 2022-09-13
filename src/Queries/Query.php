@@ -8,6 +8,8 @@ use Api\Specs\Contracts\Parser as ParserInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Api\Resources\Resource;
 use Api\Queries\Paths\Path;
+use Api\Resources\Relations\Relation as ResourceRelation;
+use Api\Resources\Relations\Stitch\Has;
 
 class Query
 {
@@ -24,6 +26,8 @@ class Query
     protected $limit;
 
     protected $offset;
+
+    protected $page;
 
     protected $search;
 
@@ -131,6 +135,17 @@ class Query
     }
 
     /**
+     * @param $sort
+     * @return $this
+     */
+    public function setSort(array $sort): static
+    {
+        $this->sort = $sort;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getSort(): array
@@ -169,11 +184,30 @@ class Query
     }
 
     /**
+     * @param $page
+     * @return $this
+     */
+    public function setPage($page): static
+    {
+        $this->page = $page;
+
+        return $this;
+    }
+
+    /**
      * @return int|null
      */
     public function getOffset(): ?int
     {
         return $this->offset;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPage(): ?int
+    {
+        return $this->page;
     }
 
     /**
@@ -196,11 +230,19 @@ class Query
     }
 
     /**
-     * @param Resource $resource
+     * @param Resource|ResourceRelation $resource
      * @return $this
      */
-    public function resolve(Resource $resource): static
+    public function resolve(Resource|ResourceRelation $resource): static
     {
+        if ($resource instanceof Has) {
+            $resource = $resource->getForeignResource();
+        }
+
+        if ($resource instanceof ResourceRelation) {
+            $resource = $resource->getLocalResource();
+        }
+
         return $this->resolveProperties($resource, $this->fields)
             ->resolveProperties($resource, $this->sort)
             ->resolveRelations($resource, $this->relations)
@@ -265,7 +307,7 @@ class Query
                 if ($foreignResource = $resourceRelation->getForeignResource()) {
                     $relation->setResource($resourceRelation);
                     $this->resolveProperties($foreignResource, $relation->getFields())
-                        ->resolveProperties($foreignResource, $relation->getsort())
+                        ->resolveProperties($foreignResource, $relation->getSort())
                         ->resolveRelations($foreignResource, $relation->getRelations());
                 }
             }
@@ -283,7 +325,7 @@ class Query
     {
         if ($relation = $path->getRelation()) {
             return $this->getSchemaByPath(
-                $resource->getRelation($relation->getName())->getLocalResource(),
+                $resource->getRelation($relation->getName())->getForeignResource(),
                 $relation->getPath()
             );
         }

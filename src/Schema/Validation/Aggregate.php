@@ -5,10 +5,6 @@ namespace Api\Schema\Validation;
 use Aggregate\Map;
 use Api\Support\Str;
 
-/**
- * Class Aggregate
- * @package Api\Schema\Validation
- */
 class Aggregate extends Map
 {
     /**
@@ -17,12 +13,16 @@ class Aggregate extends Map
     protected $messages;
 
     /**
-     * @param array $input
+     * @param mixed $input
      * @return bool
      */
-    public function run(array $input): bool
+    public function run(mixed $input): bool
     {
         $this->messages = [];
+
+        if ($input instanceof Map) {
+            $input = $input->toArray();
+        }
 
         foreach ($this->items as $key => $validator) {
             if (!array_key_exists($key, $input) && $validator->isSometimes()) {

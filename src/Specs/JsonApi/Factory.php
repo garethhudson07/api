@@ -18,6 +18,7 @@ class Factory
             'sortKey',
             'offsetKey',
             'limitKey',
+            'pageKey',
             'searchKey',
         )
             ->relationsKey('include')
@@ -26,6 +27,7 @@ class Factory
             ->sortKey('sort')
             ->offsetKey('offset')
             ->limitKey('limit')
-            ->searchKey('search');
+            ->searchKey('search')
+            ->pageKey('page');
     }
 }

@@ -2,13 +2,15 @@
 
 namespace Api\Schema\Validation;
 
+use Aggregate\Map;
+
 class Collection extends Nested
 {
     /**
-     * @param $input
+     * @param mixed $input
      * @return bool
      */
-    public function run($input): bool
+    public function run(mixed $input): bool
     {
         $this->clearMessages();
 
@@ -16,6 +18,10 @@ class Collection extends Nested
             $this->messages = $this->baseValidator->getMessages();
 
             return false;
+        }
+
+        if ($input instanceof Map) {
+            $input = $input->toArray();
         }
 
         foreach ($input as $key => $item) {

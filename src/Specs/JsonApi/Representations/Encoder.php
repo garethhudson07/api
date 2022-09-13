@@ -23,12 +23,18 @@ class Encoder implements EncoderContract
     protected $data = null;
 
     /**
+     * @var iterable
+     */
+    protected iterable $meta = [];
+
+    /**
      * @param ServerRequestInterface $request
      * @param mixed $data
      */
-    public function __construct(ServerRequestInterface $request, mixed $data = null)
+    public function __construct(ServerRequestInterface $request, mixed $data = null, iterable $meta = [])
     {
         $this->data = $data;
+        $this->meta = $meta;
 
         $this->baseEncoder = BaseEncoder::instance([
             Record::class => Schema::class
@@ -66,6 +72,10 @@ class Encoder implements EncoderContract
      */
     public function encode(mixed $data = null): string
     {
+        if ($this->meta) {
+            $this->baseEncoder->withMeta($this->meta);
+        }
+
         return $this->baseEncoder->encodeData($data ?? $this->data);
     }
 
@@ -92,6 +102,25 @@ class Encoder implements EncoderContract
     public function setData(mixed $data): static
     {
         $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * @return iterable
+     */
+    public function getMeta(): iterable
+    {
+        return $this->meta;
+    }
+
+    /**
+     * @param iterable $meta
+     * @return static
+     */
+    public function setMeta(iterable $meta): static
+    {
+        $this->meta = $meta;
 
         return $this;
     }

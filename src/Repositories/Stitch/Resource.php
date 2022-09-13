@@ -111,7 +111,7 @@ class Resource implements RepositoryInterface
     {
         return new ResultRecord(
             $this->model->record(
-                $pipe->getResource()->getTransformer()->reverse($request->getParsedBody())
+                $pipe->getResource()->getTransformer()->reverse($request->getParsedBody()->toArray())
             )->save()
         );
     }
@@ -129,7 +129,9 @@ class Resource implements RepositoryInterface
                 $this->model,
                 $pipe
             ))->byKey()->hydrate()->fill(
-                $pipe->getResource()->getTransformer()->reverse($request->getParsedBody())
+                $pipe->getResource()->getTransformer()->reverse(array_merge($request->getParsedBody()->toArray(), [
+                    $this->model->getTable()->getPrimaryKey()->getName() => $pipe->getKey(),
+                ]))
             )->save()
         );
     }

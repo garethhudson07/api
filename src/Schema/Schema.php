@@ -2,6 +2,7 @@
 
 namespace Api\Schema;
 
+use Aggregate\Map;
 use Api\Schema\Validation\Aggregate as ValidatorAggregate;
 use Api\Schema\Validation\ValidationException;
 use Api\Schema\Validation\Factory as ValidatorFactory;
@@ -43,15 +44,14 @@ class Schema
     }
 
     /**
-     * @param array $input
+     * @param mixed $input
      * @return bool
      * @throws ValidationException
      */
-    public function validate(array $input): bool
+    public function validate(mixed $input): bool
     {
         $validator = $this->resolveValidator();
 
-        // TODO move camel casing to representation class
         if (!$validator->run($input)) {
             throw (new ValidationException('The supplied resource is invalid.'))->data([
                 'errorMessages' => $validator->getMessages()
