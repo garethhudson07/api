@@ -270,9 +270,9 @@ class Resource
 
         $this->endpoints->verify('update');
 
-        $this->emitCrudEvent('updating', compact('pipe', 'request', 'resource'));
+        $this->validate($pipe, $request);
 
-        $this->schema->validate($request->getParsedBody());
+        $this->emitCrudEvent('updating', compact('pipe', 'request', 'resource'));
 
         $record = $this->repository->update($pipe, $request);
 
@@ -326,5 +326,22 @@ class Resource
         }
 
         return $encoder->setData($this->createRepresentation($entity));
+    }
+
+    /**
+     * @param Pipe $pipe
+     * @param ServerRequestInterface $request
+     * @return void
+     * @throws ValidationException
+     */
+    public function validate(Pipe $pipe, ServerRequestInterface $request): void
+    {
+        $resource = $this;
+
+        $this->emitCrudEvent('validating', compact('pipe', 'request', 'resource'));
+
+        $this->schema->validate($request->getParsedBody());
+
+        $this->emitCrudEvent('validated', compact('pipe', 'request', 'resource'));
     }
 }
