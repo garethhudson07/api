@@ -152,6 +152,18 @@ class Factory
     }
 
     /**
+     * @return RevokeAuthorisationServer
+     */
+    public function revokeAuthorisationServer()
+    {
+        return new RevokeAuthorisationServer(
+            $this->accessTokenRepository(),
+            $this->refreshTokenRepository(),
+            $this->config->get('publicKeyPath'),
+        );
+    }
+
+    /**
      * @param string $name
      * @return ClientCredentialsGrant|PasswordGrant|RefreshTokenGrant
      * @throws Exception

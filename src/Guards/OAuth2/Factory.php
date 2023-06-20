@@ -62,6 +62,7 @@ class Factory
     {
         return new Authoriser(
             $this->leagueFactory->authorisationServer(),
+            $this->leagueFactory->revokeAuthorisationServer(),
             $this->container->get('request.instance')
         );
     }

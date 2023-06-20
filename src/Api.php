@@ -155,6 +155,34 @@ class Api
     /**
      * @throws Throwable
      */
+    public function revokeAuthorisation()
+    {
+        $this->emitResponse($this->generateRevokeAuthorisationResponse());
+    }
+
+    /**
+     * @return mixed|ResponseInterface
+     * @throws Throwable
+     */
+    public function generateRevokeAuthorisationResponse()
+    {
+        return $this->try(function ()
+        {
+            $authoriser = $this->kernel->resolve('guard.authoriser');
+
+            if ($authoriser) {
+                return $authoriser->revokeAuthorisationAndPrepareResponse(
+                    $this->kernel->resolve('response.factory')->make()
+                );
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * @throws Throwable
+     */
     public function authorisedUser()
     {
         $this->emitResponse($this->generateAuthorisedUserResponse());

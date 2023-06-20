@@ -4,6 +4,7 @@ namespace Api\Guards\OAuth2;
 
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use Api\Guards\OAuth2\League\RevokeAuthorisationServer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -16,7 +17,9 @@ class Authoriser
     /**
      * @var AuthorizationServer
      */
-    protected $server;
+    protected $authServer;
+
+    protected $revokeAuthServer;
 
     /**
      * @var ServerRequestInterface
@@ -28,9 +31,10 @@ class Authoriser
      * @param AuthorizationServer $server
      * @param ServerRequestInterface $request
      */
-    public function __construct(AuthorizationServer $server, ServerRequestInterface $request)
+    public function __construct(AuthorizationServer $authServer, RevokeAuthorisationServer $revokeAuthServer, ServerRequestInterface $request)
     {
-        $this->server = $server;
+        $this->authServer = $authServer;
+        $this->revokeAuthServer = $revokeAuthServer;
         $this->request = $request;
     }
 
@@ -41,6 +45,16 @@ class Authoriser
      */
     public function authoriseAndPrepareResponse(ResponseInterface $response): ResponseInterface
     {
-        return $this->server->respondToAccessTokenRequest($this->request, $response);
+        return $this->authServer->respondToAccessTokenRequest($this->request, $response);
+    }
+
+    /**
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     * @throws OAuthServerException
+     */
+    public function revokeAuthorisationAndPrepareResponse(ResponseInterface $response): ResponseInterface
+    {
+        return $this->revokeAuthServer->respondToRevokeAccessTokenRequest($this->request, $response);
     }
 }
