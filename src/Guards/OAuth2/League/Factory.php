@@ -78,7 +78,7 @@ class Factory
         return new AccessTokenRepository(Stitch::make(function ($table)
         {
             $table->name('oauth_access_tokens');
-            $table->string('id')->primary();
+            $table->string('id')->primary()->writeable();
             $table->string('client_id');
             $table->integer('user_id');
             $table->boolean('revoked');
@@ -94,7 +94,7 @@ class Factory
         return new RefreshTokenRepository(Stitch::make(function ($table)
         {
             $table->name('oauth_refresh_tokens');
-            $table->string('id')->primary();
+            $table->string('id')->primary()->writeable();
             $table->string('oauth_access_token_id');
             $table->boolean('revoked');
             $table->datetime('expires_at');
