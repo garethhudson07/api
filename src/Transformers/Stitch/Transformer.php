@@ -24,7 +24,9 @@ class Transformer implements Contract
         $transformed = [];
 
         foreach ($this->schema->getProperties() as $property) {
-            $transformed[$property->getName()] = $attributes[$property->getColumn()->getName()] ?? null;
+            if ($property->getColumn()->isVisible()) {
+                $transformed[$property->getName()] = $attributes[$property->getColumn()->getName()] ?? null;
+            }
         }
 
         return $transformed;
