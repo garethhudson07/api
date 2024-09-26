@@ -24,7 +24,7 @@ class Transformer implements Contract
         $transformed = [];
 
         foreach ($this->schema->getProperties() as $property) {
-            if ($property->getColumn()->isVisible()) {
+            if ($property->getColumn()->isVisible() || $property->getMeta('virtual')) {
                 $transformed[$property->getName()] = $attributes[$property->getColumn()->getName()] ?? null;
             }
         }
