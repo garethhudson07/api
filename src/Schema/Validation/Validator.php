@@ -31,14 +31,15 @@ class Validator
         'alpha' => 'Alpha',
         'alphaNumeric' => 'Alnum',
         'between' => 'Between',
-        'min' => 'Min',
-        'max' => 'Max',
-        'maxAge' => 'MaxAge',
-        'email' => 'Email',
+        'callback' => 'Callback',
+        'checked' => 'TrueVal',
         'date' => 'Date',
         'decimals' => 'Decimal',
+        'email' => 'Email',
+        'max' => 'Max',
+        'maxAge' => 'MaxAge',
+        'min' => 'Min',
         'uuid' => 'Uuid',
-        'checked' => 'TrueVal',
     ];
 
     /**
@@ -55,21 +56,22 @@ class Validator
      */
     protected const MESSAGE_TEMPLATES = [
         'age' => 'must be a maximum of {{maxAge}} years',
-        'type' => 'must be of type {{type}}',
-        'required' => 'required',
         'alpha' => 'must only contain characters (a-z, A-Z)',
         'alphaNumeric' => 'must only contain characters (a-z, A-Z, 0-9)',
         'between' => 'must be between {{minValue}} and {{maxValue}}',
-        'min' => 'must be a minimum of {{interval}}',
-        'max' => 'must be a maximum of {{interval}}',
-        'minLength' => 'must be a minimum of {{minValue}} characters',
-        'maxLength' => 'must be a maximum of {{maxValue}} characters',
-        'maxAge' => 'must be {{age}} years or less',
-        'email' => 'must be a valid email',
+        'callback' => 'must be valid',
+        'checked' => 'must be checked',
         'date' => 'must be a valid date',
         'decimals' => 'must be {{decimals}} decimal places',
+        'email' => 'must be a valid email',
+        'max' => 'must be a maximum of {{interval}}',
+        'maxAge' => 'must be {{age}} years or less',
+        'maxLength' => 'must be a maximum of {{maxValue}} characters',
+        'min' => 'must be a minimum of {{interval}}',
+        'minLength' => 'must be a minimum of {{minValue}} characters',
+        'required' => 'required',
+        'type' => 'must be of type {{type}}',
         'uuid' => 'must be a valid UUID',
-        'checked' => 'must be checked',
     ];
 
     /**
@@ -221,11 +223,15 @@ class Validator
         $class = 'Respect\\Validation\\Rules\\' . $class;
         $callback = null;
 
-        if ($arguments && $arguments[count($arguments) - 1] instanceof Closure) {
+        if ($arguments && count($arguments) > ($key === 'callback' ? 1 : 0) && $arguments[count($arguments) - 1] instanceof Closure) {
             $callback = array_pop($arguments);
         }
 
-        $instance = (new $class(...$arguments))->setTemplate($this::MESSAGE_TEMPLATES[$key]);
+        $instance = (new $class(...$arguments));
+
+        if ($key !== 'callback') {
+            $instance->setTemplate($this::MESSAGE_TEMPLATES[$key]);
+        }
 
         if ($callback) {
             $callback($instance);
