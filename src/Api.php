@@ -199,7 +199,12 @@ class Api
 
             if ($key) {
                 $key->handle();
-                $user = $key->getUser()->getAttributes();
+                $user = $key->getUser()?->getAttributes();
+
+                if (!$user) {
+                    return false;
+                }
+
                 $representationFactory = $this->kernel->resolve('representationFactory');
 
                 unset($user['password']);
