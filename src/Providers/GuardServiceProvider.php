@@ -9,6 +9,7 @@ use Api\Guards\Contracts\Sentinel as SentinelInterface;
 use Api\Guards\OAuth2\Authoriser as AuthoriserInterface;
 use Api\Guards\Contracts\Key as KeyInterface;
 use Api\Guards\OAuth2\Factory as OAuth2Factory;
+use Closure;
 
 class GuardServiceProvider extends AbstractServiceProvider
 {
@@ -41,6 +42,13 @@ class GuardServiceProvider extends AbstractServiceProvider
      */
     public function register()
     {
+        if ($this->config->useVia() instanceof Closure) {
+            $closure = $this->config->useVia();
+
+            $closure($this->getContainer());
+            return;
+        }
+
         switch ($this->config->using()) {
             case 'OAuth2':
                 $this->bindOAuth2();
