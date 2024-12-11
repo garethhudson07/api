@@ -89,11 +89,33 @@ class Resource
     }
 
     /**
+     * @return Schema
+     */
+    public function schema(Schema $schema): self
+    {
+        $this->schema = $schema;
+
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getRepository()
     {
         return $this->repository;
+    }
+
+
+    /**
+     * @param mixed $repository
+     * @return self
+     */
+    public function repository($repository): self
+    {
+        $this->repository = $repository;
+
+        return $this;
     }
 
     /**
@@ -102,6 +124,17 @@ class Resource
     public function getTransformer(): TransformerInterface
     {
         return $this->transformer;
+    }
+
+    /**
+     * @param TransformerInterface $transformer
+     * @return self
+     */
+    public function transformer(TransformerInterface $transformer): self
+    {
+        $this->transformer = $transformer;
+
+        return $this;
     }
 
     /**
