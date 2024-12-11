@@ -3,6 +3,7 @@
 namespace Api\Config;
 
 use Aggregate\Map;
+use Closure;
 use Exception;
 
 class Manager
@@ -12,6 +13,8 @@ class Manager
     protected $stores;
 
     protected $using;
+
+    protected $useVia;
 
     protected $parent;
 
@@ -65,18 +68,20 @@ class Manager
      * Set the name of the enabled service
      *
      * @param string $name
+     * @param Closure $useVia
      * @return $this
      * @throws Exception
      */
-    public function use(string $name)
+    public function use($name, ?Closure $useVia = null)
     {
         if ($this->has($name) || ($this->parent && $this->parent->has($name))) {
             $this->using = $name;
+            $this->useVia = $useVia;
 
             return $this;
         }
 
-        throw new Exception("Cannot to use Unknown config $name");
+        throw new Exception("Cannot use unknown config $name");
     }
 
     /**
@@ -87,6 +92,16 @@ class Manager
     public function using()
     {
         return $this->using ? $this->using : ($this->parent ? $this->parent->using() : null);
+    }
+
+    /**
+     * Determine the name of the enabled service
+     *
+     * @return mixed
+     */
+    public function useVia()
+    {
+        return $this->useVia ? $this->useVia : ($this->parent ? $this->parent->useVia() : null);
     }
 
     /**
