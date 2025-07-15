@@ -15,6 +15,21 @@ abstract class Nested
         $this->baseValidator = $baseValidator;
     }
 
+    public function isSometimes(): bool
+    {
+        return $this->baseValidator->isSometimes();
+    }
+
+    public function hasRule(string $name): bool
+    {
+        return $this->baseValidator->hasRule($name);
+    }
+
+    public function hasHook(string $name): bool
+    {
+        return $this->baseValidator->hasHook($name);
+    }
+
     /**
      * @param $validator
      * @return $this
