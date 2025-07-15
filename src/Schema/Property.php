@@ -10,8 +10,9 @@ use Closure;
 /**
  * Class Property
  * @package Api\Schema
- * @method Property sometimes()
- * @method Property required()
+ * @method Property sometimes(bool $value = true)
+ * @method Property required(bool $value = true)
+ * @method Property nullable(bool $value = true)
  * @method Property minLength(int $minLength, ?Closure $configureRule = null)
  * @method Property maxLength(int $minLength, ?Closure $configureRule = null)
  * @method Property alpha(?Closure $configureRule = null)
@@ -20,7 +21,6 @@ use Closure;
  * @method Property min($minimum, ?Closure $configureRule = null)
  * @method Property max($maximum, ?Closure $configureRule = null)
  * @method Property email(?Closure $configureRule = null)
- * @method Property nullable(?Closure $configureRule = null)
  * @method Property date(string $format = 'Y-m-d', ?Closure $configureRule = null)
  * @method Property decimals(int $places, ?Closure $configureRule = null)
  * @method Property uuid(?Closure $configureRule = null)
