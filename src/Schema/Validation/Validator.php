@@ -123,9 +123,9 @@ class Validator
     /**
      * @return $this
      */
-    public function required(): self
+    public function required(bool $value = true): self
     {
-        $this->required = true;
+        $this->required = $value;
 
         return $this;
     }
@@ -133,9 +133,9 @@ class Validator
     /**
      * @return $this
      */
-    public function nullable(): self
+    public function nullable(bool $value = true): self
     {
-        $this->nullable = true;
+        $this->nullable = $value;
 
         return $this;
     }
@@ -143,9 +143,9 @@ class Validator
     /**
      * @return $this
      */
-    public function sometimes(): self
+    public function sometimes(bool $value = true): self
     {
-        $this->sometimes = true;
+        $this->sometimes = $value;
 
         return $this;
     }
