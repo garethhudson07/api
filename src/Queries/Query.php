@@ -53,11 +53,7 @@ class Query
      */
     public static function extract(ParserInterface $parser, ServerRequestInterface $request, Manager $config): Query
     {
-        $segments = $request->getAttribute('segments');
-
-        if (empty($segments)) {
-            throw new \InvalidArgumentException('No segments found in the request.');
-        }
+        $segments = $request->getAttribute('segments') ?: [];
 
         // If segments is an even number, we assume the query is scoped to an id and the last segment is the id.
         // If segments is an odd number, we assume the query is for a collection and the last segment is the type.
