@@ -66,20 +66,15 @@ class Factory implements FactoryInterface
     {
         $parser = $this->container->get('request.parser');
         $request = $request->withAttribute('segments', Parser::segments($request->getUri()->getPath()));
-        $request = $request->withAttribute(
-            'parsedQuery',
-            Query::extract(
-                $parser,
-                $request,
-                $this->specConfig
-            )
-        );
 
-        if ($request->getMethod() !== 'GET') {
-            $body = json_decode(
-                file_get_contents("php://input"),
-                true
-            ) ?: [];
+        $query = Query::extract($parser, $request, $this->specConfig);
+
+        $request = $request->withAttribute('parsedQuery', $query)
+            ->withAttribute('parsedId', $query->getId())
+            ->withAttribute('parsedType', $query->getType());
+
+        if (!in_array($request->getMethod(), ['GET', 'HEAD', 'OPTIONS', 'DELETE'])) {
+            $body = json_decode(file_get_contents("php://input"), true) ?: [];
 
             if (($request->getServerParams()['CONTENT_TYPE'] ?? null) === 'application/vnd.api+json') {
                 $request = $request->withAttribute('parsedId', $parser->id($body))

@@ -15,6 +15,8 @@ class Query
 {
     protected string $type = '';
 
+    protected mixed $id = null;
+
     protected Relations $relations;
 
     protected array $fields = [];
@@ -35,9 +37,10 @@ class Query
      * Query constructor.
      * @param string $type
      */
-    public function __construct(string $type)
+    public function __construct(string $type, mixed $id = null)
     {
         $this->type = $type;
+        $this->id = $id;
         $this->relations = new Relations();
         $this->filters = new Expression();
     }
@@ -51,7 +54,17 @@ class Query
     public static function extract(ParserInterface $parser, ServerRequestInterface $request, Manager $config): Query
     {
         $segments = $request->getAttribute('segments');
-        $instance = new static($segments[count($segments) - 1] ?? '');
+
+        if (empty($segments)) {
+            throw new \InvalidArgumentException('No segments found in the request.');
+        }
+
+        // If segments is an even number, we assume the query is scoped to an id and the last segment is the id.
+        // If segments is an odd number, we assume the query is for a collection and the last segment is the type.
+        $type = count($segments) % 2 === 0 ? $segments[count($segments) - 2] : $segments[count($segments) - 1];
+        $id = count($segments) % 2 === 0 ? $segments[count($segments) - 1] : null;
+
+        $instance = new static($type, $id);
 
         $parser->setQuery($instance)->parse($request, $config);
 
@@ -64,6 +77,14 @@ class Query
     public function getType(): string
     {
         return $this->type;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId(): mixed
+    {
+        return $this->id;
     }
 
     /**
