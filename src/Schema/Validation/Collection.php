@@ -24,7 +24,7 @@ class Collection extends Nested
             $input = $input->toArray();
         }
 
-        foreach ($input as $key => $item) {
+        foreach ($input ?? [] as $key => $item) {
             if (!$this->childValidator->run($item)) {
                 if (!array_key_exists('items', $this->messages)) {
                     $this->messages['items'] = [];
